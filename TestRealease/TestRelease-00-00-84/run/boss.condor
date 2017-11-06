@@ -1,0 +1,93 @@
+#!/bin/bash
+
+HelpMsg_BC="\
+Usage:  $0  [-h]  [-g group]  [-n njobs]  joboptions
+
+  (  I), the default group is 'physics'
+
+  ( II), '-n njobs' to submit a bunch of jobs
+        In this case:
+        1. suppose there are 100 files named as joboptionsN.txt
+        2. N must be an integer from 0 to 99
+        3. submit these jobs with a single command
+            $ boss.condor -n 100 joboptions%{ProcId}.txt
+        4. the substring '%{ProcId}' is fixed, but can appear at
+        any position of the file name
+        5. the substring '%{ProcId}' acts as wildcard of job ID
+
+  (III), '-h' to print this message
+"
+
+JobXCount=0
+JobXGroup="physics"
+HepSubCmd="/afs/ihep.ac.cn/soft/common/sysgroup/hep_job/bin5/hep_sub"
+//BossShell="/afs/ihep.ac.cn/soft/common/sysgroup/hep_job/bin5/xboss"
+BossShell="/afs/ihep.ac.cn/users/x/xiaosy/bes/chic2invi/v0.1/TestRealease/TestRelease-00-00-84/run/xboss"
+BossJobOpt=""
+
+while true; do
+    if [ $# -lt 1 ]; then
+        break
+    fi
+    case "$1" in
+        -h )
+            echo "$HelpMsg_BC"
+            exit 0
+            ;;
+        -g )
+            JobXGroup=$2
+            shift 2
+            ;;
+        -n )
+            JobXCount=$2
+            shift 2
+            ;;
+        * )
+            BossJobOpt=$1
+            shift
+            ;;
+    esac
+done
+
+if [ "x$BossJobOpt" == "x" ]; then
+    echo "$HelpMsg_BC"
+    exit 1
+fi
+
+expr $JobXCount + 1 &>/dev/null
+if [ $? -ne 0 ]; then
+    echo "Error: boss.condor > integer expression expected after '-n'"
+    exit 1
+fi
+
+HepSubGo="${HepSubCmd} -quiet -o /dev/null -e /dev/null -g ${JobXGroup}"
+RunBossGo="${BossShell} -argu ${BossJobOpt}"
+
+OptFileVerify ()
+{
+    if [ ! -f $1 ]; then
+        echo "Error: Invalid joboptions file $1, check it!"
+        exit 1
+    fi
+}
+
+if [ $JobXCount -eq 0 ]; then
+    OptFileVerify ${BossJobOpt}
+    ${HepSubGo} ${RunBossGo}
+elif [ $JobXCount -gt 1 ]; then
+    if [ ${BossJobOpt/\%\{ProcId\}/} == ${BossJobOpt} ]; then
+        echo "Error: Please use '%{ProcId}' as wildcard of job ID in your joboptions name"
+        exit 1
+    fi
+    for iJob in `seq 0 $((JobXCount-1))`; do
+        if [ $((iJob%100)) -eq 0 ]; then
+            echo -n '.'
+        fi
+        OptFileVerify ${BossJobOpt/\%\{ProcId\}/$iJob}
+    done
+    echo ">> Submitting ${JobXCount} Jobs"
+    ${HepSubGo} -n ${JobXCount} ${RunBossGo}
+else
+    echo "Error: at least 2 jobs should be set in a Cluster"
+    exit 1
+fi
