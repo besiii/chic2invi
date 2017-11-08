@@ -28,7 +28,7 @@ RealizationSvc.RunIdList = {-8093};
 
 
 #include "$ROOTIOROOT/share/jobOptions_Digi2Root.txt"
-RootCnvSvc.digiRootOutputFile = "/besfs/groups/nphy/users/xiaosy/bes/chic2invi/v0.1/TestRelease/TestRelease-00-00-84/run/gamma.rtraw";
+RootCnvSvc.digiRootOutputFile = "./gamma.rtraw";
 
 
 // OUTPUT PRINTOUT LEVEL
@@ -36,5 +36,5 @@ RootCnvSvc.digiRootOutputFile = "/besfs/groups/nphy/users/xiaosy/bes/chic2invi/v
 MessageSvc.OutputLevel  = 5;
 
 // Number of events to be processed (default is 10)
-ApplicationMgr.EvtMax = 5000;
+ApplicationMgr.EvtMax = 50;
 

@@ -22,7 +22,7 @@ JobXCount=0
 JobXGroup="physics"
 HepSubCmd="/afs/ihep.ac.cn/soft/common/sysgroup/hep_job/bin5/hep_sub"
 //BossShell="/afs/ihep.ac.cn/soft/common/sysgroup/hep_job/bin5/xboss"
-BossShell="/afs/ihep.ac.cn/users/x/xiaosy/bes/chic2invi/v0.1/TestRealease/TestRelease-00-00-84/run/xboss"
+BossShell="/afs/ihep.ac.cn/users/x/xiaosy/bes/chic2invi/v0.1/TestRealease/TestRelease-00-00-84/run_invi/xboss"
 BossJobOpt=""
 
 while true; do
