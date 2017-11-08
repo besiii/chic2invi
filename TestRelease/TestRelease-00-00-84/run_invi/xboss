@@ -1,0 +1,10 @@
+#!/bin/tcsh -f
+set CondorJobGID=`grep -e '^GlobalJobId = ' $_CONDOR_JOB_AD | cut -d'"' -f 2`
+set CondorJobID=`echo ${CondorJobGID} | cut -d'#' -f 2`
+set CondorJobTime=`echo ${CondorJobGID} | cut -d'#' -f 3`
+set CondorJobTime=`date -d @${CondorJobTime} +"%Y-%m-%d %T"`
+set CondorJobHost="`grep -e '^RemoteHost = ' $_CONDOR_JOB_AD`"
+echo "Job ${CondorJobID} submitted at ${CondorJobTime}" > /besfs/groups/nphy/users/xiaosy/bes/chic2invi/v0.1/TestRelease/TestRelease-00-00-84/run/gamma0.rtraw.bosslog
+echo "Sent to ${CondorJobHost}" >> /besfs/groups/nphy/users/xiaosy/bes/chic2invi/v0.1/TestRelease/TestRelease-00-00-84/run/gamma0.rtraw.bosslog
+((time boss.exe ${1}) >> /besfs/groups/nphy/users/xiaosy/bes/chic2invi/v0.1/TestRelease/TestRelease-00-00-84/run/gamma0.rtraw.bosslog) >& /besfs/groups/nphy/users/xiaosy/bes/chic2invi/v0.1/TestRelease/TestRelease-00-00-84/run/gamma0.rtraw.bosserr
+sleep 2

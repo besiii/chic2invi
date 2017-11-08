@@ -1,0 +1,14 @@
+
+Decay psi(2S)
+1.0 gamma chi_c0 P2GC0;
+Enddecay
+
+Decay chi_c0
+1.0 dummy00_1 dummy00_1 PHSP;
+Enddecay
+
+
+End
+
+
+
