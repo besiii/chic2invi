@@ -1,5 +1,4 @@
-// -*- C++ -*-
-//
+// -*- C++ -*- //
 //
 // Description: chic -> Invisible 
 //
@@ -24,7 +23,7 @@
 #include "EventModel/EventHeader.h"
 #include "EvtRecEvent/EvtRecEvent.h"
 #include "EvtRecEvent/EvtRecTrack.h"
-
+#include "EventModel/EventHeader.h"
 #include "CLHEP/Vector/ThreeVector.h"
 
 #include "VertexFit/IVertexDbSvc.h"
@@ -91,6 +90,20 @@ private:
   int m_run;
   int m_event;
 
+  //MC truth info
+  int m_evttag;
+ // int m_idxmc;
+  int m_indexmc;
+  int m_motheridx[100];
+  int m_pdgid[100];
+
+  double m_mc_mom_gam1;
+  double m_mc_mom_gam2;
+  double m_mc_pt_gam1;
+  double m_mc_pt_gam2;
+  double m_mc_costhe_gam1;
+  double m_mc_costhe_gam2;
+
   // neutral tracks
   int m_nshow;
   int m_ngam;
@@ -118,6 +131,7 @@ private:
   void book_tree(); 
   void clearVariables();
   bool buildChicToInvisible();
+  void saveGenInfo();
   void saveTrkInfo(EvtRecTrackIterator,
 		   EvtRecTrackIterator);
   void savePionInfo(RecMdcKalTrack *,
@@ -158,6 +172,17 @@ DECLARE_FACTORY_ENTRIES( Chic2invi ) {
 }
 
 LOAD_FACTORY_ENTRIES( Chic2invi )
+
+
+//
+//constants
+//
+//
+
+const int PSI2S_PDG_ID = 100443;
+const int CHIC0_PDG_ID = 174;
+const int GAMMA_PDG_ID = 22;
+
 
 //
 // member functions
@@ -204,10 +229,11 @@ Chic2invi::Chic2invi(const std::string& name, ISvcLocator* pSvcLocator) :
 }
 
 
-StatusCode Chic2invi::initialize(){
-  MsgStream log(msgSvc(), name());
+StatusCode Chic2invi::initialize(){ MsgStream log(msgSvc(), name());
   log << MSG::INFO << ">>>>>>> in initialize()" << endmsg;
 
+  StatusCode status;
+  
   m_fout = new TFile(m_output_filename.c_str(), "RECREATE");
   m_fout->cd(); 
 
@@ -232,7 +258,39 @@ StatusCode Chic2invi::execute() {
 
   m_run = eventHeader->runNumber();
   m_event = eventHeader->eventNumber();
+  m_evttag = eventHeader->eventTag();
+/*
+  if (m_event>10000 && m_event%10000 ==0) cout<<"event =="<<eventHeader->eventNumber()<<endl;
+  if (eventHeader->runNumber()<0)
+  {
+  	//MC information
+	SmartDataPtr<Event::McParticleCol> mcParticleCol(eventSvc(),"/Event/MC/McParticleCol");
+	int m_numParticle = 0;
+	if (!mcParticleCol){
+		std::cout << "Could not retrieve McParticleCole" << std::endl;
+		return StatusCode::FAILURE;
+	}
+	bool chicDecay = false;
+	int rootIndex = -1;
+	bool strange = false;
+	Event::McParticleCol::iterator iter_mc = mcParticleCol->begin();
+	int ngam_mc_eta =0, ngam_mc_pi0 = 0;
+    
+	for (; iter_mc != mcParticleCol->end(); iter_mc++){
+		if (!chicDecay) continue;
+		int mcidx = ((*iter_mc)->mother()).trackIndex() - rootIndex;
+		int pdgid = (*iter_mc)->particleProperty();
+		if(strange && ((*iter_mc)->mother()).particleProperty()!=100443) mcidx--;
+		m_pdgid[m_numParticle] = pdgid;
+		m_motheridx[m_numParticle] = mcidx;
+		m_numParticle +=1;
+		HepLorentzVector mctrue_track = (*iter_mc)->initialFourMomentum();
+
+	}
+	m_idxmc = m_numParticle;
   
+  }
+*/
   if (buildChicToInvisible()) {
     m_tree->Fill(); // only fill tree for the selected events 
   }
@@ -301,7 +359,16 @@ void Chic2invi::book_tree() {
   m_tree->Branch("raw_secmom", &m_raw_secmom);
   m_tree->Branch("raw_time", &m_raw_time);
 
-  
+  if (!m_isMonteCarlo) return;
+  m_tree->Branch("indexmc",&m_indexmc, "m_indexmc/I"); 
+  m_tree->Branch("pdgid", m_pdgid, "m_pdgid[100]/I");
+  m_tree->Branch("motheridx", m_motheridx, "m_motheridx[100]/I");
+  m_tree->Branch("mc_mom_gam1", &m_mc_mom_gam1, "mc_mom_gam1/D");
+  m_tree->Branch("mc_mom_gam2", &m_mc_mom_gam2, "mc_mom_gam2/D");
+  m_tree->Branch("mc_pt_gam1", &m_mc_pt_gam1, "mc_pt_gam1/D");
+  m_tree->Branch("mc_pt_gam2", &m_mc_pt_gam2, "mc_pt_gam2/D");
+  m_tree->Branch("mc_costhe_gam1", &m_mc_costhe_gam1, "mc_costhe_gam1/D");
+  m_tree->Branch("mc_costhe_gam2", &m_mc_costhe_gam2, "mc_costhe_gam2/D");
 }
 
 void Chic2invi::clearVariables() {
@@ -321,11 +388,19 @@ void Chic2invi::clearVariables() {
   m_raw_secmom->clear();
   m_raw_time->clear();
 
+  //MC Topology
+  m_indexmc = 0;
+  for(int i=0; i<100; i++){
+	  m_pdgid[i] = 0;
+	  m_motheridx[i] = 0;
+  }
   m_run = 0;
   m_event = 0;
 }
 
 bool Chic2invi::buildChicToInvisible() {
+
+  if (m_isMonteCarlo) saveGenInfo();
 
   SmartDataPtr<EvtRecEvent>evtRecEvent(eventSvc(),"/Event/EvtRec/EvtRecEvent");
   if(!evtRecEvent) return false;
@@ -340,10 +415,73 @@ bool Chic2invi::buildChicToInvisible() {
   h_evtflw->Fill(1); // N_{Good} = 0
 
   selectNeutralTracks(evtRecEvent, evtRecTrkCol);
-  if (m_ngam >= 2) return false;
-  h_evtflw->Fill(8); // N_{#gamma} < 2 
+  if (m_ngam >= 10) return false;
+  h_evtflw->Fill(8); // N_{#gamma} < 10 
 
   return true; 
+}
+
+void Chic2invi::saveGenInfo(){
+
+	SmartDataPtr<Event::McParticleCol> mcParticleCol(eventSvc(), "/Event/MC/McParticleCol");
+	HepLorentzVector mc_psip, mc_gam1, mc_gam2;
+
+	//MC Topology
+	{
+		int m_numParticle = 0;
+		bool Decay = false;
+		int rootIndex = -1;
+		Event::McParticleCol::iterator iter_mc_topo = mcParticleCol->begin();
+		for (; iter_mc_topo != mcParticleCol->end(); iter_mc_topo++){
+	/*		if((*iter_mc_topo)->primaryParticle() && Decay){
+				rootIndex++; continue;
+			}
+	*/		if ((*iter_mc_topo)->primaryParticle()) continue;
+			if (!(*iter_mc_topo)->decayFromGenerator()) continue;
+			if ((*iter_mc_topo)->particleProperty() == PSI2S_PDG_ID){
+				Decay = true;
+				rootIndex = (*iter_mc_topo)->trackIndex();
+			}
+			if (!Decay) continue;
+            int mcidx = ((*iter_mc_topo)->mother()).trackIndex() - rootIndex;
+			int pdgid = (*iter_mc_topo)->particleProperty();
+			m_pdgid[m_numParticle] = pdgid;
+			m_motheridx[m_numParticle] = mcidx;
+			m_numParticle++;
+		}
+		m_indexmc = m_numParticle;
+
+	/*	int m_numParticle = 0;
+		if (!mcParticleCol){
+			std::cout << "Could not retrieve McParticleCol" << std::endl;
+			return StatusCode::FAILURE;
+		}
+		bool Decay = false;
+	*/	
+
+	}
+	Event::McParticleCol::iterator iter_mc = mcParticleCol->begin();
+	for (; iter_mc != mcParticleCol->end(); iter_mc++){
+		if ((*iter_mc)->primaryParticle()) continue;
+		if (!(*iter_mc)->decayFromGenerator()) continue;
+
+		if ((*iter_mc)->mother().particleProperty() == PSI2S_PDG_ID){
+			if ((*iter_mc)->particleProperty() == GAMMA_PDG_ID)
+				mc_gam1 = (*iter_mc)->initialFourMomentum();
+		}
+		if ((*iter_mc)->mother().particleProperty() == CHIC0_PDG_ID){
+			if ((*iter_mc)->particleProperty() == GAMMA_PDG_ID)
+				mc_gam2 = (*iter_mc)->initialFourMomentum();
+		}
+	}
+	m_mc_mom_gam1 = mc_gam1.vect().mag();
+	m_mc_mom_gam2 = mc_gam2.vect().mag();
+
+	m_mc_pt_gam1 = mc_gam1.vect().perp();
+	m_mc_pt_gam2 = mc_gam2.vect().perp();
+
+	m_mc_costhe_gam1 = mc_gam1.vect().cosTheta();
+	m_mc_costhe_gam2 = mc_gam2.vect().cosTheta();
 }
 
 

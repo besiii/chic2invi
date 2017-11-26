@@ -7,6 +7,6 @@ fi
 
 tempfile=`${CMTROOT}/mgr/cmt -quiet build temporary_name`
 if test ! $? = 0 ; then tempfile=/tmp/cmt.$$; fi
-${CMTROOT}/mgr/cmt setup -sh -pack=Chic2invi -version=Chic2invi-00-00-01 -path=/besfs/groups/nphy/users/xiaosy/bes/chic2invi/v0.1/analysis/physics/psip  -no_cleanup $* >${tempfile}; . ${tempfile}
+${CMTROOT}/mgr/cmt setup -sh -pack=Chic2invi -version=Chic2invi-00-00-01 -path=/afs/ihep.ac.cn/users/x/xiaosy/bes/chic2invi/v0.1/Analysis/Physics/Chic2invi/Chic2invi/Chic2invi-00-00-01/cmt  -no_cleanup $* >${tempfile}; . ${tempfile}
 /bin/rm -f ${tempfile}
 
