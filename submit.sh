@@ -136,7 +136,7 @@ case $option in
 	   root analysis.cxx
 	   ;; 
 
-	0.2.5) echo  "Merge root file on con3650 data..."
+	0.2.) echo  "Merge root file on con3650 data..."
 	   ./python/mrg_rootfiles.py run/events/con3650 run/hist/con3650 
 	   ;;
 

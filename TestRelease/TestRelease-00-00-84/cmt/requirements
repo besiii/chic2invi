@@ -14,10 +14,10 @@ use ExHelloWorld        *                       BesExamples
 #use KlamsTestAlg          KlamsTestAlg-00-*             Analysis/Physics
 #use RhopiAlg              RhopiAlg-00-*                 Analysis/Physics
 #use PipiJpsiAlg           PipiJpsiAlg-*              Analysis/Physics/PsiPrime
-use Jpsi2invi             Jpsi2invi-*                Analysis/Physics/PsiPrime
-use Jpsi2incl             Jpsi2incl-*                Analysis/Physics/PsiPrime
-use Mumu                    Mumu-*                   Analysis/Physics/PsiPrime
-use AbsCor                AbsCor-*                   Analysis/PhotonCor
+#use Jpsi2invi             Jpsi2invi-*                Analysis/Physics/PsiPrime
+#use Jpsi2incl             Jpsi2incl-*                Analysis/Physics/PsiPrime
+#use Mumu                    Mumu-*                   Analysis/Physics/PsiPrime
+#use AbsCor                AbsCor-*                   Analysis/PhotonCor
 #use Telesis               Telesis-00-*                  Analysis
 #use VertexFit             VertexFit-*                   Analysis
 
@@ -48,7 +48,7 @@ use BeamParamsAlg BeamParamsAlg-*   Reconstruction
 use DTagSkim      DTagSkim-*        Reconstruction 
 use LumTauAlg     LumTauAlg-*       
 use T0Dummy       T0Dummy-*         Reconstruction
-use TagWriterAlg  TagWriterAlg-*    Reconstruction
+#use TagWriterAlg  TagWriterAlg-*    Reconstruction
 
 #=========  for DQA   ========================
 use DiGamAlg       DiGamAlg-*       DQA
@@ -79,8 +79,8 @@ use RootIO         RootIO-*          Event
 #========   for  RawData           ============
 use RawDataCnv     RawDataCnv-*      Event 
 use RawDataProviderSvc RawDataProviderSvc-* Event
-use RawEventReader RawEventReader-*  Event
-use RootRawEvtReader RootRawEvtReader-* Event
+#use RawEventReader RawEventReader-*  Event
+#use RootRawEvtReader RootRawEvtReader-* Event
 
 #========   for  MagneticField     ============
 use MagneticField MagneticField-*
@@ -133,5 +133,5 @@ use Pi0EtaToGGRecAlg Pi0EtaToGGRecAlg-* Reconstruction
 use DTagAlg DTagAlg-* Reconstruction
 
 #========   for  Root version upgrade  ==============
-use DummyLoadOldROOT    DummyLoadOldROOT-*   Utilities
+#use DummyLoadOldROOT    DummyLoadOldROOT-*   Utilities
 
