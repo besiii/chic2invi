@@ -91,6 +91,7 @@ private:
   int m_event;
 
   //MC truth info
+  int m_testMC;
   int m_evttag;
  // int m_idxmc;
   int m_indexmc;
@@ -229,6 +230,7 @@ Chic2invi::Chic2invi(const std::string& name, ISvcLocator* pSvcLocator) :
 }
 
 
+
 StatusCode Chic2invi::initialize(){ MsgStream log(msgSvc(), name());
   log << MSG::INFO << ">>>>>>> in initialize()" << endmsg;
 
@@ -291,9 +293,9 @@ StatusCode Chic2invi::execute() {
   
   }
 */
-  if (buildChicToInvisible()) {
-    m_tree->Fill(); // only fill tree for the selected events 
-  }
+	if (buildChicToInvisible()) {
+    	m_tree->Fill(); // only fill tree for the selected events 
+  	}
 
   return StatusCode::SUCCESS; 
 }
@@ -400,8 +402,6 @@ void Chic2invi::clearVariables() {
 
 bool Chic2invi::buildChicToInvisible() {
 
-  if (m_isMonteCarlo) saveGenInfo();
-
   SmartDataPtr<EvtRecEvent>evtRecEvent(eventSvc(),"/Event/EvtRec/EvtRecEvent");
   if(!evtRecEvent) return false;
 
@@ -418,6 +418,8 @@ bool Chic2invi::buildChicToInvisible() {
   if (m_ngam >= 10) return false;
   h_evtflw->Fill(8); // N_{#gamma} < 10 
 
+  if (m_isMonteCarlo) saveGenInfo();
+
   return true; 
 }
 
@@ -431,12 +433,11 @@ void Chic2invi::saveGenInfo(){
 		int m_numParticle = 0;
 		bool Decay = false;
 		int rootIndex = -1;
+		bool strange = false;
 		Event::McParticleCol::iterator iter_mc_topo = mcParticleCol->begin();
 		for (; iter_mc_topo != mcParticleCol->end(); iter_mc_topo++){
-	/*		if((*iter_mc_topo)->primaryParticle() && Decay){
-				rootIndex++; continue;
-			}
-	*/		if ((*iter_mc_topo)->primaryParticle()) continue;
+			if ((*iter_mc_topo)->primaryParticle()&&(*iter_mc_topo)->particleProperty()==11&&((*iter_mc_topo)->mother()).particleProperty()==11) {strange=true;}
+			if ((*iter_mc_topo)->primaryParticle()) continue;
 			if (!(*iter_mc_topo)->decayFromGenerator()) continue;
 			if ((*iter_mc_topo)->particleProperty() == PSI2S_PDG_ID){
 				Decay = true;
@@ -445,21 +446,14 @@ void Chic2invi::saveGenInfo(){
 			if (!Decay) continue;
             int mcidx = ((*iter_mc_topo)->mother()).trackIndex() - rootIndex;
 			int pdgid = (*iter_mc_topo)->particleProperty();
+			if(strange&&((*iter_mc_topo)->mother()).particleProperty()!=PSI2S_PDG_ID) mcidx--;
 			m_pdgid[m_numParticle] = pdgid;
 			m_motheridx[m_numParticle] = mcidx;
 			m_numParticle++;
-		}
+			}
 		m_indexmc = m_numParticle;
-
-	/*	int m_numParticle = 0;
-		if (!mcParticleCol){
-			std::cout << "Could not retrieve McParticleCol" << std::endl;
-			return StatusCode::FAILURE;
-		}
-		bool Decay = false;
-	*/	
-
 	}
+
 	Event::McParticleCol::iterator iter_mc = mcParticleCol->begin();
 	for (; iter_mc != mcParticleCol->end(); iter_mc++){
 		if ((*iter_mc)->primaryParticle()) continue;
