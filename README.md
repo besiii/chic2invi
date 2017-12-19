@@ -2,11 +2,11 @@
 
 ## Install v0.1 
 
-> mkdir -p $HOME/bes/jpsi2invi
+> mkdir -p $HOME/bes/chic2invi
 
-> cd $HOME/bes/jpsi2invi 
+> cd $HOME/bes/chic2invi 
 
-> git clone https://github.com/besiii/jpsi2invi.git v0.1 
+> git clone https://github.com/besiii/chic2invi.git v0.1 
 
 ## Initialize BOSS
 
