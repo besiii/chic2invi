@@ -1,4 +1,4 @@
-# J/psi to invisible decay
+# Chic to invisible decay
 
 ## Install v0.1 
 
@@ -32,7 +32,7 @@ This only need to be done for the first time after clone the code:
 
 - Fork the code with your personal github ID. See [details](https://help.github.com/articles/fork-a-repo/)
 
-> git clone git@github.com:yourid/jpsi2invi.git .
+> git clone git@github.com:yourid/chic2invi.git .
 
 - Make your change, commit and push 
 
