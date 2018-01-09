@@ -45,7 +45,7 @@ case $option in
 	 ;;
 
     0.1.1) echo "Split MC sample with each group 20G ..."
-	   ./python/get_samples.py  /bes3fs/offline/data/664p03/psip/12mc/dst run/samples/mc_664p03_psip_12mc.txt 20G
+	   ./python/get_samples.py  /bes3fs/offline/data/664p03/psip/12mc/dst run/samples/inclusiveMC/mc_664p03_psip_12mc.txt 20G
 	   # made 394 groups 
 	   ;;
 
