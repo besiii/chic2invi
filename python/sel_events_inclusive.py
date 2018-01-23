@@ -21,8 +21,8 @@ from array import array
 TEST=False
 
 # Global constants 
-mPsip = 3.686;
-ecms = 3.686;
+M_PSIP = 3.686;
+ECMS = 3.686;
 
 # Global histograms
 
@@ -179,7 +179,7 @@ def fill_histograms(t):
 
         gam1_p4_raw = ROOT.TLorentzVector(t.raw_gpx.at(gam1_index), t.raw_gpy.at(gam1_index), t.raw_gpz.at(gam1_index), t.raw_ge.at(gam1_index))    
         gam2_p4_raw = ROOT.TLorentzVector(t.raw_gpx.at(gam2_index), t.raw_gpy.at(gam2_index), t.raw_gpz.at(gam2_index), t.raw_ge.at(gam2_index))    
-        cms_p4 = ROOT.TLorentzVector(0.011*ecms, 0, 0, ecms)
+        cms_p4 = ROOT.TLorentzVector(0.011*ECMS, 0, 0, ECMS)
         gamgam_p4_raw = gam1_p4_raw + gam2_p4_raw
         rec_gam1_p4_raw = cms_p4 - gam1_p4_raw
         rec_gamgam_p4_raw = cms_p4 - gamgam_p4_raw
@@ -235,4 +235,4 @@ def select_chic0_to_inclusive(t):
     
     
 if __name__ == '__main__':
-    main()
+  
