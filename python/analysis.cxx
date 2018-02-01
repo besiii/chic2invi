@@ -1,4 +1,8 @@
-#include "/afs/ihep.ac.cn/users/x/xiaosy/bes/chic2invi/v0.1/run/analysis/.rootInclude.h"
+#include <TFile.h>
+#include <TH1.h>
+#include <TTree.h>
+#include <TChain.h>
+#include <TLorentzVector.h>
 
 void analysis()
 {
@@ -10,6 +14,7 @@ void analysis()
 	TFile* newfile = new TFile("Analysis_inclusiveMC.root", "recreate");
 	TTree* newtree = new TTree("all", "step2");
 	TChain chain("tree");
+
 //	string filelist="/afs/ihep.ac.cn/users/x/xiaosy/bes/chic2invi/v0.1/run/chic2invi/rootfile_inclusiveMC/";
 //	string filename;
 //	ifstream is(filelist.c_str());
@@ -17,9 +22,9 @@ void analysis()
 //		chain.Add(filename.c_str());
 //		cout<<"filename"<<filename<<endl;
 //	} 
-	
-	chain.Add("/afs/ihep.ac.cn/users/x/xiaosy/bes/chic2invi/v0.1/run/chic2invi/hist_inclusiveMC/chic2invi_psip_mc_merged_2.root");
-	chain.Add("/afs/ihep.ac.cn/users/x/xiaosy/bes/chic2invi/v0.1/run/chic2invi/hist_inclusiveMC/chic2invi_psip_mc_merged_3.root");
+
+	chain.Add("/afs/ihep.ac.cn/users/x/xiaosy/bes/chic2invi/v0.1/run/chic2incl/hist_inclusiveMC/chic2invi_psip_mc_merged_2.root");
+	chain.Add("/afs/ihep.ac.cn/users/x/xiaosy/bes/chic2invi/v0.1/run/chic2incl/hist_inclusiveMC/chic2invi_psip_mc_merged_3.root");
 
 	//data3650
 /*	TFile* newfile = new TFile("Analysis_data3650.root", "recreate");
@@ -29,13 +34,15 @@ void analysis()
 //	chain.Add("/afs/ihep.ac.cn/users/x/xiaosy/bes/chic2invi/v0.1/run/chic2invi/hist_data3650/chic2invi_data3650_merged_4.root");
 	chain.Add("/afs/ihep.ac.cn/users/x/xiaosy/bes/chic2invi/v0.1/run/chic2invi/hist_data3650/chic2invi_data3650_merged_16.root");
 */	
-	//signal mc
-	/*	TFile* newfile = new TFile("Analysis_signalmc.root", "recreate");
-		TTree* newtree = new TTree("all", "step2");
-		TChain chain("tree");
-		chain.Add("/besfs/groups/nphy/users/xiaosy/bes/chic2invi/v0.1/TestRelease/TestRelease-00-00-84/rootfile/run_invi/chic2invi_signal_psip_mc.root");
-
-*/	Int_t m_run, m_event, m_indexmc, m_pdgid[100], m_motheridx[100];
+/*	//signal mc
+	TFile* newfile = new TFile("Analysis_signalmc.root", "recreate");
+	TTree* newtree = new TTree("all", "step2");
+	TChain chain("tree");
+	chain.Add("/besfs/groups/nphy/users/xiaosy/bes/chic2invi/v0.1/run/gen_mc/chic0_invi/rootfile_chic0/chic0_gam2invi_gen_mc.root");
+//	chain.Add("/besfs/groups/nphy/users/xiaosy/bes/chic2invi/v0.1/run/gen_mc/chic1_invi/rootfile_chic1/chic1_gam2invi_gen_mc.root");
+//	chain.Add("/besfs/groups/nphy/users/xiaosy/bes/chic2invi/v0.1/run/gen_mc/chic2_invi/rootfile_chic2/chic2_gam2invi_gen_mc.root");
+*/
+	Int_t m_run, m_event, m_indexmc, m_pdgid[100], m_motheridx[100];
 	std::vector<double> *  m_raw_ge = 0;
 	std::vector<double> * m_raw_gpx = 0;
 	std::vector<double> * m_raw_gpy = 0;
@@ -106,7 +113,7 @@ void analysis()
 	TLorentzVector cms_p4(0.011*ecms, 0, 0, ecms) ;
 	TLorentzVector gam_p4_raw;
 	TLorentzVector gams_p4_raw;
-	cout << "N " << chain.GetEntries() << endl;
+//	cout << "N " << chain.GetEntries() << endl;
 	for (Int_t ii=0; ii<chain.GetEntries(); ii++){
 		
 	//	if (ii>5000) break;
@@ -122,14 +129,14 @@ void analysis()
 		int Ncount  = 0;
 
 		if (m_raw_costheta->size() != 2 ) continue;
-		for(int l=0; l < m_raw_ge->size(); l++)
+/*		for(int l=0; l < m_raw_ge->size(); l++)
 		{
 			//cuts on photon candidates
 			if (! ( m_raw_costheta->at(l) < 0.75 &&  m_raw_costheta->at(l) >-0.75 ) ) continue;
 			Ncount ++;
 		}
 		if (Ncount != 2 ) continue;
-
+*/
 		//find index of gam1, gam2
 		if (m_raw_ge->at(0) < m_raw_ge->at(1)){
 			gam1_index = 0;
@@ -157,10 +164,11 @@ void analysis()
 	//	if (! (m_raw_ge->at(gam1_index) > 0.22 && m_raw_ge->at(gam1_index) < 0.28) ) continue;
 		//RecM gam1
 	//	if(! (rec_gam1_p4_raw.M() > 3.4 && rec_gam1_p4_raw.M() < 3.45) ) continue;
-	
-		if( (gams_p4_raw.M() > 0.12 && gams_p4_raw.M() < 0.14) ) continue;	
-		if( (gams_p4_raw.M() > 0.45 && gams_p4_raw.M() < 0.6) ) continue;	
-		if( (rec_gams_p4_raw.M() > 3.09 && rec_gams_p4_raw.M() < 3.13) ) continue;	
+
+		//veto Mgamgam	
+		if( (gams_p4_raw.M() > 0.10 && gams_p4_raw.M() < 0.16) ) continue;	
+		if( (gams_p4_raw.M() > 0.50 && gams_p4_raw.M() < 0.57) ) continue;	
+		if( (gams_p4_raw.M() > 3.75 && gams_p4_raw.M() < 3.75) ) continue;	
 		//----------------------------
 		//   save into new tree
 		//----------------------------
@@ -191,5 +199,5 @@ void analysis()
 	}
 	newfile->cd();
 	newtree->Write();
-	cout<<"end"<<endl;
+//	cout<<"end"<<endl;
 }
