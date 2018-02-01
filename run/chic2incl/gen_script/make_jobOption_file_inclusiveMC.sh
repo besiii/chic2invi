@@ -5,8 +5,8 @@ JobText_SaveDir=../job_text/inclusiveMC
 for num in {1..394}
 do
     file_list=mc_664p03_psip_12mc_20G-${num}.txt
-    rootfile=chic2invi_psip_mc-${num}.root
-    jobOptions=jobOptions_chic2invi_inclusive_psip_mc-${num}.txt
+    rootfile=chic2incl_psip_mc-${num}.root
+    jobOptions=jobOptions_inclusive_psip_mc-${num}.txt
     echo   "#include \"\$ROOTIOROOT/share/jobOptions_ReadRec.txt\"        "  > ${JobText_SaveDir}/${jobOptions}
     echo   "#include \"\$VERTEXFITROOT/share/jobOptions_VertexDbSvc.txt\" " >> ${JobText_SaveDir}/${jobOptions}
     echo   "#include \"\$MAGNETICFIELDROOT/share/MagneticField.txt\"      " >> ${JobText_SaveDir}/${jobOptions}
@@ -25,7 +25,7 @@ do
     echo   "ApplicationMgr.EvtMax = -1;                                   " >> ${JobText_SaveDir}/${jobOptions}
     echo   "                                                              " >> ${JobText_SaveDir}/${jobOptions}
     echo   "Chic2invi.IsMonteCarlo=\"true\";                             " >> ${JobText_SaveDir}/${jobOptions}
-    echo   "Chic2invi.OutputFileName=\"/besfs/groups/nphy/users/xiaosy/bes/chic2invi/v0.1/run/chic2invi/rootfile_inclusiveMC/$rootfile\"; " >> ${JobText_SaveDir}/${jobOptions}
+    echo   "Chic2invi.OutputFileName=\"/besfs/groups/nphy/users/xiaosy/bes/chic2invi/v0.1/run/chic2incl/rootfile_inclusiveMC/$rootfile\"; " >> ${JobText_SaveDir}/${jobOptions}
     echo   "                                                              " >> ${JobText_SaveDir}/${jobOptions}
     echo   "                                                              " >> ${JobText_SaveDir}/${jobOptions}
 done

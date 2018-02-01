@@ -32,14 +32,15 @@ h_evtflw.GetXaxis().SetBinLabel(2, 'N_{#gamma}=2')
 h_evtflw.GetXaxis().SetBinLabel(3, '|cos#theta|<0.75')
 h_evtflw.GetXaxis().SetBinLabel(8, '3<M_{#gamma#gamma}^{rec}<3.75') 
 
-h_mrec_gam1 = ROOT.TH1D('h_mrec_gam1', 'mrec_gam1', 100, 3, 3.95)
-h_mrec_gamgam = ROOT.TH1D('h_mrec_gamgam', 'mrec_gamgam', 100, 3, 3.95)
-h_Mgamgam = ROOT.TH1D('h_Mgamgam', 'Mgamgam', 100, 0.2, 0.7) 
+h_mrec_gam1 = ROOT.TH1D('h_mrec_gam1', 'mrec_gam1', 100, 3.3, 3.7)
+h_mrec_gamgam = ROOT.TH1D('h_mrec_gamgam', 'mrec_gamgam', 100, 0.0, 3.95)
+h_Mgamgam = ROOT.TH1D('h_Mgamgam', 'Mgamgam', 100, 3, 4) 
 h_gam1_p = ROOT.TH1D('h_gam1_p', 'gam1_p', 100, 0.0, 0.5) 
 h_gam2_p = ROOT.TH1D('h_gam2_p', 'gam2_p', 100, 0.0, 0.5) 
 h_gam1_costhe = ROOT.TH1D('h_gam1_costhe', 'gam1_costhe', 100, -1.0, 1.0)
+h_gam1_E = ROOT.TH1D('h_gam1_E', 'gam1_E', 100, 0.0, 0.4)
 h_gam2_costhe = ROOT.TH1D('h_gam2_costhe', 'gam2_costhe', 100, -1.0, 1.0)
-h_ngam = ROOT.TH1D('h_ngam', 'ngam', 100, 0, 20)
+h_ngam = ROOT.TH1D('h_ngam', 'ngam', 100, 0, 11)
 
 # Global items
 raw_gpx = ROOT.vector('double')()
@@ -63,11 +64,11 @@ ROOT.gROOT.ProcessLine(
 def usage():
     sys.stdout.write('''
 NAME
-    sel_events.py 
+    sel_events_inclusiveMC.py 
 
 SYNOPSIS
 
-    ./sel_events.py infile outfile 
+    ./sel_events_inclusiveMC.py infile outfile 
 
 AUTHOR 
     XIAO Suyu <xiaosuyu@ihep.ac.cn> 
@@ -104,12 +105,9 @@ def main():
  #   t.SetBranchAddress("pdgid", m_pdgid, "pdgid[100]/I")
 #    t.SetBranchAddress("motheridx", m_motheridx, "motheridx[100]/I")
     entries = t.GetEntriesFast()
-
-    pbar = ProgressBar(widgets=[Percentage(), Bar()], maxval=entries).start()
-    time_start = time()
-
+ #   fout = ROOT.TFile(outfile, "RECREATE")
     fout = ROOT.TFile(outfile, "RECREATE")
-    t_out = ROOT.TTree('signal', 'signal')
+    t_out = ROOT.TTree('tree', 'tree')
     mystruct = ROOT.MyTreeStruct()
 #    t_out.Branch('vtx_mrecgam1', mystruct, 'vtx_mrecgam1/D')
     t_out.Branch('mrec_gam1_raw', mystruct, 'mrec_gam1_raw/D')
@@ -129,6 +127,9 @@ def main():
     t_out.Branch("pdgid", n_pdgid, "pdgid[100]/I")
     t_out.Branch("motheridx", n_motheridx, "motheridx[100]/I")
 
+    pbar = ProgressBar(widgets=[Percentage(), Bar()], maxval=entries).start()
+    time_start = time()
+
     for jentry in xrange(entries):
         pbar.update(jentry+1)
         # get the next tree in the chain and verify
@@ -140,6 +141,12 @@ def main():
         if TEST and ientry > 10000:
             break
         
+        if select_chic0_to_inclusive(t): 
+#            h_mrecgam1.Fill(t.vtx_mrecgam1)
+#            mystruct.vtx_mrecgam1 = t.vtx_mrecgam1
+            t_out.Fill()
+            fill_histograms(t)
+ 
         nb = t.GetEntry(jentry)
         if nb<=0:
             continue
@@ -150,13 +157,6 @@ def main():
             n_pdgid[ii] = t.m_pdgid[ii]
             n_motheridx[ii] = t.m_motheridx[ii]
         
-        if select_chic0_to_inclusive(t): 
-#            h_mrecgam1.Fill(t.vtx_mrecgam1)
-#            mystruct.vtx_mrecgam1 = t.vtx_mrecgam1
-            t_out.Fill()
-            fill_histograms(t)
- 
- #   fout = ROOT.TFile(outfile, "RECREATE")
     t_out.Write()
     write_histograms() 
     fout.Close()
@@ -183,23 +183,31 @@ def fill_histograms(t):
         gamgam_p4_raw = gam1_p4_raw + gam2_p4_raw
         rec_gam1_p4_raw = cms_p4 - gam1_p4_raw
         rec_gamgam_p4_raw = cms_p4 - gamgam_p4_raw
-        Mgamgam = rec_gamgam_p4_raw.M()
+        Mgamgam = gamgam_p4_raw.M()
         mrec_gam1_raw = rec_gam1_p4_raw.M()
         mrec_gamgam_raw = rec_gamgam_p4_raw.M()
+
         cut_ngam = (t.ngam == 2)
+#        cut_ngam = (t.ngam < 11)
         cut_gam1_costhe = (abs(t.raw_costheta.at(gam1_index)) < 0.75)
         cut_gam2_costhe = (abs(t.raw_costheta.at(gam2_index)) < 0.75)
    #     cut_mgamgam = (t.vtx_mgamgam > 3.0 and t.vtx_mgamgam < 3.75)
+        cut_pi0 = (Mgamgam < 0.10 or Mgamgam > 0.16)
+        cut_eta = (Mgamgam < 0.50 or Mgamgam > 0.57)
+        cut_chic = (Mgamgam < 3.22 or Mgamgam > 3.75)
         cut_egam = (t.raw_ge.at(gam1_index) < t.raw_ge.at(gam2_index))
 	# don't know how to tag gam1 and gam2
     #    if (cut_ngam and cut_gam1_costhe and cut_gam2_costhe and cut_mgamgam and cut_egam):
-        if (cut_ngam and cut_gam1_costhe and cut_gam2_costhe and cut_egam):
+        if (cut_ngam and cut_egam and cut_pi0 and cut_eta and cut_chic):
+#        if (cut_ngam and cut_egam and cut_gam1_costhe and cut_gam2_costhe):
+#        if (cut_ngam):
             h_Mgamgam.Fill(Mgamgam)
             h_mrec_gam1.Fill(mrec_gam1_raw)
             h_mrec_gamgam.Fill(mrec_gamgam_raw)
 #            h_gam1_p.Fill(t.(gam1_index))
 #            h_gam2_p.Fill(t.gam2_p)
             h_gam1_costhe.Fill(t.raw_costheta.at(gam1_index))
+            h_gam1_E.Fill(t.raw_ge.at(gam1_index))
             h_gam2_costhe.Fill(t.raw_costheta.at(gam2_index))
             h_ngam.Fill(t.ngam)
 
@@ -211,6 +219,7 @@ def write_histograms():
 #    h_gam1_p.Write()
 #    h_gam2_p.Write()
     h_gam1_costhe.Write()
+    h_gam1_E.Write()
     h_gam2_costhe.Write()
     h_ngam.Write()
 
@@ -222,6 +231,18 @@ def select_chic0_to_inclusive(t):
         return False
     h_evtflw.Fill(1) 
  
+#    if not ( (abs(t.raw_costheta.at(gam1_index)) < 0.75) and abs(t.raw_costheta.at(gam2_index)) < 0.75 ):
+#        return False
+#    h_evtflw.Fill(2) 
+ 
+#    if not (t.raw_ge.at(gam1_index) < t.raw_ge.at(gam2_index)):
+#        return False
+#    h_evtflw.Fill(3) 
+ 
+#    if not ((Mgamgam < 0.12 or Mgamgam > 0.14) and (Mgamgam < 0.53 or Mgamgam > 0.57)):
+#        return False
+#    h_evtflw.Fill(4) 
+
 #    for i in range(1, 3):
 #        if not ( t.raw_costheta.at(i) < 0.75 and t.raw_costheta.at(i) > -0.75):
 #            return False
@@ -235,4 +256,4 @@ def select_chic0_to_inclusive(t):
     
     
 if __name__ == '__main__':
-  
+    main() 
