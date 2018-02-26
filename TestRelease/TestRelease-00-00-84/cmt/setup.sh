@@ -7,6 +7,6 @@ fi
 
 tempfile=`${CMTROOT}/mgr/cmt -quiet build temporary_name`
 if test ! $? = 0 ; then tempfile=/tmp/cmt.$$; fi
-${CMTROOT}/mgr/cmt setup -sh -pack=TestRelease -version=TestRelease-00-00-84 -path=/afs/ihep.ac.cn/users/y/yangyz/bes/chic2invi/v0.1  -no_cleanup $* >${tempfile}; . ${tempfile}
+${CMTROOT}/mgr/cmt setup -sh -pack=TestRelease -version=TestRelease-00-00-84 -path=$HOME/bes/chic2invi/v0.1  -no_cleanup $* >${tempfile}; . ${tempfile}
 /bin/rm -f ${tempfile}
 

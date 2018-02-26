@@ -1,4 +1,4 @@
-//DENG Zi-yan 2008-03-17
+// Yang Yuzhen 2018-02-09
 
 #include "$OFFLINEEVENTLOOPMGRROOT/share/OfflineEventLoopMgr_Option.txt"
 
@@ -29,7 +29,7 @@ RealizationSvc.RunIdList = {-25338,0,-27090};//////2012 run number
 
 
 #include "$ROOTIOROOT/share/jobOptions_Digi2Root.txt"
-RootCnvSvc.digiRootOutputFile ="../../../gen_mc_file/chic0gamgam_mc_rtraw/chic0gamgam.rtraw";
+RootCnvSvc.digiRootOutputFile ="../run/chic0gamgam_mc_rtraw/chic0gamgam.rtraw";
 
 
 // OUTPUT PRINTOUT LEVEL
@@ -37,5 +37,5 @@ RootCnvSvc.digiRootOutputFile ="../../../gen_mc_file/chic0gamgam_mc_rtraw/chic0g
 MessageSvc.OutputLevel  = 5;
 
 // Number of events to be processed (default is 10)
-// ApplicationMgr.EvtMax = 6000;
+ ApplicationMgr.EvtMax = 6000;
 
