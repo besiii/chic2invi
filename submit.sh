@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # Main driver to submit jobs 
-# Author XIAO Suyu <xiaosuyu@ihep.ac.cn>
-# Created [2017-11-24 Fri 20:44]
+# Author Yuzhen Yang <yangyz@ihep.ac.cn>
+# Created [2018-01-23 Tue 20:36]
 
 
 usage() {
@@ -23,6 +23,15 @@ usage() {
     printf "\n\t%-9s  %-40s"  "0.2.3"    "Check Condor jobs on con3650 data"     
     printf "\n\t%-9s  %-40s"  "0.2.4"    "Merge root file on con3650 data"     
     printf "\n\t%-9s  %-40s"  "0.2.5"    "Select events on con3650 data"     
+    printf "\n\t%-9s  %-40s"  ""          ""
+    printf "\n\t%-9s  %-40s"  "0.3"      "[run on signal MC of chic2gamgam and chic2gamnunu]"
+    printf "\n\t%-9s  %-40s"  "0.3.1"    "simulate 6k signal MC samples of chic2gamgam to rtraw file"
+    printf "\n\t%-9s  %-40s"  "0.3.2"    "reconstruct the samples of chic2gamgam to dst file"
+    printf "\n\t%-9s  %-40s"  "0.3.3"    "run the algorithm to root file"
+#    printf "\n\t%-9s  %-40s"  "0.3.4"    "[run on signal MC of chic2gamnunu]"
+    printf "\n\t%-9s  %-40s"  "0.3.5"    "simulate 6k signal MC samples of chic2gamnunu to rtraw file"
+    printf "\n\t%-9s  %-40s"  "0.3.6"    "reconstruct the samples of chic2gamnunu to dst file"
+    printf "\n\t%-9s  %-40s"  "0.3.7"    "run the algorithm to root file"
     printf "\n\n" 
 }
 
@@ -109,6 +118,68 @@ case $option in
 	   mkdir run/analysis
 	   root analysis.cxx
 	   ;; 
+
+
+
+   # --------------------------------------------------------------------------
+    # 0.3 signal MC of chic2gamgam and chic2gamnunu
+        # --------------------------------------------------------------------------
+                 #---------chic2gamgam------------
+    0.3) echo "running on signal MC of chic2gamgam and chic2gamnunu..."
+         ;;
+
+    0.3.1) echo "simulate 6k signal MC samples of chic2gamgam to rtraw file..."
+           mkdir run/gen_mc_file/chic0gamgam_mc_rtraw
+           cd run/gen_mc/chic0gamgam/run_gamgam/
+	  # boss.exe jobOptions_sim_gamgam.txt
+           boss.condor -g physics jobOptions_sim_gamgam.txt
+        #  boss.condor -g physics run/gen_mc/chic0gamgam/run_gamgam/jobOptions_sim_gamgam.txt
+            ;;
+
+    0.3.2) echo "reconstruct the samples of chic2gamgam to dst file..."
+           mkdir run/gen_mc_file/chic0gamgam_mc_dst/
+           cd run/gen_mc/chic0gamgam/run_gamgam/
+	  # boss.exe jobOptions_rec_gamgam.txt
+           boss.condor -g physics jobOptions_rec_gamgam.txt
+          #boss.condor -g physics run/gen_mc/chic0gamgam/run_gamgam/jobOptions_rec_gamgam.txt        
+            ;;
+
+    0.3.3) echo "run the algorithm to root file..."
+           mkdir run/gen_mc_file/chic0gamgam_mc_root/
+           cd run/gen_mc/chic0gamgam/run_gamgam/
+          # boss.exe jobOptions_gamgam_gen_mc.txt
+           boss.condor -g physics jobOptions_gamgam_gen_mc.txt
+          #boss.condor -g physics run/gen_mc/chic0gamgam/run_gamgam/jobOptions_gamgam_gen_mc.txt
+           ;;
+
+
+                  #---------------chic2gamnunu-------------
+#    0.3.4) echo "running on signal MC of chic2gamnunu..."
+#         ;;
+
+    0.3.5) echo "simulate 6k signal MC samples of chic2gamnunu to rtraw file..."
+          mkdir run/gen_mc_file/chic0gamnunu_mc_rtraw/
+          cd run/gen_mc/chic0gamnunu/run_gamnunu/
+          boss.condor -g physics jobOptions_sim_gamnunu.txt 
+         # boss.exe jobOptions_sim_gamnunu.txt
+        #  boss.condor -g physics run/gen_mc/chic0gamnunu/run_gamnunu/jobOptions_sim_gamnunu.txt
+            ;;
+
+    0.3.6) echo "reconstruct the samples of chic2gamnunu to dst file..."
+          mkdir run/gen_mc_file/chic0gamnunu_mc_dst/
+          cd run/gen_mc/chic0gamnunu/run_gamnunu/
+          boss.condor -g physics jobOptions_rec_gamnunu.txt
+       #   boss.exe jobOptions_rec_gamnunu.txt
+        #  boss.condor -g physics run/gen_mc/chic0gamnunu/run_gamnunu/jobOptions_rec_gamnunu.txt
+            ;;
+
+    0.3.7) echo "run the algorithm to root file..."
+          mkdir run/gen_mc_file/chic0gamnunu_mc_root/
+	  cd run/gen_mc/chic0gamnunu/run_gamnunu/
+         # boss.exe jobOptions_gamnunu_gen_mc.txt
+           boss.condor -g physics jobOptions_gamnunu_gen_mc.txt
+        #  boss.condor -g physics run/gen_mc/chic0gamnunu/run_gamnunu/jobOptions_gamnunu_gen_mc.txt
+           ;;
 
 esac
 
