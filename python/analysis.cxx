@@ -11,7 +11,7 @@ void analysis()
 	double n_mgamma1;
 
 	//inclusive mc
-	TFile* newfile = new TFile("Analysis_inclusiveMC.root", "recreate");
+	TFile* newfile = new TFile("../cxx.root", "recreate");
 	TTree* newtree = new TTree("all", "step2");
 	TChain chain("tree");
 
@@ -23,8 +23,10 @@ void analysis()
 //		cout<<"filename"<<filename<<endl;
 //	} 
 
-	chain.Add("/afs/ihep.ac.cn/users/x/xiaosy/bes/chic2invi/v0.1/run/chic2incl/hist_inclusiveMC/chic2invi_psip_mc_merged_2.root");
-	chain.Add("/afs/ihep.ac.cn/users/x/xiaosy/bes/chic2invi/v0.1/run/chic2incl/hist_inclusiveMC/chic2invi_psip_mc_merged_3.root");
+//	chain.Add("/afs/ihep.ac.cn/users/x/xiaosy/bes/chic2invi/v0.1/run/chic2incl/hist_inclusiveMC/chic2invi_psip_mc_merged_2.root");
+//	chain.Add("/afs/ihep.ac.cn/users/x/xiaosy/bes/chic2invi/v0.1/run/chic2incl/hist_inclusiveMC/chic2invi_psip_mc_merged_3.root");
+	chain.Add("/afs/ihep.ac.cn/users/x/xiaosy/bes/chic2invi/v0.1/run/chic2incl/rootfile_inclusiveMC/chic2invi_psip_mc-99.root");
+	
 
 	//data3650
 /*	TFile* newfile = new TFile("Analysis_data3650.root", "recreate");
