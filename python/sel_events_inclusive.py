@@ -141,11 +141,12 @@ def main():
         if TEST and ientry > 10000:
             break
         
+
         if select_chic0_to_inclusive(t): 
 #            h_mrecgam1.Fill(t.vtx_mrecgam1)
 #            mystruct.vtx_mrecgam1 = t.vtx_mrecgam1
-            t_out.Fill()
             fill_histograms(t)
+            t_out.Fill()
  
         nb = t.GetEntry(jentry)
         if nb<=0:
@@ -166,6 +167,7 @@ def main():
     sys.stdout.write(' \nDone in %s. \n' % dur) 
 
 def fill_histograms(t):
+
     if (len(raw_ge) == 2):
         gam1_index = -1
         gam2_index = -1
@@ -189,8 +191,8 @@ def fill_histograms(t):
 
         cut_ngam = (t.ngam == 2)
 #        cut_ngam = (t.ngam < 11)
-        cut_gam1_costhe = (abs(t.raw_costheta.at(gam1_index)) < 0.75)
-        cut_gam2_costhe = (abs(t.raw_costheta.at(gam2_index)) < 0.75)
+#        cut_gam1_costhe = (abs(t.raw_costheta.at(gam1_index)) < 0.75)
+#        cut_gam2_costhe = (abs(t.raw_costheta.at(gam2_index)) < 0.75)
    #     cut_mgamgam = (t.vtx_mgamgam > 3.0 and t.vtx_mgamgam < 3.75)
         cut_pi0 = (Mgamgam < 0.10 or Mgamgam > 0.16)
         cut_eta = (Mgamgam < 0.50 or Mgamgam > 0.57)
@@ -230,7 +232,15 @@ def select_chic0_to_inclusive(t):
     if not (t.ngam == 2):
         return False
     h_evtflw.Fill(1) 
+
+#    if not (t.raw_ge.at(gam1_index) < t.raw_ge.at(gam2_index)):
+#        return False
+#    h_evtflw.Fill(2) 
  
+#    if not (Mgamgam<0.1 or Mgamgam>0.16):
+#        return False
+#    h_evtflw.Fill(3) 
+
 #    if not ( (abs(t.raw_costheta.at(gam1_index)) < 0.75) and abs(t.raw_costheta.at(gam2_index)) < 0.75 ):
 #        return False
 #    h_evtflw.Fill(2) 

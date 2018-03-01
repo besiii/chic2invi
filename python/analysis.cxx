@@ -169,8 +169,8 @@ void analysis()
 
 		//veto Mgamgam	
 		if( (gams_p4_raw.M() > 0.10 && gams_p4_raw.M() < 0.16) ) continue;	
-		if( (gams_p4_raw.M() > 0.50 && gams_p4_raw.M() < 0.57) ) continue;	
-		if( (gams_p4_raw.M() > 3.75 && gams_p4_raw.M() < 3.75) ) continue;	
+		if( (gams_p4_raw.M() > 0.50 && gams_p4_raw.M() < 0.56) ) continue;	
+		if( (gams_p4_raw.M() > 3.20 && gams_p4_raw.M() < 3.75) ) continue;	
 		//----------------------------
 		//   save into new tree
 		//----------------------------
