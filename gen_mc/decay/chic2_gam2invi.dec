@@ -1,0 +1,14 @@
+
+Decay psi(2S)
+1.0 gamma chi_c2 P2GC2;
+Enddecay
+
+Decay chi_c2
+1.0 gamma nu_e anti-nu_e PHSP;
+Enddecay
+
+
+End
+
+
+
