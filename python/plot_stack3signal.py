@@ -28,11 +28,11 @@ xbins = 100.0
 ytitle = "Events/%dMeV" %((xmax - xmin) / xbins * 1000.0)
 
 chic0 = TChain('tree')
-chic0.Add('run/gen_mc/chic0_invi/rootfile_chic0/chic0_gam2invi_gen_mc.root')
+chic0.Add('scripts/chic0_invi/rootfile_chic0/chic0_gam2invi_gen_mc.root')
 chic1 = TChain('tree')
-chic1.Add('run/gen_mc/chic1_invi/rootfile_chic1/chic1_gam2invi_gen_mc.root')
+chic1.Add('scripts/chic1_invi/rootfile_chic1/chic1_gam2invi_gen_mc.root')
 chic2 = TChain('tree')
-chic2.Add('run/gen_mc/chic2_invi/rootfile_chic2/chic2_gam2invi_gen_mc.root')
+chic2.Add('scripts/chic2_invi/rootfile_chic2/chic2_gam2invi_gen_mc.root')
 
 hs = THStack('hs', '')
 
