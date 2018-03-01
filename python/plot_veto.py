@@ -28,12 +28,12 @@ xbins = 100.0
 ytitle = "Events/%dMeV" %((xmax - xmin) / xbins * 1000.0)
 '''
 #signal
-f00 = TFile("run/gen_mc/chic0_invi/event_chic0/chic0_gam2invi_gen_mc_event_n.root")
-f01 = TFile("run/gen_mc/chic1_invi/event_chic1/chic1_gam2invi_gen_mc_event_n.root")
-f02 = TFile("run/gen_mc/chic2_invi/event_chic2/chic2_gam2invi_gen_mc_event_n.root")
-f10 = TFile("run/gen_mc/chic0_invi/event_chic0/chic0_gam2invi_gen_mc_event_nveto.root")
-f11 = TFile("run/gen_mc/chic1_invi/event_chic1/chic1_gam2invi_gen_mc_event_nveto.root")
-f12 = TFile("run/gen_mc/chic2_invi/event_chic2/chic2_gam2invi_gen_mc_event_nveto.root")
+f00 = TFile("scripts/chic0_invi/event_chic0/chic0_gam2invi_gen_mc_event_n.root")
+f01 = TFile("scripts/chic1_invi/event_chic1/chic1_gam2invi_gen_mc_event_n.root")
+f02 = TFile("scripts/chic2_invi/event_chic2/chic2_gam2invi_gen_mc_event_n.root")
+f10 = TFile("scripts/chic0_invi/event_chic0/chic0_gam2invi_gen_mc_event_nveto.root")
+f11 = TFile("scripts/chic1_invi/event_chic1/chic1_gam2invi_gen_mc_event_nveto.root")
+f12 = TFile("scripts/chic2_invi/event_chic2/chic2_gam2invi_gen_mc_event_nveto.root")
 h00_E = f00.Get('h_gam1_E')
 h01_E = f01.Get('h_gam1_E')
 h02_E = f02.Get('h_gam1_E')

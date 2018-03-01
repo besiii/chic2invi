@@ -136,15 +136,14 @@ for jentry in xrange(entries):
             h_gam1_E.Fill(t.raw_ge.at(gam1_index))
             h_gam2_costhe.Fill(t.raw_costheta.at(gam2_index))
             h_ngam.Fill(t.ngam)
+            n_run[0] = t.run
+            n_event[0] = t.event
+            n_indexmc[0] = t.m_indexmc
+            for ii in range(t.m_indexmc):
+                n_pdgid[ii] = t.m_pdgid[ii]
+                n_motheridx[ii] = t.m_motheridx[ii]
             t_out.Fill()
-
-    n_run[0] = t.run
-    n_event[0] = t.event
-    n_indexmc[0] = t.m_indexmc
-    for ii in range(t.m_indexmc):
-        n_pdgid[ii] = t.m_pdgid[ii]
-        n_motheridx[ii] = t.m_motheridx[ii]
-            
+        
 t_out.Write()
 h_evtflw.Write()
 h_mrec_gam1.Write()

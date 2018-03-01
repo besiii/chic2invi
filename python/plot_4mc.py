@@ -27,9 +27,9 @@ xmax = 0.4
 xbins = 100.0
 ytitle = "Events/%dMeV" %((xmax - xmin) / xbins * 1000.0)
 
-f0 = TFile("run/gen_mc/chic0_invi/event_chic0/chic0_gam2invi_gen_mc_event_nveto.root")
-f1 = TFile("run/gen_mc/chic1_invi/event_chic1/chic1_gam2invi_gen_mc_event_nveto.root")
-f2 = TFile("run/gen_mc/chic2_invi/event_chic2/chic2_gam2invi_gen_mc_event_nveto.root")
+f0 = TFile("scripts/chic0_invi/event_chic0/chic0_gam2invi_gen_mc_event_nveto.root")
+f1 = TFile("scripts/chic1_invi/event_chic1/chic1_gam2invi_gen_mc_event_nveto.root")
+f2 = TFile("scripts/chic2_invi/event_chic2/chic2_gam2invi_gen_mc_event_nveto.root")
 f3 = TFile('run/chic2incl/hist_inclusiveMC/chic2incl_psip_mc_event_merged_nveto.root')
 #h0_E = f0.Get('h_gam1_E')
 #h1_E = f1.Get('h_gam1_E')
