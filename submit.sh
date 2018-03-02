@@ -24,17 +24,26 @@ usage() {
     printf "\n\t%-9s  %-40s"  "0.2.4"    "Merge root file on con3650 data"     
     printf "\n\t%-9s  %-40s"  "0.2.5"    "Select events on con3650 data"     
     printf "\n\t%-9s  %-40s"  ""          ""
+
     printf "\n\t%-9s  %-40s"  "0.3"      "[run on signal MC of chic0->gamgam and chic0->gamnunu,now is chic0->gamgam]"
     printf "\n\t%-9s  %-40s"  "0.3.1"    "chic0->gg:simulate 6000 signal MC samples--rtraw"
     printf "\n\t%-9s  %-40s"  "0.3.2"    "chic0->gg:reconstruct--dst"
     printf "\n\t%-9s  %-40s"  "0.3.3"    "chic0->gg:run algorithm--root"
     printf "\n\t%-9s  %-40s"  "0.3.4"    "chic0->gg:select event with ngam=3--root"
     printf "\n\t%-9s  %-40s"  "0.3.5"    "chic0->gg:plot the gamma energy"
-
     printf "\n\t%-9s  %-40s"  "0.3.6"    "[Now is signal MC of chic0->gamnunu]"
     printf "\n\t%-9s  %-40s"  "0.3.7"    "chic0->gamnunu:simulate 6000 signal MC samples--rtraw"
     printf "\n\t%-9s  %-40s"  "0.3.8"    "chic0->gamnunu:reconstruct--dst"
     printf "\n\t%-9s  %-40s"  "0.3.9"    "chic0->gamnunu:run algorithm--root"
+
+    printf "\n\t%-9s  %-40s"  ""          ""
+    printf "\n\t%-9s  %-40s"  "0.4"      "[run on signal MC sample]" 
+    printf "\n\t%-9s  %-40s"  "0.4.1"    "Simulation -- generate signal MC sample"
+    printf "\n\t%-9s  %-40s"  "0.4.2"    "Reconstruction -- generate signal MC sample"
+    printf "\n\t%-9s  %-40s"  "0.4.3"    "Run on signal MC sample"
+    printf "\n\t%-9s  %-40s"  "0.4.4"    "Select events on signal MC sample"
+    printf "\n\t%-9s  %-40s"  "0.4.5"    "Generate plots of signal and inclusive MC samples"
+
     printf "\n\n" 
 }
 
@@ -69,7 +78,8 @@ case $option in
 	   cd ../job_text/inclusiveMC
 	   mv jobOptions_chic2invi_inclusive_psip_mc-394.txt jobOptions_chic2invi_inclusive_psip_mc-0.txt
 	   boss.condor -g physics -n 394 jobOptions_chic2invi_inclusive_psip_mc-%{ProcId}.txt
-	   ;;
+       cd $HOME/bes/chic2invi/v0.1	   
+       ;;
 
     0.1.3) echo "Check Condor jobs on MC..."
 	   ./python/chk_condorjobs.py run/chic2invi/rootfile_inclusiveMC 394
@@ -106,7 +116,8 @@ case $option in
 		cd ../job_text/data3650
 		mv jobOptions_chic2invi_data3650-84.txt jobOptions_chic2invi_data3650-0.txt
 		boss.condor -g physics -n 84 jobOptions_chic2invi_data3650-%{ProcId}.txt
-	    ;;
+        cd $HOME/bes/chic2invi/v0.1	    
+        ;;
 
     0.2.3) echo "Check Condor jobs on con3650 data..."
 	   ./python/chk_condorjobs.py run/chic2invi/rootfile_data3650  84 
@@ -187,5 +198,53 @@ case $option in
          # boss.exe jobOptions_gamnunu_gen_mc.txt
            boss.condor -g physics jobOptions_gamnunu_gen_mc.txt
            ;;
+
+    0.4) echo "signal MC sample..."
+	 ;;
+
+    0.4.1) echo "simulation -- generate signal MC sample..."
+	    cd scripts/chic0_invi/jobs_chic0
+        boss.condor -g physics jobOptions_sim_chic0.txt
+        cd ../../chic1_invi/jobs_chic1
+        boss.condor -g physics jobOptions_sim_chic1.txt
+        cd ../../chic2_invi/jobOptions_chic2
+        boss.condor -g physics jobOptions_sim_chic2.txt
+        cd $HOME/bes/chic2invi/v0.1
+	    ;;
+
+    0.4.2) echo "reconstruction -- generate signal MC sample..."
+	    cd scripts/chic0_invi/jobs_chic0
+        boss.condor -g physics jobOptions_rec_chic0.txt
+        cd ../../chic1_invi/jobs_chic1
+        boss.condor -g physics jobOptions_rec_chic1.txt
+        cd ../../chic2_invi/jobOptions_chic2
+        boss.condor -g physics jobOptions_rec_chic2.txt
+        cd $HOME/bes/chic2invi/v0.1
+	    ;;
+
+    0.4.3) echo "run on signal MC sample..."
+	    cd scripts/chic0_invi/jobs_chic0
+        boss.condor -g physics jobOptions_chic0_gam2invi_gen_mc.txt
+        cd ../../chic1_invi/jobs_chic1
+        boss.condor -g physics jobOptions_chic1_gam2invi_gen_mc.txt
+        cd ../../chic2_invi/jobOptions_chic2        
+        boss.condor -g physics jobOptions_chic2_gam2invi_gen_mc.txt
+        cd $HOME/bes/chic2invi/v0.1
+	    ;;
+
+     0.4.4) echo "select events on signal MC sample..."
+        ./python/sel_events.py scripts/chic0_invi/rootfile_chic0/chic0_gam2invi_gen_mc.root scripts/chic0_invi/event_chic0/chic0_gam2invi_gen_mc_event.root
+        ./python/sel_events.py scripts/chic1_invi/rootfile_chic1/chic1_gam2invi_gen_mc.root scripts/chic1_invi/event_chic1/chic1_gam2invi_gen_mc_event.root
+        ./python/sel_events.py scripts/chic2_invi/rootfile_chic2/chic2_gam2invi_gen_mc.root scripts/chic2_invi/event_chic2/chic2_gam2invi_gen_mc_event.root
+	    ;;
+
+     0.4.5) echo "generate plots of signal and inclusive MC samples..."
+        ./python/plot_4mc.py
+        ./python/plot_same4mc.py
+        ./python/plot_signal.py
+        ./python/plot_stack3signal.py
+        ./python/plot_veto.py
+        ;;
+
 
 esac

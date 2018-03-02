@@ -4,7 +4,7 @@ Decay psi(2S)
 Enddecay
 
 Decay chi_c0
-1.0 gamma gamma   PHSP;
+1.0 gamma nu_e anti-nu_e PHSP;
 Enddecay
 
 
