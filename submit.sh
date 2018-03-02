@@ -24,14 +24,18 @@ usage() {
     printf "\n\t%-9s  %-40s"  "0.2.4"    "Merge root file on con3650 data"     
     printf "\n\t%-9s  %-40s"  "0.2.5"    "Select events on con3650 data"     
     printf "\n\t%-9s  %-40s"  ""          ""
-    printf "\n\t%-9s  %-40s"  "0.3"      "[run on signal MC of chic2gamgam and chic2gamnunu]"
-    printf "\n\t%-9s  %-40s"  "0.3.1"    "simulate 6k signal MC samples of chic2gamgam to rtraw file"
-    printf "\n\t%-9s  %-40s"  "0.3.2"    "reconstruct the samples of chic2gamgam to dst file"
-    printf "\n\t%-9s  %-40s"  "0.3.3"    "run the algorithm to root file"
-#    printf "\n\t%-9s  %-40s"  "0.3.4"    "[run on signal MC of chic2gamnunu]"
-    printf "\n\t%-9s  %-40s"  "0.3.5"    "simulate 6k signal MC samples of chic2gamnunu to rtraw file"
-    printf "\n\t%-9s  %-40s"  "0.3.6"    "reconstruct the samples of chic2gamnunu to dst file"
-    printf "\n\t%-9s  %-40s"  "0.3.7"    "run the algorithm to root file"
+
+    printf "\n\t%-9s  %-40s"  "0.3"      "[run on signal MC of chic0->gamgam and chic0->gamnunu,now is chic0->gamgam]"
+    printf "\n\t%-9s  %-40s"  "0.3.1"    "chic0->gg:simulate 6000 signal MC samples--rtraw"
+    printf "\n\t%-9s  %-40s"  "0.3.2"    "chic0->gg:reconstruct--dst"
+    printf "\n\t%-9s  %-40s"  "0.3.3"    "chic0->gg:run algorithm--root"
+    printf "\n\t%-9s  %-40s"  "0.3.4"    "chic0->gg:select event with ngam=3--root"
+    printf "\n\t%-9s  %-40s"  "0.3.5"    "chic0->gg:plot the gamma energy"
+    printf "\n\t%-9s  %-40s"  "0.3.6"    "[Now is signal MC of chic0->gamnunu]"
+    printf "\n\t%-9s  %-40s"  "0.3.7"    "chic0->gamnunu:simulate 6000 signal MC samples--rtraw"
+    printf "\n\t%-9s  %-40s"  "0.3.8"    "chic0->gamnunu:reconstruct--dst"
+    printf "\n\t%-9s  %-40s"  "0.3.9"    "chic0->gamnunu:run algorithm--root"
+
     printf "\n\t%-9s  %-40s"  ""          ""
     printf "\n\t%-9s  %-40s"  "0.4"      "[run on signal MC sample]" 
     printf "\n\t%-9s  %-40s"  "0.4.1"    "Simulation -- generate signal MC sample"
@@ -39,6 +43,7 @@ usage() {
     printf "\n\t%-9s  %-40s"  "0.4.3"    "Run on signal MC sample"
     printf "\n\t%-9s  %-40s"  "0.4.4"    "Select events on signal MC sample"
     printf "\n\t%-9s  %-40s"  "0.4.5"    "Generate plots of signal and inclusive MC samples"
+
     printf "\n\n" 
 }
 
@@ -131,63 +136,67 @@ case $option in
 
 
    # --------------------------------------------------------------------------
-    # 0.3 signal MC of chic2gamgam and chic2gamnunu
+   #    0.3  signal MC of chic0->gamgam and chic0->gamnunu
         # --------------------------------------------------------------------------
-                 #---------chic2gamgam------------
-    0.3) echo "running on signal MC of chic2gamgam and chic2gamnunu..."
+                 #---------now is chic0->gamgam------------
+    0.3) echo "running on signal MC of chic0->gamgam..."
          ;;
 
-    0.3.1) echo "simulate 6k signal MC samples of chic2gamgam to rtraw file..."
-           mkdir run/gen_mc_file/chic0gamgam_mc_rtraw
-           cd run/gen_mc/chic0gamgam/run_gamgam/
-	  # boss.exe jobOptions_sim_gamgam.txt
-           boss.condor -g physics jobOptions_sim_gamgam.txt
-        #  boss.condor -g physics run/gen_mc/chic0gamgam/run_gamgam/jobOptions_sim_gamgam.txt
+    0.3.1) echo "chic0->gg:simulate 6000 signal MC samples--rtraw..."
+           mkdir run/chic0gamgam_mc_rtraw
+           #cd  gen_mc
+           boss.exe run/gen_mc/jobOptions_sim_gamgam.txt          
+           #boss.condor -g physics jobOptions_sim_gamgam.txt           
+           cd ..
             ;;
 
-    0.3.2) echo "reconstruct the samples of chic2gamgam to dst file..."
-           mkdir run/gen_mc_file/chic0gamgam_mc_dst/
-           cd run/gen_mc/chic0gamgam/run_gamgam/
-	  # boss.exe jobOptions_rec_gamgam.txt
-           boss.condor -g physics jobOptions_rec_gamgam.txt
-          #boss.condor -g physics run/gen_mc/chic0gamgam/run_gamgam/jobOptions_rec_gamgam.txt        
+    0.3.2) echo "chic0->gg:reconstruct--dst..."
+           mkdir run/chic0gamgam_mc_dst
+           cd gen_mc 
+	   boss.exe jobOptions_rec_gamgam.txt
+          # boss.condor -g physics jobOptions_rec_gamgam.txt
             ;;
 
-    0.3.3) echo "run the algorithm to root file..."
-           mkdir run/gen_mc_file/chic0gamgam_mc_root/
-           cd run/gen_mc/chic0gamgam/run_gamgam/
+    0.3.3) echo "chic0->gg:run algorithm--root..."
+           mkdir run/chic0gamgam_mc_root
+           cd gen_mc
           # boss.exe jobOptions_gamgam_gen_mc.txt
            boss.condor -g physics jobOptions_gamgam_gen_mc.txt
-          #boss.condor -g physics run/gen_mc/chic0gamgam/run_gamgam/jobOptions_gamgam_gen_mc.txt
+           ;;
+    
+    0.3.4) echo "chic0->gg:select event with ngam=3--root..."
+           #mkdir run/chic0gamgam_mc_sel_ngam3
+           ./python/sel_events_chic0gamgam.py
+           ;;
+    0.3.5) echo "chic0->gg:plot the gamma energy..."
+           mkdir run/chic0gamgam_mc_plot
+           ./python/plot
            ;;
 
+                 #---------------Now is chic0->gamnunu-------------
+    0.3.6) echo "Now is signal MC of chic0->gamnunu..."
+         ;;
 
-                  #---------------chic2gamnunu-------------
-#    0.3.4) echo "running on signal MC of chic2gamnunu..."
-#         ;;
-
-    0.3.5) echo "simulate 6k signal MC samples of chic2gamnunu to rtraw file..."
-          mkdir run/gen_mc_file/chic0gamnunu_mc_rtraw/
-          cd run/gen_mc/chic0gamnunu/run_gamnunu/
+    0.3.7) echo "chic0->gamnunu:simulate 6000 signal MC samples--rtraw..."
+          mkdir run/chic0gamnunu_mc_rtraw
+          cd gen_mc
           boss.condor -g physics jobOptions_sim_gamnunu.txt 
          # boss.exe jobOptions_sim_gamnunu.txt
-        #  boss.condor -g physics run/gen_mc/chic0gamnunu/run_gamnunu/jobOptions_sim_gamnunu.txt
+          cd ..
             ;;
 
-    0.3.6) echo "reconstruct the samples of chic2gamnunu to dst file..."
-          mkdir run/gen_mc_file/chic0gamnunu_mc_dst/
-          cd run/gen_mc/chic0gamnunu/run_gamnunu/
-          boss.condor -g physics jobOptions_rec_gamnunu.txt
-       #   boss.exe jobOptions_rec_gamnunu.txt
-        #  boss.condor -g physics run/gen_mc/chic0gamnunu/run_gamnunu/jobOptions_rec_gamnunu.txt
+    0.3.8) echo "chic0->gamnunu:reconstruct--dst..."
+          mkdir run/chic0gamnunu_mc_dst
+          cd gen_mc
+       #   boss.condor -g physics jobOptions_rec_gamnunu.txt
+          boss.exe jobOptions_rec_gamnunu.txt
             ;;
 
-    0.3.7) echo "run the algorithm to root file..."
-          mkdir run/gen_mc_file/chic0gamnunu_mc_root/
-	  cd run/gen_mc/chic0gamnunu/run_gamnunu/
+    0.3.9) echo "chic0->gamnunu:run algorithm--root..."
+          mkdir run/chic0gamnunu_mc_root/
+	  cd gen_mc
          # boss.exe jobOptions_gamnunu_gen_mc.txt
            boss.condor -g physics jobOptions_gamnunu_gen_mc.txt
-        #  boss.condor -g physics run/gen_mc/chic0gamnunu/run_gamnunu/jobOptions_gamnunu_gen_mc.txt
            ;;
 
     0.4) echo "signal MC sample..."
@@ -239,4 +248,3 @@ case $option in
 
 
 esac
-
