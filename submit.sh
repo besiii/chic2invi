@@ -39,6 +39,18 @@ usage() {
     printf "\n\t%-9s  %-40s"  "0.4.3"    "Run on signal MC sample"
     printf "\n\t%-9s  %-40s"  "0.4.4"    "Select events on signal MC sample"
     printf "\n\t%-9s  %-40s"  "0.4.5"    "Generate plots of signal and inclusive MC samples"
+    printf "\n\t%-9s  %-40s"  ""          ""
+    printf "\n\t%-9s  %-40s"  "0.5"      "[run on data 2012]" 
+    printf "\n\t%-9s  %-40s"  "0.5.1"    "Split data 2012 with each group 20G"
+    printf "\n\t%-9s  %-40s"  "0.5.2"    "Generate Condor jobs on data 2012 ---- 1"
+    printf "\n\t%-9s  %-40s"  "0.5.3"    "Test on data 2012"
+    printf "\n\t%-9s  %-40s"  "0.5.4"    "Submit Condor jobs on data 2012 ---- 2"
+    printf "\n\t%-9s  %-40s"  "0.5.5"    "Check Condor jobs on data 2012"
+    printf "\n\t%-9s  %-40s"  "0.5.6"    "Test 1 job on data 2012 event"
+    printf "\n\t%-9s  %-40s"  "0.5.7"    "Generate Condor jobs on data 2012 event ---- 1"
+    printf "\n\t%-9s  %-40s"  "0.5.8"    "Submit Condor jobs on data 2012 event ---- 2"
+    printf "\n\t%-9s  %-40s"  "0.5.9"    "Check Condor jobs on data 2012 event"
+    printf "\n\t%-9s  %-40s"  "0.5.10"    "Merge rootfile on data 2012 event"
     printf "\n\n" 
 }
 
@@ -66,9 +78,9 @@ case $option in
 	   ;;
 
     0.1.2) echo "Submit Condor jobs on MC..."
-	   mkdir -p run/chic2invi/job_text/inclusiveMC
-	   mkdir -p run/chic2invi/rootfile_inclusiveMC
-	   cd run/chic2invi/gen_script
+	   mkdir -p run/chic2incl/job_text/inclusiveMC
+	   mkdir -p run/chic2incl/rootfile_inclusiveMC
+	   cd scripts/gen_script
 	   ./make_jobOption_file_inclusiveMC.sh
 	   cd ../job_text/inclusiveMC
 	   mv jobOptions_chic2invi_inclusive_psip_mc-394.txt jobOptions_chic2invi_inclusive_psip_mc-0.txt
@@ -77,18 +89,42 @@ case $option in
        ;;
 
     0.1.3) echo "Check Condor jobs on MC..."
-	   ./python/chk_condorjobs.py run/chic2invi/rootfile_inclusiveMC 394
+	   ./python/chk_condorjobs.py run/chic2incl/rootfile_inclusiveMC 394
 	   ;;
     
-	0.1.4) echo "Merge root file on MC..."
-	   ./python/mrg_rootfiles.py run/chic2invi/rootfile_inclusiveMC run/chic2invi/hist_inclusiveMC
+    0.1.6) echo "Test 1 job on MC event..."
+        ./python/sel_events.py run/chic2incl/rootfile_inclusiveMC/chic2incl_psip_mc-1.root run/chic2incl/event_data/chic2incl_psip_mc_event-1.root                                                              
 	   ;;
 
-    0.1.5) echo  "Select events on MC..."
-	   mkdir -p  run/analysis
-	   root analysis.cxx 
-	   ;; 
+    0.1.7) echo "Generate Condor jobs on MC event..."
+        mkdir -p run/chic2incl/job_text/inclusiveMC_event
+        mkdir -p run/chic2incl/event_inclusiveMC
+        cd scripts/gen_script
+        rm ../../run/chic2incl/job_text/inclusiveMC_event/jobOptions_chic2incl_inclusive_mc_event-*
+        ./make_jobOption_file_inclusiveMC_event.sh
+        cd ../../run/chic2incl/job_text/inclusiveMC_event
+        chmod 755 jobOptions_chic2incl_inclusive_mc_event-*
+        mv jobOptions_chic2incl_inclusive_mc_event-394.sh jobOptions_chic2incl_inclusive_mc_event-0.sh
+        cd $HOME/bes/chic2invi/v0.1	    
+	   ;;
 
+    0.1.8) echo "Submit Condor jobs on MC event..."
+        cd run/chic2incl/job_text/inclusiveMC_event
+        rm ../../event_inclusiveMC/chic2incl_psip_mc_event-*
+        find . -name "*.out.*" | xargs rm
+        find . -name "*.err.*" | xargs rm
+        hep_sub -g physics -n 394 jobOptions_chic2incl_inclusive_mc_event-%{ProcId}.sh
+        cd $HOME/bes/chic2invi/v0.1
+        ;;
+
+    0.1.9) echo "Check Condor jobs on MC event..."
+	   ./python/chk_condorjobs.py run/chic2incl/event_inclusiveMC  394
+	   ;;
+
+	0.1.10) echo  "Merge rootfile on MC event..."
+	   mkdir run/chic2incl/hist_inclusiveMC
+	   ./python/mrg_rootfiles.py run/chic2incl/event_inclusiveMC run/chic2incl/hist_inclusiveMC
+	   ;;
 
 
     # --------------------------------------------------------------------------
@@ -104,9 +140,9 @@ case $option in
 	    ;;
 
     0.2.2) echo "Submit Condor jobs on con3650 data..."
-	    mkdir run/chic2invi/job_text/data3650
-	    mkdir run/chic2invi/rootfile_data3650
-		cd run/chic2invi/gen_script
+	    mkdir run/chic2incl/job_text/data3650
+	    mkdir run/chic2incl/rootfile_data3650
+		cd run/chic2incl/gen_script
 		./make_jobOption_file_data3650.sh
 		cd ../job_text/data3650
 		mv jobOptions_chic2invi_data3650-84.txt jobOptions_chic2invi_data3650-0.txt
@@ -115,12 +151,12 @@ case $option in
         ;;
 
     0.2.3) echo "Check Condor jobs on con3650 data..."
-	   ./python/chk_condorjobs.py run/chic2invi/rootfile_data3650  84 
+	   ./python/chk_condorjobs.py run/chic2incl/rootfile_data3650  84 
 	   ;;
 
 	0.2.4) echo  "Merge root file on con3650 data..."
-	   mkdir run/chic2invi/hist_data3650
-	   ./python/mrg_rootfiles.py run/chic2invi/rootfile_data3650 run/chic2invi/hist_data3650 
+	   mkdir run/chic2incl/hist_data3650
+	   ./python/mrg_rootfiles.py run/chic2incl/rootfile_data3650 run/chic2incl/hist_data3650 
 	   ;;
 
     0.2.5) echo  "Select event on con3650 data..."
@@ -236,6 +272,85 @@ case $option in
         ./python/plot_stack3signal.py
         ./python/plot_veto.py
         ;;
+
+    0.5) echo "run on data 2012..."
+	 ;;
+
+    0.5.1) echo "Split data 2012 with each group 20G ..."
+	    mkdir run/samples/data
+	    ./python/get_samples.py /bes3fs/offline/data/664p03/psip/dst run/samples/data/data_664p03_psip.txt 20G
+	    # made 84 groups 
+	    ;;
+
+    0.5.2) echo "Generate Condor jobs on data 2012 ---- 1..."
+	    mkdir run/chic2incl/job_text/data
+	    mkdir run/chic2incl/rootfile_data
+		cd scripts/gen_script
+		./make_jobOption_file_data.sh
+		cd ../../run/chic2incl/job_text/data
+		mv jobOptions_chic2invi_data-633.txt jobOptions_chic2invi_data-0.txt
+        cd $HOME/bes/chic2invi/v0.1	 
+        ;;   
+
+    0.5.3) echo "Test on data 2012..."
+        echo "have you changed test number?(yes / NO)
+        ./run/chic2incl/job_text/data/jobOptions_chic2invi_data-0.txt"
+        read opt
+        if [ $opt == "yes" ]
+            then
+            echo "now in yes"  
+            cd run/chic2incl/job_text/data
+            boss.exe jobOptions_inclusive_psip_data-0.txt
+            cd $HOME/bes/chic2invi/v0.1
+        else
+            echo "Default value is 'NO', please change test number."
+        fi
+        ;;
+
+    0.5.4) echo "Submit Condor jobs on data 2012 ---- 2..."
+        cd run/chic2incl/job_text/data
+        find . -name "*.out.*" | xargs rm
+        find . -name "*.err.*" | xargs rm
+		boss.condor -g physics -n 633 jobOptions_inclusive_psip_data-%{ProcId}.txt
+        cd $HOME/bes/chic2invi/v0.1	    
+        ;;
+
+    0.5.5) echo "Check Condor jobs on data 2012..."
+	   ./python/chk_condorjobs.py run/chic2incl/rootfile_data  633
+	   ;;
+
+    0.5.6) echo "Test 1 job on data 2012 event..."
+        ./python/sel_events.py run/chic2incl/rootfile_data/chic2incl_psip_data-1.root run/chic2incl/event_data/chic2incl_psip_data_event-1.root                                                              
+	   ;;
+
+    0.5.7) echo "Generate Condor jobs on data 2012 event..."
+        mkdir -p run/chic2incl/job_text/data_event
+        mkdir -p run/chic2incl/event_data
+        cd scripts/gen_script
+        ./make_jobOption_file_data_event.sh
+        cd ../../run/chic2incl/job_text/data_event
+        chmod 755 jobOptions_chic2incl_data_event-*
+        mv jobOptions_chic2incl_data_event-633.sh jobOptions_chic2incl_data_event-0.sh
+        cd $HOME/bes/chic2invi/v0.1	    
+	   ;;
+
+    0.5.8) echo "Submit Condor jobs on data 2012 event..."
+        cd run/chic2incl/job_text/data_event
+        rm ../../event_data/chic2incl_psip_data_event-*
+        find . -name "*.out.*" | xargs rm
+        find . -name "*.err.*" | xargs rm
+        hep_sub -g physics -n 633 jobOptions_chic2incl_data_event-%{ProcId}.sh
+        cd $HOME/bes/chic2invi/v0.1
+        ;;
+
+    0.5.9) echo "Check Condor jobs on data 2012 event..."
+	   ./python/chk_condorjobs.py run/chic2incl/event_data  633
+	   ;;
+
+	0.5.10) echo  "Merge rootfile on data 2012 event..."
+	   mkdir run/chic2incl/hist_data
+	   ./python/mrg_rootfiles.py run/chic2incl/event_data run/chic2incl/hist_data
+	   ;;
 
 
 esac
