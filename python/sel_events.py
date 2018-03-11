@@ -25,7 +25,7 @@ h_evtflw.GetXaxis().SetBinLabel(8, '3<M_{#gamma#gamma}^{rec}<3.75')
 
 h_mrec_gam1 = ROOT.TH1D('h_mrec_gam1', 'mrec_gam1', 100, 3.3, 3.7)
 h_mrec_gamgam = ROOT.TH1D('h_mrec_gamgam', 'mrec_gamgam', 100, 0.0, 3.95)
-h_Mgamgam = ROOT.TH1D('h_Mgamgam', 'Mgamgam', 100, 3, 4) 
+h_Mgamgam = ROOT.TH1D('h_Mgamgam', 'Mgamgam', 100, 0, 4) 
 h_gam1_p = ROOT.TH1D('h_gam1_p', 'gam1_p', 100, 0.0, 0.5) 
 h_gam2_p = ROOT.TH1D('h_gam2_p', 'gam2_p', 100, 0.0, 0.5) 
 h_gam1_costhe = ROOT.TH1D('h_gam1_costhe', 'gam1_costhe', 100, -1.0, 1.0)
@@ -34,6 +34,7 @@ h_gam2_costhe = ROOT.TH1D('h_gam2_costhe', 'gam2_costhe', 100, -1.0, 1.0)
 h_ngam = ROOT.TH1D('h_ngam', 'ngam', 100, 0, 11)
 
 # Global items
+#MC = bool(m_isMonteCarlo) 
 raw_gpx = ROOT.vector('double')()
 raw_gpy = ROOT.vector('double')()
 raw_gpz = ROOT.vector('double')()
@@ -68,6 +69,7 @@ t.SetBranchAddress("raw_gpz", raw_gpz)
 t.SetBranchAddress("raw_ge", raw_ge)
 t.SetBranchAddress("raw_costheta", raw_costheta)
 t.SetBranchAddress("raw_costheta", raw_costheta)
+#t.SetBranchAddress("m_isMonteCarlo", m_isMonteCarlo)
  #   t.SetBranchAddress("pdgid", m_pdgid, "pdgid[100]/I")
 #    t.SetBranchAddress("motheridx", m_motheridx, "motheridx[100]/I")
 entries = t.GetEntriesFast()
@@ -82,6 +84,8 @@ t_out.Branch("raw_gpy", raw_gpy)
 t_out.Branch("raw_gpz", raw_gpz)
 t_out.Branch("raw_ge", raw_ge)
 t_out.Branch("raw_costheta", raw_costheta)
+
+#if (t.run < 0):   # judge whether this run is MonteCarlo
 n_run = array('i',[0])
 n_event = array('i',[0])
 n_indexmc = array('i',[0])
@@ -98,6 +102,7 @@ time_start = time()
 
 cms_p4 = ROOT.TLorentzVector(0.011*ECMS, 0, 0, ECMS)
 for jentry in xrange(entries):
+#for jentry in xrange(1000):    
     pbar.update(jentry+1)
 #    ientry = t.LoadTree(jentry)
     nb = t.GetEntry(jentry)
@@ -128,7 +133,8 @@ for jentry in xrange(entries):
         mrec_gam1_raw = rec_gam1_p4_raw.M()
         mrec_gamgam_raw = rec_gams_p4_raw.M()
 
-        if (cut_ngam and cut_egam and cut_pi0 and cut_eta and cut_chic):
+        #if (cut_ngam and cut_egam and cut_pi0 and cut_eta and cut_chic):
+        if (cut_ngam and cut_egam):
             h_Mgamgam.Fill(Mgamgam)
             h_mrec_gam1.Fill(mrec_gam1_raw)
             h_mrec_gamgam.Fill(mrec_gamgam_raw)
@@ -136,15 +142,17 @@ for jentry in xrange(entries):
             h_gam1_E.Fill(t.raw_ge.at(gam1_index))
             h_gam2_costhe.Fill(t.raw_costheta.at(gam2_index))
             h_ngam.Fill(t.ngam)
-            n_run[0] = t.run
-            n_event[0] = t.event
-            n_indexmc[0] = t.m_indexmc
-            for ii in range(t.m_indexmc):
-                n_pdgid[ii] = t.m_pdgid[ii]
-                n_motheridx[ii] = t.m_motheridx[ii]
-            t_out.Fill()
+#            print t.run
+            if (t.run < 0):   # judge whether this run is MonteCarlo
+                n_run[0] = t.run
+                n_event[0] = t.event
+                n_indexmc[0] = t.m_indexmc
+                for ii in range(t.m_indexmc):
+                    n_pdgid[ii] = t.m_pdgid[ii]
+                    n_motheridx[ii] = t.m_motheridx[ii]
+#            t_out.Fill()
         
-t_out.Write()
+#t_out.Write()
 h_evtflw.Write()
 h_mrec_gam1.Write()
 h_mrec_gamgam.Write()
