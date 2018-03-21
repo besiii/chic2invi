@@ -19,7 +19,7 @@ gStyle.SetCanvasColor(0)
 gStyle.SetOptStat(0)
 mbc.SetLeftMargin(0.15)
 mbc.SetRightMargin(0.15)
-mbc.SetTopMargin(0.1)
+mbc.SetTopMargin(0.15)
 mbc.SetBottomMargin(0.15)
 
 xmin = 0.0
@@ -64,6 +64,7 @@ h00_E.GetYaxis().SetTitle(ytitle)
 h00_E.GetYaxis().SetTitleOffset(1.5)
 h00_E.SetMaximum(1200)
 '''
+'''
 #inclusive
 f03 = TFile("run/chic2incl/hist_inclusiveMC/chic2incl_psip_mc_event_merged_n.root")
 f13 = TFile("run/chic2incl/hist_inclusiveMC/chic2incl_psip_mc_event_merged_nveto.root")
@@ -78,8 +79,24 @@ h13_E.Draw("same")
 h03_E.GetXaxis().SetTitle("E_{#gamma1} (GeV)")
 h03_E.GetYaxis().SetTitle(ytitle)
 h03_E.GetYaxis().SetTitleOffset(1.5)
+'''
 
-legend = TLegend(0.5, 0.55, 0.82, 0.85)
+#data
+f04 = TFile("run/chic2incl/hist_data/chic2incl_psip_data_event_merged_n_3_4.root")
+f14 = TFile("run/chic2incl/hist_data/chic2incl_psip_data_event_merged_ntagveto.root")
+h04_E = f04.Get('h_gam1_E')
+h14_E = f14.Get('h_gam1_E')
+h04_E.SetLineColor(ROOT.kGreen+3)
+h14_E.SetLineColor(ROOT.kGreen+3)
+h04_E.SetLineWidth(2)
+h14_E.SetLineWidth(2)
+h04_E.Draw('e')
+h14_E.Draw("same")
+h04_E.GetXaxis().SetTitle("E_{#gamma1} (GeV)")
+h04_E.GetYaxis().SetTitle(ytitle)
+h04_E.GetYaxis().SetTitleOffset(1.5)
+
+legend = TLegend(0.55, 0.6, 0.8, 0.85)
 '''
 #signal
 legend.AddEntry(h00_E,'#gamma_{1} with #chi_{c0} before veto')
@@ -89,15 +106,19 @@ legend.AddEntry(h10_E,'#gamma_{1} with #chi_{c0} after veto')
 legend.AddEntry(h11_E,'#gamma_{1} with #chi_{c1} after veto')
 legend.AddEntry(h12_E,'#gamma_{1} with #chi_{c2} after veto')
 '''
+'''
 #inclusive
 legend.AddEntry(h03_E,'#gamma_{1} from inclusive MC before veto')
 legend.AddEntry(h13_E,'#gamma_{1} from inclusive MC after veto')
-
+'''
+#data
+legend.AddEntry(h04_E,'#gamma_{1} from data before veto')
+legend.AddEntry(h14_E,'#gamma_{1} from data after veto')
 
 #legend.SetNColums(1)
 legend.SetBorderSize(0)
 legend.SetFillColor(0)
 legend.Draw()
 #mbc.SaveAs("python/plots/veto_signal.pdf")
-mbc.SaveAs("python/plots/veto_inclusive.pdf")
+mbc.SaveAs("python/plots/veto_data.pdf")
 
