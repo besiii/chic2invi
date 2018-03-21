@@ -1,6 +1,6 @@
 #!/bin/bash
 
-JobText_SaveDir=../job_text/data
+JobText_SaveDir=../../run/chic2incl/job_text/data
 
 for num in {1..633}
 do

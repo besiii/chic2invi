@@ -1,6 +1,6 @@
 #!/bin/bash
 
-JobText_SaveDir=../job_text/inclusiveMC
+JobText_SaveDir=../../run/chic2incl/job_text/inclusiveMC
 
 for num in {1..394}
 do
@@ -25,7 +25,7 @@ do
     echo   "ApplicationMgr.EvtMax = -1;                                   " >> ${JobText_SaveDir}/${jobOptions}
     echo   "                                                              " >> ${JobText_SaveDir}/${jobOptions}
     echo   "Chic2invi.IsMonteCarlo=\"true\";                             " >> ${JobText_SaveDir}/${jobOptions}
-    echo   "Chic2invi.OutputFileName=\"/besfs/groups/nphy/users/xiaosy/bes/chic2invi/v0.1/run/chic2incl/rootfile_inclusiveMC/$rootfile\"; " >> ${JobText_SaveDir}/${jobOptions}
+    echo   "Chic2invi.OutputFileName=\"\$HOME/bes/chic2invi/v0.1/run/chic2incl/rootfile_inclusiveMC/$rootfile\"; " >> ${JobText_SaveDir}/${jobOptions}
     echo   "                                                              " >> ${JobText_SaveDir}/${jobOptions}
     echo   "                                                              " >> ${JobText_SaveDir}/${jobOptions}
 done

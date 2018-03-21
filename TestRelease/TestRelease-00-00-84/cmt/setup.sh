@@ -1,4 +1,4 @@
-# echo "Setting TestRelease TestRelease-00-00-84 in /afs/ihep.ac.cn/users/y/yangyz/bes/chic2invi/v0.1"
+# echo "Setting TestRelease TestRelease-00-00-84 in /afs/ihep.ac.cn/users/x/xiaosy/bes/chic2invi/v0.1"
 
 if test "${CMTROOT}" = ""; then
   CMTROOT=/afs/ihep.ac.cn/bes3/offline/ExternalLib/contrib/CMT/v1r20p20081118; export CMTROOT
