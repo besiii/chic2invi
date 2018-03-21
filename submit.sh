@@ -56,7 +56,6 @@ usage() {
     printf "\n\t%-9s  %-40s"  "0.5.8"    "Submit Condor jobs on data 2012 event ---- 2"
     printf "\n\t%-9s  %-40s"  "0.5.9"    "Check Condor jobs on data 2012 event"
     printf "\n\t%-9s  %-40s"  "0.5.10"    "Merge rootfile on data 2012 event"
-<<<<<<< HEAD
     printf "\n\t%-9s  %-40s"  ""          ""
     printf "\n\t%-9s  %-40s"  "0.6"      "[run on ee, mumu, gamgam]"
     printf "\n\t%-9s  %-40s"  "0.6.1"    "Simulation -- generate ee, mumu, gamgam MC sample"
@@ -64,8 +63,6 @@ usage() {
     printf "\n\t%-9s  %-40s"  "0.6.3"    "Run on ee, mumu, gamgam MC sample"
     printf "\n\t%-9s  %-40s"  "0.6.4"    "Select events on ee, mumu, gamgam MC sample"
     printf "\n\t%-9s  %-40s"  "0.6.5"    "Generate plots of ee, mumu, gamgam and inclusive MC samples"
-=======
->>>>>>> besiii/master
 
     printf "\n\n" 
 }
