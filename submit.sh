@@ -157,6 +157,7 @@ case $option in
 
 	0.1.10) echo  "Merge rootfile on MC event..."
 	   mkdir run/chic2incl/hist_inclusiveMC
+       rm run/chic2incl/hist_inclusiveMC/chic2incl_psip_mc_event_merged_1.root
 	   ./python/mrg_rootfiles.py run/chic2incl/event_inclusiveMC run/chic2incl/hist_inclusiveMC
 	   ;;
 
@@ -431,6 +432,7 @@ case $option in
 
 	0.5.10) echo  "Merge rootfile on data 2012 event..."
 	   mkdir run/chic2incl/hist_data
+       rm run/chic2incl/hist_data/chic2incl_psip_data_event_merged_1.root
 	   ./python/mrg_rootfiles.py run/chic2incl/event_data run/chic2incl/hist_data
 	   ;;
 
@@ -467,6 +469,18 @@ case $option in
         ./python/sel_events.py scripts/ee_decay/rootfile/ee_mumu_gen_mc.root scripts/ee_decay/event/ee_mumu_gen_mc_event.root
         ./python/sel_events.py scripts/ee_decay/rootfile/ee_gamgam_gen_mc.root scripts/ee_decay/event/ee_gamgam_gen_mc_event.root
 	    ;;
+
+     0.6.5) echo "Generate reconstruct jobs on mumu MC sample..."
+        cd scripts/gen_script
+        ./make_jobOption_file_dimoun.sh
+		;;
+
+     0.6.6) echo "Submit reconstruct jobs on mumu MC sample..."
+        cd scripts/ee_decay/jobs
+        boss.condor -g physics -n 
+		;;
+
+
 
     0.7) echo "ee, mumu, gamgam data 2012..."
 	 ;;

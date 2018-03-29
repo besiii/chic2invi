@@ -34,6 +34,7 @@
 #include "ParticleID/ParticleID.h"
 #include "McTruth/McParticle.h"
 
+#include "VertexFit/KalmanKinematicFit.h"
 
 #include <TFile.h>
 #include <TH1.h>
@@ -261,38 +262,7 @@ StatusCode Chic2invi::execute() {
   m_run = eventHeader->runNumber();
   m_event = eventHeader->eventNumber();
   m_evttag = eventHeader->eventTag();
-/*
-  if (m_event>10000 && m_event%10000 ==0) cout<<"event =="<<eventHeader->eventNumber()<<endl;
-  if (eventHeader->runNumber()<0)
-  {
-  	//MC information
-	SmartDataPtr<Event::McParticleCol> mcParticleCol(eventSvc(),"/Event/MC/McParticleCol");
-	int m_numParticle = 0;
-	if (!mcParticleCol){
-		std::cout << "Could not retrieve McParticleCole" << std::endl;
-		return StatusCode::FAILURE;
-	}
-	bool chicDecay = false;
-	int rootIndex = -1;
-	bool strange = false;
-	Event::McParticleCol::iterator iter_mc = mcParticleCol->begin();
-	int ngam_mc_eta =0, ngam_mc_pi0 = 0;
-    
-	for (; iter_mc != mcParticleCol->end(); iter_mc++){
-		if (!chicDecay) continue;
-		int mcidx = ((*iter_mc)->mother()).trackIndex() - rootIndex;
-		int pdgid = (*iter_mc)->particleProperty();
-		if(strange && ((*iter_mc)->mother()).particleProperty()!=100443) mcidx--;
-		m_pdgid[m_numParticle] = pdgid;
-		m_motheridx[m_numParticle] = mcidx;
-		m_numParticle +=1;
-		HepLorentzVector mctrue_track = (*iter_mc)->initialFourMomentum();
 
-	}
-	m_idxmc = m_numParticle;
-  
-  }
-*/
 	if (buildChicToInvisible()) {
     	m_tree->Fill(); // only fill tree for the selected events 
   	}
