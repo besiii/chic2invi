@@ -23,13 +23,16 @@ h_evtflw.GetXaxis().SetBinLabel(2, 'N_{#gamma}=2')
 h_evtflw.GetXaxis().SetBinLabel(3, '|cos#theta|<0.75')
 h_evtflw.GetXaxis().SetBinLabel(8, '3<M_{#gamma#gamma}^{rec}<3.75') 
 
-h_mrec_gam1 = ROOT.TH1D('h_mrec_gam1', 'mrec_gam1', 100, 3.5, 3.6)
+h_mrec_gam1 = ROOT.TH1D('h_mrec_gam1', 'mrec_gam1', 100, 3.3, 3.7)
 h_mrec_gamgam = ROOT.TH1D('h_mrec_gamgam', 'mrec_gamgam', 100, 0.0, 3.95)
-h_Mgamgam = ROOT.TH1D('h_Mgamgam', 'Mgamgam', 100, 0, 1) 
+h_Mgamgam_wide = ROOT.TH1D('h_Mgamgam_wide', 'Mgamgam_wide', 100, 0, 4) 
+h_Mgamgam_narrow = ROOT.TH1D('h_Mgamgam_narrow', 'Mgamgam_narrow', 100, 0, 0.7) 
 h_gam1_p = ROOT.TH1D('h_gam1_p', 'gam1_p', 100, 0.0, 0.5) 
 h_gam2_p = ROOT.TH1D('h_gam2_p', 'gam2_p', 100, 0.0, 0.5) 
 h_gam1_costhe = ROOT.TH1D('h_gam1_costhe', 'gam1_costhe', 100, -1.0, 1.0)
-h_gam1_E = ROOT.TH1D('h_gam1_E', 'gam1_E', 100, 0.0, 0.2)
+h_gam1_E_wide = ROOT.TH1D('h_gam1_E_wide', 'gam1_E_wide', 100, 0.0, 2.0)
+h_gam1_E_narrow = ROOT.TH1D('h_gam1_E_narrow', 'gam1_E_narrow', 100, 0.0, 0.4)
+h_gam2_E = ROOT.TH1D('h_gam2_E', 'gam2_E', 100, 0.0, 2.0)
 h_gam2_costhe = ROOT.TH1D('h_gam2_costhe', 'gam2_costhe', 100, -1.0, 1.0)
 h_ngam = ROOT.TH1D('h_ngam', 'ngam', 100, 0, 11)
 
@@ -41,6 +44,7 @@ raw_gpz = ROOT.vector('double')()
 #n_raw_ge = ROOT.vector('double')()
 raw_ge = ROOT.vector('double')()
 gam1_E = ROOT.vector('double')()
+gam2_E = ROOT.vector('double')()
 
 raw_costheta = ROOT.vector('double')()
 #m_pdgid = ROOT.vector('int')()
@@ -82,6 +86,7 @@ t_out = ROOT.TTree('tree', 'tree')
 #    t_out.Branch('vtx_mrecgam1', mystruct, 'vtx_mrecgam1/D')
 # t_out.Branch('gam1_E', gam1_E, 'gam1_E/D')
 t_out.Branch('gam1_E', gam1_E)
+t_out.Branch('gam2_E', gam2_E)
 t_out.Branch("raw_gpx", raw_gpx)
 t_out.Branch("raw_gpy", raw_gpy)
 t_out.Branch("raw_gpz", raw_gpz)
@@ -132,22 +137,36 @@ for jentry in xrange(entries):
         cut_pi0 = (gams_p4_raw.M() < 0.10 or gams_p4_raw.M() > 0.16)
         cut_eta = (gams_p4_raw.M() < 0.50 or gams_p4_raw.M() > 0.57)
         cut_chic = (gams_p4_raw.M() < 3.22 or gams_p4_raw.M() > 3.75)
-        cut_mrec = (rec_gam1_p4_raw.M() > 3.3 and rec_gam1_p4_raw.M() < 3.7)
-        cut_chic2 = (rec_gam1_p4_raw.M() > 3.54 and rec_gam1_p4_raw.M() < 3.59)
+        cut_cos = (abs(t.raw_costheta.at(gam1_index)) < 0.75 and abs(t.raw_costheta.at(gam2_index)) < 0.75)
+        # cut_mrec = (rec_gam1_p4_raw.M() > 3.3 and rec_gam1_p4_raw.M() < 3.7)
+        # cut_chic2 = (rec_gam1_p4_raw.M() > 3.54 and rec_gam1_p4_raw.M() < 3.59)
         cut_egam = (t.raw_ge.at(gam1_index) < t.raw_ge.at(gam2_index))
 
         Mgamgam = gams_p4_raw.M()
         mrec_gam1_raw = rec_gam1_p4_raw.M()
         mrec_gamgam_raw = rec_gams_p4_raw.M()
 
-        if (cut_ngam and cut_egam and cut_pi0 and cut_eta and cut_chic and cut_chic2):
-        #if (cut_ngam and cut_egam):
+        #if (cut_ngam and cut_egam and cut_pi0 and cut_eta and cut_chic and cut_chic2):
+
+        # veto
+        if (cut_ngam and cut_egam and cut_pi0 and cut_eta and cut_chic):
+        
+        # cos
+        # if (cut_ngam and cut_egam and cut_pi0 and cut_eta and cut_chic and cut_cos):
+        
+        # n
+        # if (cut_ngam and cut_egam):
+            
             gam1_E.push_back(t.raw_ge.at(gam1_index))
-            h_Mgamgam.Fill(Mgamgam)
+            gam2_E.push_back(t.raw_ge.at(gam2_index))
+            h_Mgamgam_wide.Fill(Mgamgam)
+            h_Mgamgam_narrow.Fill(Mgamgam)
             h_mrec_gam1.Fill(mrec_gam1_raw)
             h_mrec_gamgam.Fill(mrec_gamgam_raw)
             h_gam1_costhe.Fill(t.raw_costheta.at(gam1_index))
-            h_gam1_E.Fill(t.raw_ge.at(gam1_index))
+            h_gam1_E_wide.Fill(t.raw_ge.at(gam1_index))
+            h_gam1_E_narrow.Fill(t.raw_ge.at(gam1_index))
+            h_gam2_E.Fill(t.raw_ge.at(gam2_index))
             h_gam2_costhe.Fill(t.raw_costheta.at(gam2_index))
             h_ngam.Fill(t.ngam)
 #            print t.run
@@ -158,16 +177,20 @@ for jentry in xrange(entries):
                 for ii in range(t.m_indexmc):
                     n_pdgid[ii] = t.m_pdgid[ii]
                     n_motheridx[ii] = t.m_motheridx[ii]
-            t_out.Fill()
+       #     t_out.Fill()
             gam1_E.clear()
+            gam2_E.clear()
         
-t_out.Write()
+#t_out.Write()
 h_evtflw.Write()
 h_mrec_gam1.Write()
 h_mrec_gamgam.Write()
-h_Mgamgam.Write()
+h_Mgamgam_wide.Write()
+h_Mgamgam_narrow.Write()
 h_gam1_costhe.Write()
-h_gam1_E.Write()
+h_gam1_E_wide.Write()
+h_gam1_E_narrow.Write()
+h_gam2_E.Write()
 h_gam2_costhe.Write()
 h_ngam.Write()
 fout.Close()
