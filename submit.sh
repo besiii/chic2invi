@@ -128,7 +128,7 @@ case $option in
 	   ;;
 
     0.1.6) echo "Test 1 job on incl MC event..."
-        ./python/sel_events.py run/chic2incl/rootfile_inclusiveMC/chic2invi_psip_mc-1.root run/chic2incl/event_inclusiveMC/chic2incl_psip_mc_event-1.root                                                              
+        ./python/sel_events.py run/chic2incl/rootfile_inclusiveMC/chic2incl_psip_mc-1.root run/chic2incl/event_inclusiveMC/chic2incl_psip_mc_event-1.root                                                              
 	   ;;
 
     0.1.7) echo "Generate Condor jobs on MC event..."
@@ -339,7 +339,7 @@ case $option in
         boss.condor -g physics jobOptions_chic0_gam2invi_gen_mc.txt
         cd ../../chic1_invi/jobs_chic1
         boss.condor -g physics jobOptions_chic1_gam2invi_gen_mc.txt
-        cd ../../chic2_invi/jobOptions_chic2        
+        cd ../../chic2_invi/jobs_chic2        
         boss.condor -g physics jobOptions_chic2_gam2invi_gen_mc.txt
         cd $HOME/bes/chic2invi/v0.1
 	    ;;
@@ -509,17 +509,17 @@ case $option in
 
     0.7.3) echo "run on ee, mumu, gamgam data 2012..."
 	    cd scripts/ee_decay/jobs
-        boss.condor -g physics jobOptions_GEBhabha.txt
-        boss.condor -g physics jobOptions_GBBhabha.txt
-        boss.condor -g physics jobOptions_GDiphoton.txt
+        # boss.condor -g physics jobOptions_GEBhabha.txt
+        # boss.condor -g physics jobOptions_GBBhabha.txt
+        # boss.condor -g physics jobOptions_GDiphoton.txt
         boss.condor -g physics jobOptions_GDimuon.txt
         cd $HOME/bes/chic2invi/v0.1
 	    ;;
 
      0.7.4) echo "select events on ee, mumu, gamgam data 2012..."
-        ./python/sel_events.py scripts/ee_decay/rootfile/GEBhabha.root scripts/ee_decay/event/GEBhabha.root
-        ./python/sel_events.py scripts/ee_decay/rootfile/GBBhabha.root scripts/ee_decay/event/GBBhabha.root
-        ./python/sel_events.py scripts/ee_decay/rootfile/GDiphoton.root scripts/ee_decay/event/GDiphoton.root
+        # ./python/sel_events.py scripts/ee_decay/rootfile/GEBhabha.root scripts/ee_decay/event/GEBhabha.root
+        # ./python/sel_events.py scripts/ee_decay/rootfile/GBBhabha.root scripts/ee_decay/event/GBBhabha.root
+        # ./python/sel_events.py scripts/ee_decay/rootfile/GDiphoton.root scripts/ee_decay/event/GDiphoton.root
         ./python/sel_events.py scripts/ee_decay/rootfile/GDimuon.root scripts/ee_decay/event/GDimuon.root
 	    ;;
 
