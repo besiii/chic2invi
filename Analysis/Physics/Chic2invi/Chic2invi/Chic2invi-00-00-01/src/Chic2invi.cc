@@ -116,6 +116,7 @@ private:
   std::vector<double> *m_raw_ge; 
 
   std::vector<double> *m_raw_phi;
+  std::vector<double> *m_chic2_1c;
   std::vector<double> *m_raw_theta;
   std::vector<double> *m_raw_costheta;
   std::vector<int> *m_raw_cstat;
@@ -141,7 +142,9 @@ private:
   void saveVtxInfo(HepLorentzVector,
 		   HepLorentzVector);  
   void saveGamInfo(std::vector<int>,
-		   SmartDataPtr<EvtRecTrackCol>);
+  		 SmartDataPtr<EvtRecTrackCol>);
+  void kmFit(std::vector<int>,
+  		 SmartDataPtr<EvtRecTrackCol>);
   int selectChargedTracks(SmartDataPtr<EvtRecEvent>,
 			  SmartDataPtr<EvtRecTrackCol>,
 			  std::vector<int> &,
@@ -156,8 +159,8 @@ private:
   bool hasGoodPiPiVertex(RecMdcKalTrack *,
 			 RecMdcKalTrack *,
 			 bool);
-  int selectNeutralTracks(SmartDataPtr<EvtRecEvent>,
-			  SmartDataPtr<EvtRecTrackCol>);
+  void selectNeutralTracks(SmartDataPtr<EvtRecEvent>,
+			  SmartDataPtr<EvtRecTrackCol>, std::vector<int>& iGam, std::vector<int>& iShow);
   bool passVertexSelection(CLHEP::Hep3Vector,
 			   RecMdcKalTrack* ); 
   CLHEP::Hep3Vector getOrigin();
@@ -197,6 +200,7 @@ Chic2invi::Chic2invi(const std::string& name, ISvcLocator* pSvcLocator) :
   m_raw_gpz(0), 
   m_raw_ge(0),  
   m_raw_phi(0),
+  m_chic2_1c(0),
   m_raw_theta(0),
   m_raw_costheta(0),
   m_raw_cstat(0),
@@ -323,6 +327,7 @@ void Chic2invi::book_tree() {
   m_tree->Branch("raw_ge", &m_raw_ge);
   
   m_tree->Branch("raw_phi", &m_raw_phi);
+  m_tree->Branch("m_chic2_1c", &m_chic2_1c);
   m_tree->Branch("raw_theta", &m_raw_theta);
   m_tree->Branch("raw_costheta", &m_raw_costheta);
   m_tree->Branch("raw_cstat", &m_raw_cstat);
@@ -352,6 +357,7 @@ void Chic2invi::clearVariables() {
   m_raw_ge->clear();
 
   m_raw_phi->clear();
+  m_chic2_1c->clear();
   m_raw_theta->clear();
   m_raw_costheta->clear();
   m_raw_cstat->clear();
@@ -372,25 +378,40 @@ void Chic2invi::clearVariables() {
 
 bool Chic2invi::buildChicToInvisible() {
 
-  SmartDataPtr<EvtRecEvent>evtRecEvent(eventSvc(),"/Event/EvtRec/EvtRecEvent");
-  if(!evtRecEvent) return false;
+	SmartDataPtr<EvtRecEvent>evtRecEvent(eventSvc(),"/Event/EvtRec/EvtRecEvent");
+	if(!evtRecEvent) return false;
 
-  SmartDataPtr<EvtRecTrackCol> evtRecTrkCol(eventSvc(), "/Event/EvtRec/EvtRecTrackCol");
-  if(!evtRecTrkCol) return false;
+	SmartDataPtr<EvtRecTrackCol> evtRecTrkCol(eventSvc(), "/Event/EvtRec/EvtRecTrackCol");
+	if(!evtRecTrkCol) return false;
 
-  h_evtflw->Fill(9);
+	h_evtflw->Fill(9);
 
-  m_ncharged = evtRecEvent->totalCharged();
-  if (m_ncharged != 0) return false;
-  h_evtflw->Fill(1); // N_{Good} = 0
+	m_ncharged = evtRecEvent->totalCharged();
+	if (m_ncharged != 0) return false;
+	h_evtflw->Fill(1); // N_{Good} = 0
 
-  selectNeutralTracks(evtRecEvent, evtRecTrkCol);
-  if (m_ngam >= 10) return false;
-  h_evtflw->Fill(8); // N_{#gamma} < 10 
+	if (evtRecEvent->totalNeutral() != 2) return false;
+	h_evtflw->Fill(2); // N_{Shower} = 2
 
-  if (m_isMonteCarlo) saveGenInfo();
+	std::vector<int> iGam;
+	iGam.clear();
+	std::vector<int> iShow;
+	iShow.clear();
 
-  return true; 
+	selectNeutralTracks(evtRecEvent, evtRecTrkCol, iGam, iShow);
+	if (iGam.size() != 2) return false;
+	//if( isCosmicRay() ) return false;
+	saveGamInfo(iGam, evtRecTrkCol);
+	m_ngam = iGam.size();
+	m_nshow = iShow.size();
+
+	kmFit(iGam, evtRecTrkCol);
+
+	h_evtflw->Fill(8); // N_{#gamma} < 10 
+
+	if (m_isMonteCarlo) saveGenInfo();
+
+	return true; 
 }
 
 void Chic2invi::saveGenInfo(){
@@ -414,13 +435,13 @@ void Chic2invi::saveGenInfo(){
 				rootIndex = (*iter_mc_topo)->trackIndex();
 			}
 			if (!Decay) continue;
-            int mcidx = ((*iter_mc_topo)->mother()).trackIndex() - rootIndex;
+			int mcidx = ((*iter_mc_topo)->mother()).trackIndex() - rootIndex;
 			int pdgid = (*iter_mc_topo)->particleProperty();
 			if(strange&&((*iter_mc_topo)->mother()).particleProperty()!=PSI2S_PDG_ID) mcidx--;
 			m_pdgid[m_numParticle] = pdgid;
 			m_motheridx[m_numParticle] = mcidx;
 			m_numParticle++;
-			}
+		}
 		m_indexmc = m_numParticle;
 	}
 
@@ -449,13 +470,9 @@ void Chic2invi::saveGenInfo(){
 }
 
 
-int Chic2invi::selectNeutralTracks(SmartDataPtr<EvtRecEvent> evtRecEvent,
-		SmartDataPtr<EvtRecTrackCol> evtRecTrkCol) {
+void Chic2invi::selectNeutralTracks(SmartDataPtr<EvtRecEvent> evtRecEvent,
+		SmartDataPtr<EvtRecTrackCol> evtRecTrkCol, std::vector<int>& iGam, std::vector<int>& iShow) {
 
-	std::vector<int> iGam;
-	iGam.clear();
-	std::vector<int> iShow;
-	iShow.clear();
 
 	// loop through neutral tracks
 	for(int i=evtRecEvent->totalCharged(); i< evtRecEvent->totalTracks(); i++) {
@@ -525,25 +542,37 @@ int Chic2invi::selectNeutralTracks(SmartDataPtr<EvtRecEvent> evtRecEvent,
 		iGam.push_back((*itTrk)->trackId());
 	} // end loop neutral tracks     
 
-	m_ngam = iGam.size();
-	m_nshow = iShow.size();
+	/*  if(iGam.size() == 2) {
+		m_ngam = iGam.size();
+		m_nshow = iShow.size();
 
-	saveGamInfo(iGam, evtRecTrkCol);   
-
-	return iGam.size(); 
+		}
+	//saveGamInfo(iGam, evtRecTrkCol);   
+	*/
+	//return iGam.size(); 
 }
 
 
 void Chic2invi::saveGamInfo(std::vector<int> iGam,
 		SmartDataPtr<EvtRecTrackCol> evtRecTrkCol){
 
+
+	double eraw;
+	double phi;
+	double theta;
+
 	for(vector<int>::size_type i=0; i<iGam.size(); i++)  {
 
 		EvtRecTrackIterator itTrk = evtRecTrkCol->begin() + iGam[i];
 		RecEmcShower* emcTrk = (*itTrk)->emcShower();
-		double eraw = emcTrk->energy();
-		double phi = emcTrk->phi();
-		double theta = emcTrk->theta();
+		eraw = emcTrk->energy();
+		phi = emcTrk->phi();
+		theta = emcTrk->theta();
+		int cstat = emcTrk->status();
+		int nhit = emcTrk->numHits();
+		int module = emcTrk->module();      
+		double secmom = emcTrk->secondMoment();      
+		double time = emcTrk->time();
 
 		HepLorentzVector p4 = HepLorentzVector(eraw * sin(theta) * cos(phi),
 				eraw * sin(theta) * sin(phi),
@@ -554,13 +583,6 @@ void Chic2invi::saveGamInfo(std::vector<int> iGam,
 		m_raw_gpz->push_back(p4.pz());
 		m_raw_ge->push_back(p4.e());
 
-
-		int cstat = emcTrk->status();
-		int nhit = emcTrk->numHits();
-		int module = emcTrk->module();      
-		double secmom = emcTrk->secondMoment();      
-		double time = emcTrk->time();
-
 		m_raw_phi->push_back(phi);
 		m_raw_theta->push_back(theta);
 		m_raw_costheta->push_back(cos(theta));
@@ -570,7 +592,67 @@ void Chic2invi::saveGamInfo(std::vector<int> iGam,
 		m_raw_secmom->push_back(secmom);
 		m_raw_time->push_back(time);
 	}
+
+
 }
 
 
 
+
+
+void Chic2invi::kmFit(std::vector<int> iGam,
+		SmartDataPtr<EvtRecTrackCol> evtRecTrkCol){
+
+	double eraw;
+	double phi;
+	double theta;
+
+	for(vector<int>::size_type i=0; i<iGam.size(); i++)  {
+
+		EvtRecTrackIterator itTrk = evtRecTrkCol->begin() + iGam[i];
+		RecEmcShower* emcTrk = (*itTrk)->emcShower();
+		eraw = emcTrk->energy();
+		phi = emcTrk->phi();
+		theta = emcTrk->theta();
+	}
+
+	int gam1_index = -1;
+	int gam2_index = -1;
+	// if(m_raw_ge->size()!=2) continue;
+	if(m_raw_ge->at(0)<m_raw_ge->at(1)){
+		gam1_index = 0;
+		gam2_index = 1;
+	}
+	else{
+		gam1_index = 1;
+		gam2_index = 0;
+	}
+	HepLorentzVector gam1_p4_raw = HepLorentzVector(m_raw_gpx->at(gam1_index), 
+			m_raw_gpy->at(gam1_index), 
+			m_raw_gpz->at(gam1_index), 
+			m_raw_ge->at(gam1_index));
+	HepLorentzVector gam2_p4_raw = HepLorentzVector(m_raw_gpx->at(gam2_index), 
+			m_raw_gpy->at(gam2_index), 
+			m_raw_gpz->at(gam2_index), 
+			m_raw_ge->at(gam2_index));
+	//    WTrackParameter gam1 = WTrackParameter(gam1_p4_raw, phi, theta, eraw);
+	HepLorentzVector cms_p4 = HepLorentzVector(0.011*m_ecms, 0, 0, m_ecms);
+	RecEmcShower *gam1 = (*(evtRecTrkCol->begin()+iGam[gam1_index]))->emcShower();
+
+	double M_CHIC2=3.55620;
+	KalmanKinematicFit* kmfitchic2 = KalmanKinematicFit::instance();
+	kmfitchic2->init();
+	kmfitchic2->setChisqCut(2500);
+	kmfitchic2->AddTrack(0, 0.0, gam1);
+	kmfitchic2->AddMissTrack(1,M_CHIC2);
+	//    kmfitchic2->AddFourMomentum(0, cms_p4);
+	kmfitchic2->AddResonance(0, m_ecms, 0, 1);
+	double kmchisq(-9.);
+	if(!kmfitchic2->Fit()) kmchisq=999.;
+	else{
+		kmchisq=kmfitchic2->chisq();
+	}
+
+	m_chic2_1c->push_back(kmchisq);
+
+}
