@@ -21,32 +21,67 @@ mbc.SetLeftMargin(0.15)
 mbc.SetRightMargin(0.15)
 mbc.SetTopMargin(0.1)
 mbc.SetBottomMargin(0.15)
-mbc.SetLogy()
-
-xmin = 0.0
-xmax = 0.4
-xbins = 100.0
-ytitle = "Events/%dMeV" %((xmax - xmin) / xbins * 1000.0)
+# mbc.SetLogy()
+# mbc.SetLogx()
 
 # histo = 'h_Mgamgam_d'
+# xmin = 0.0
+# xmax = 5.0
+
 # histo = 'h_Mgamgam_n'
+# xmin = 2.9
+# xmax = 3.8
+
 # histo = 'h_gam1_E_d'
+# xmin = 0.0
+# xmax = 2.0
+
 # histo = 'h_gam1_E_n'
-# histo = 'h_gam2_E'
+# xmin = 0.0
+# xmax = 0.4
+
+histo = 'h_gam2_E'
+xmin = 0.0
+xmax = 2.5
+
 # histo = 'h_mrec_gam1_d'
+# xmin = 0.0
+# xmax = 3.7
+
 # histo = 'h_mrec_gam1_n'
+# xmin = 3.3
+# xmax = 3.7
+
 # histo = 'h_gam1_costhe'
 # histo = 'h_gam2_costhe'
+
 # histo = 'h_mrec_gamgam_d'
-histo = 'h_mrec_gamgam_n'
+# xmin = 0.0
+# xmax = 3.8
+
+# histo = 'h_mrec_gamgam_n'
+# xmin = 2.9
+# xmax = 3.8
+
 # histo = 'h_ngam'
-f0 = TFile("scripts/chic0_invi/event_chic0/chic0_gam2invi_gen_mc_event_22.root")
-f1 = TFile("scripts/chic1_invi/event_chic1/chic1_gam2invi_gen_mc_event_22.root")
-f2 = TFile("scripts/chic2_invi/event_chic2/chic2_gam2invi_gen_mc_event_22.root")
-f3 = TFile('run/chic2incl/hist_inclusiveMC/chic2incl_psip_mc_event_merged_22.root')
-f4 = TFile('run/chic2incl/hist_data/chic2incl_psip_data_event_merged_22.root')
-f5 = TFile('run/chic2incl/hist_data3650/chic2incl_data3650_event_merged_22.root')
-f6 = TFile('scripts/ee_decay/event/GDimuon_22.root')
+# histo = 'h_chic2_1c_d'
+# histo = 'h_chic2_1c_n'
+
+# histo = 'h_angle_gamgam'
+
+# histo = 'h_trigger'
+
+# xbins = 100.0
+# ytitle = "Events/%dMeV" %((xmax - xmin) / xbins * 1000.0)
+
+f0 = TFile("scripts/chic0_invi/event_chic0/chic0_gam2invi_gen_mc_event.root")
+f1 = TFile("scripts/chic1_invi/event_chic1/chic1_gam2invi_gen_mc_event.root")
+f2 = TFile("scripts/chic2_invi/event_chic2/chic2_gam2invi_gen_mc_event.root")
+f3 = TFile('run/chic2incl/hist_inclusiveMC/chic2incl_psip_mc_event_merged_1.root')
+f4 = TFile('run/chic2incl/hist_data/chic2incl_psip_data_event_merged_1.root')
+# f4 = TFile('run/chic2incl/hist_data09/chic2incl_psip_data09_event_merged_1.root')
+f5 = TFile('run/chic2incl/hist_data3650/chic2incl_data3650_event_merged_1.root')
+f6 = TFile('scripts/ee_decay/event/GDimuon.root')
 h0_E = f0.Get(histo)
 h1_E = f1.Get(histo)
 h2_E = f2.Get(histo)
@@ -55,9 +90,23 @@ h4_E = f4.Get(histo)
 h5_E = f5.Get(histo)
 h6_E = f6.Get(histo)
 
-h5_E.Scale(11.33)
-h4_E.Scale(1)
-h4_E.GetYaxis().SetRangeUser(1, 10000000000)
+# for data 2012
+# h5_E.Scale(7.866)
+# h5_E.Scale(11.33)
+
+# for data 2009
+# h5_E.Scale(3.45)
+
+# h4_E.Scale(1)
+h4_E.GetYaxis().SetRangeUser(0.1, 10000000)
+# h4_E.GetXaxis().SetRangeUser(0.000001, 0.0001)
+
+h6_E.Scale(2)
+h5_E.Scale(0.00013)
+h4_E.Scale(0.000013)
+h3_E.Scale(0.13)
+# # h4_E.GetYaxis().SetRangeUser(1, 300000)
+# h4_E.GetXaxis().SetRangeUser(0, 0.0001)
 
 # just for costheta
 # h5_E.Scale(0.00025)
@@ -65,6 +114,13 @@ h4_E.GetYaxis().SetRangeUser(1, 10000000000)
 # h3_E.Scale(0.025)
 # h6_E.Scale(0.1)
 # h4_E.GetYaxis().SetRangeUser(1, 260)
+
+# just for theta_gamgam
+# h5_E.Scale(0.0005665)
+# h4_E.Scale(0.00005)
+# h3_E.Scale(0.1)
+# h6_E.Scale(0.1)
+# h4_E.GetYaxis().SetRangeUser(1, 80)
 
 h0_E.SetLineColor(ROOT.kRed)
 h1_E.SetLineColor(ROOT.kBlue)
@@ -79,7 +135,16 @@ h1_E.SetLineWidth(2)
 h0_E.SetLineWidth(2)
 h5_E.SetLineWidth(2)
 h6_E.SetLineWidth(2)
-h4_E.Draw('e')
+
+h4_E.SetFillColor(ROOT.kGreen+3)
+h5_E.SetFillColor(ROOT.kOrange+7)
+h6_E.SetFillColor(ROOT.kCyan+2)
+h4_E.SetFillStyle(3335)
+h5_E.SetFillStyle(3005)
+h6_E.SetFillStyle(3353)
+
+# h4_E.Draw('e')
+h4_E.Draw()
 h2_E.Draw("same")
 h1_E.Draw("same")
 h0_E.Draw("same")
@@ -88,17 +153,17 @@ h5_E.Draw("same")
 h6_E.Draw("same")
 
 
-h4_E.GetYaxis().SetTitle(ytitle)
+# h4_E.GetYaxis().SetTitle(ytitle)
 h4_E.GetYaxis().SetTitleOffset(1.5)
 
-legend = TLegend(0.44, 0.68, 0.74, 0.87)
-#legend = TLegend(0.54, 0.68, 0.84, 0.87)
-# legend = TLegend(0.3, 0.65, 0.6, 0.87)
+# legend = TLegend(0.55, 0.68, 0.77, 0.87)
+# legend = TLegend(0.62, 0.68, 0.84, 0.87)
+legend = TLegend(0.18, 0.68, 0.48, 0.87)
 legend.AddEntry(h0_E,'#gamma_{1} with #chi_{c0}')
 legend.AddEntry(h1_E,'#gamma_{1} with #chi_{c1}')
 legend.AddEntry(h2_E,'#gamma_{1} with #chi_{c2}')
 legend.AddEntry(h3_E,'#gamma_{1} from inclusive MC')
-legend.AddEntry(h4_E,'#gamma_{1} from data 2012')
+legend.AddEntry(h4_E,'#gamma_{1} from data 2009')
 legend.AddEntry(h5_E,'#gamma_{1} from con3650')
 legend.AddEntry(h6_E,'#gamma_{1} from GDimuon')
 #legend.SetNColums(1)
@@ -119,8 +184,8 @@ legend.Draw()
 # h4_E.GetXaxis().SetTitle("E_{#gamma1} (GeV)")
 # mbc.SaveAs("python/plots/egam1_n.pdf")
 
-# h4_E.GetXaxis().SetTitle("E_{#gamma2} (GeV)")
-# mbc.SaveAs("python/plots/egam2.pdf")
+h4_E.GetXaxis().SetTitle("E_{#gamma2} (GeV)")
+mbc.SaveAs("python/plots/egam2.pdf")
 
 # h4_E.GetXaxis().SetTitle("mrec_{#gamma1} (GeV/c^{2})")
 # mbc.SaveAs("python/plots/mrecgam1_d.pdf")
@@ -137,6 +202,14 @@ legend.Draw()
 # h4_E.GetXaxis().SetTitle("mrec_{#gamma#gamma} (GeV/c^{2})")
 # mbc.SaveAs("python/plots/mrecgamgam_d.pdf")
 
-h4_E.GetXaxis().SetTitle("mrec_{#gamma#gamma} (GeV/c^{2})")
-mbc.SaveAs("python/plots/mrecgamgam_n.pdf")
+# h4_E.GetXaxis().SetTitle("mrec_{#gamma#gamma} (GeV/c^{2})")
+# mbc.SaveAs("python/plots/mrecgamgam_n.pdf")
 
+# h4_E.GetXaxis().SetTitle("#chi^{2}_{1c}")
+# mbc.SaveAs("python/plots/chisq.pdf")
+
+# h4_E.GetXaxis().SetTitle("#theta_{#gamma#gamma}")
+# mbc.SaveAs("python/plots/theta.pdf")
+
+# h4_E.GetXaxis().SetTitle("trigger")
+# mbc.SaveAs("python/plots/trigger.pdf")
