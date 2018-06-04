@@ -27,7 +27,7 @@ fi
 
 
 case $option in 
-    1) echo "Building Jpsi2invi module..."
+    1) echo "Building Chic2invi module..."
        cd Analysis/Physics/Chic2invi/Chic2invi/Chic2invi-00-00-01/cmt 
        gmake  
        ;;

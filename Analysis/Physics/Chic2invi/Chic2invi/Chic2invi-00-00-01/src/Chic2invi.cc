@@ -20,13 +20,21 @@
 #include "GaudiKernel/NTuple.h"
 #include "GaudiKernel/Bootstrap.h"
 
-#include "EventModel/EventHeader.h"
 #include "EvtRecEvent/EvtRecEvent.h"
 #include "EvtRecEvent/EvtRecTrack.h"
+
 #include "EventModel/EventHeader.h"
+#include "EventModel/EventModel.h"
+#include "EventModel/Event.h"
+#include "TrigEvent/TrigEvent.h"
+#include "TrigEvent/TrigData.h"
+
 #include "CLHEP/Vector/ThreeVector.h"
 
+#include "DstEvent/TofHitStatus.h"
+
 #include "VertexFit/IVertexDbSvc.h"
+#include "VertexFit/SecondVertexFit.h"
 #include "VertexFit/Helix.h"
 #include "VertexFit/WTrackParameter.h"
 #include "VertexFit/VertexFit.h"
@@ -35,6 +43,7 @@
 #include "McTruth/McParticle.h"
 
 #include "VertexFit/KalmanKinematicFit.h"
+//#include "GammaConv/GammaConv.h"
 
 #include <TFile.h>
 #include <TH1.h>
@@ -71,14 +80,63 @@ private:
   double m_photon_iso_angle_min;
   double m_pion_polar_angle_max;
   double m_pion_momentum_max;
-  double m_prob_pion_min;
+  double m_prob_e_min;
   double m_dipion_mass_min;
   double m_dipion_mass_max;
+  double m_epem_theta_max;
+  double psi_pair;
+  double psi_pair_max;
+  double cosepem;
+
+  // PID info
+  double m_prob_ep;
+  double m_prob_em;
+  double m_prob_mup;
+  double m_prob_mum;
+  double m_prob_pip;
+  double m_prob_pim;
+  double m_prob_kp;
+  double m_prob_km;
+  double m_prob_p; 
+  double m_prob_pb; 
+
+  // ee info
+  double m_ep_px;
+  double m_ep_py;
+  double m_ep_pz;
+
+  double m_em_px;
+  double m_em_py;
+  double m_em_pz;
+
+  // fitted info
+  double m_vtx_ep_px; 
+  double m_vtx_ep_py; 
+  double m_vtx_ep_pz; 
+  double m_vtx_ep_p; 
+  double m_vtx_ep_e;
+  double m_vtx_ep_costheta;
+  double m_vtx_ep_phi;
+
+  double m_vtx_em_px; 
+  double m_vtx_em_py; 
+  double m_vtx_em_pz; 
+  double m_vtx_em_p; 
+  double m_vtx_em_e;
+  double m_vtx_em_costheta;
+  double m_vtx_em_phi;
+
+  double m_vtx_mepem;
+  double m_vtx_mrecepem;
+  double m_vtx_cosepem;
+  double m_vtx_cos2esys;
 
   // output file
   std::string m_output_filename;
   bool m_isMonteCarlo; 
   bool m_isZCcondition;
+  bool m_trigger_flag;
+  bool m_eventrate;
   TFile* m_fout; 
   
   // define Histograms
@@ -90,6 +148,7 @@ private:
   // common info 
   int m_run;
   int m_event;
+  int m_chan_det;
 
   //MC truth info
   int m_testMC;
@@ -106,10 +165,29 @@ private:
   double m_mc_costhe_gam1;
   double m_mc_costhe_gam2;
 
+  double m_trkm_p; 
+  double m_trkm_px; 
+  double m_trkm_py; 
+  double m_trkm_pz; 
+  double m_trkm_theta; 
+  double m_trkm_phi; 
+  double m_trkm_eraw; 
+
+  // charged tracks
+  int m_ncharged;
+  int m_nptrk;
+  int m_nmtrk;
+  double m_trkp_p;
+  double m_trkp_px;
+  double m_trkp_py;
+  double m_trkp_pz;
+  double m_trkp_theta;
+  double m_trkp_phi;
+  double m_trkp_eraw;
+
   // neutral tracks
   int m_nshow;
   int m_ngam;
-  int m_ncharged;
   std::vector<double> *m_raw_gpx; 
   std::vector<double> *m_raw_gpy; 
   std::vector<double> *m_raw_gpz; 
@@ -124,7 +202,12 @@ private:
   std::vector<int> *m_raw_module;
   std::vector<double> *m_raw_secmom;
   std::vector<double> *m_raw_time;       
-  
+  std::vector<double> *m_raw_trigger;       
+ 
+  // vertex
+  double m_vr0;
+  double m_vz0;
+
   // chic2invi
   int m_ntrk; 
   int m_npho;
@@ -137,7 +220,7 @@ private:
   void saveGenInfo();
   void saveTrkInfo(EvtRecTrackIterator,
 		   EvtRecTrackIterator);
-  void savePionInfo(RecMdcKalTrack *,
+  void saveEeInfo(RecMdcKalTrack *,
 		    RecMdcKalTrack *);
   void saveVtxInfo(HepLorentzVector,
 		   HepLorentzVector);  
@@ -145,18 +228,22 @@ private:
   		 SmartDataPtr<EvtRecTrackCol>);
   void kmFit(std::vector<int>,
   		 SmartDataPtr<EvtRecTrackCol>);
+  bool isCosmicRay(std::vector<int>,
+  		 SmartDataPtr<EvtRecTrackCol>);
   int selectChargedTracks(SmartDataPtr<EvtRecEvent>,
 			  SmartDataPtr<EvtRecTrackCol>,
 			  std::vector<int> &,
 			  std::vector<int> &); 
-  int selectPionPlusPionMinus(SmartDataPtr<EvtRecTrackCol>,
+  int selectElectronPositron(SmartDataPtr<EvtRecTrackCol>,
 			      std::vector<int>,
 			      std::vector<int>);
   void calcTrackPID(EvtRecTrackIterator,
 		    double&,
 		    double&,
-		    double&);
-  bool hasGoodPiPiVertex(RecMdcKalTrack *,
+		    double&,
+		    double&,
+			double&);
+  bool hasGoodEeVertex(RecMdcKalTrack *,
 			 RecMdcKalTrack *,
 			 bool);
   void selectNeutralTracks(SmartDataPtr<EvtRecEvent>,
@@ -188,6 +275,9 @@ const int PSI2S_PDG_ID = 100443;
 const int CHIC0_PDG_ID = 174;
 const int GAMMA_PDG_ID = 22;
 
+const double E_MASS = 0.000511;
+
+static long m_cout_everat(0);
 
 //
 // member functions
@@ -207,15 +297,16 @@ Chic2invi::Chic2invi(const std::string& name, ISvcLocator* pSvcLocator) :
   m_raw_nhit(0),
   m_raw_module(0),
   m_raw_secmom(0),
-  m_raw_time(0)
+  m_raw_time(0),
+  m_raw_trigger(0)
 {
   declareProperty("OutputFileName", m_output_filename);
   declareProperty("IsMonteCarlo", m_isMonteCarlo);
   declareProperty("ZChi_AnaCondition", m_isZCcondition=false);
   //declareProperty("ZChi_AnaCondition", m_isZCcondition=true);
   declareProperty("Ecms", m_ecms = 3.686);
-  declareProperty("Vr0cut", m_vr0cut=1.0);
-  declareProperty("Vz0cut", m_vz0cut=10.0);
+  declareProperty("Vr0cut", m_vr0cut=10.0);
+  declareProperty("Vz0cut", m_vz0cut=30.0);
   declareProperty("ChaCosthetaCut", m_cha_costheta_cut=0.93);
   declareProperty("TotalNumberOfChargedMax", m_total_number_of_charged_max=50);
   declareProperty("MinEstCut", m_min_emctime=0.0);
@@ -229,9 +320,14 @@ Chic2invi::Chic2invi(const std::string& name, ISvcLocator* pSvcLocator) :
   declareProperty("PhotonIsoAngleMin", m_photon_iso_angle_min=10);
   declareProperty("PionPolarAngleMax", m_pion_polar_angle_max=0.99);
   declareProperty("PionMomentumMax", m_pion_momentum_max=1.9); 
-  declareProperty("ProbPionMin", m_prob_pion_min=0.001);
+  declareProperty("OpenAngle_epem", m_epem_theta_max=0.5); 
+  declareProperty("PsiPairMax", psi_pair_max=0.5); 
+  declareProperty("Prob_e", m_prob_e_min=0.001);
   declareProperty("DipionMassMin", m_dipion_mass_min=3.0); 
   declareProperty("DipionMassMax", m_dipion_mass_max=3.2); 
+  declareProperty("Trigger", m_trigger_flag=true); 
+  declareProperty("EventRate", m_eventrate=true); 
+  declareProperty("ChanDet", m_chan_det=1); 
 }
 
 
@@ -263,15 +359,47 @@ StatusCode Chic2invi::execute() {
   SmartDataPtr<Event::EventHeader>eventHeader(eventSvc(),"/Event/EventHeader");
   if(!eventHeader) return StatusCode::FAILURE;
 
+//   SmartDataPtr<EvtRecTrackCol> evtRecTrkCol(eventSvc(), "/Event/EvtRec/EvtRecTrackCol");
+// 	if(!evtRecTrkCol){
+// 		log << MSG::ERROR << "EvtRecTrackCol" << endreq;
+// 		return StatusCode::SUCCESS;
+// 	}
+
   m_run = eventHeader->runNumber();
   m_event = eventHeader->eventNumber();
   m_evttag = eventHeader->eventTag();
 
-	if (buildChicToInvisible()) {
-    	m_tree->Fill(); // only fill tree for the selected events 
-  	}
+	if (!m_isMonteCarlo) {
+	// if(m_trigger_flag){
+		SmartDataPtr<TrigData> trigData(eventSvc(),EventModel::Trig::TrigData);
+		if (!trigData){
+			log << MSG::FATAL << "Could not find Trigger Data for physics analysis" << endreq;
+			return StatusCode::FAILURE;
+		}
+		log << MSG::DEBUG << "Trigger conditions: " << endreq;
+		for(int i=0; i < 48; i++){
+			log << MSG::DEBUG << "i:" << i << "  name:" << trigData->getTrigCondName(i) << "  cond:" << trigData->getTrigCondition(i) << endreq;
+		}
+		int m_trig_tot(0), m_trig_which(-1);
+		if(m_eventrate){
+			for(int j=0; j<16; j++){
+				if(trigData->getTrigChannel(j)){
+					m_trig_tot ++;
+					m_trig_which = j+1;
+					//m_raw_trigger->push_back(m_trig_which);
+					m_raw_trigger->push_back(j);
+				}
+			}
+		}
+	}
+	
+if (buildChicToInvisible()) {
+	m_tree->Fill(); // only fill tree for the selected events 
+}
 
-  return StatusCode::SUCCESS; 
+cout<<"end"<<endl;
+
+return StatusCode::SUCCESS; 
 }
 
 StatusCode Chic2invi::finalize() {
@@ -317,6 +445,29 @@ void Chic2invi::book_tree() {
   m_tree->Branch("run",&m_run,"run/I");
   m_tree->Branch("event",&m_event,"event/I");
 	  
+  //charged tracks
+  m_tree->Branch("ncharged", &m_ncharged, "ncharged/I");
+  m_tree->Branch("nptrk", &m_nptrk, "nptrk/I");
+  m_tree->Branch("nmtrk", &m_nmtrk, "nmtrk/I");
+  m_tree->Branch("trkp_p", &m_trkp_p, "trkp_p/D"); 
+  m_tree->Branch("trkp_px", &m_trkp_px, "trkp_px/D"); 
+  m_tree->Branch("trkp_py", &m_trkp_py, "trkp_py/D"); 
+  m_tree->Branch("trkp_pz", &m_trkp_pz, "trkp_pz/D"); 
+  m_tree->Branch("trkp_theta", &m_trkp_theta, "trkp_theta/D"); 
+  m_tree->Branch("trkp_phi", &m_trkp_phi, "trkp_phi/D"); 
+  m_tree->Branch("trkp_eraw", &m_trkp_eraw, "trkp_eraw/D"); 
+
+  m_tree->Branch("trkm_p", &m_trkm_p, "trkm_p/D"); 
+  m_tree->Branch("trkm_px", &m_trkm_px, "trkm_px/D"); 
+  m_tree->Branch("trkm_py", &m_trkm_py, "trkm_py/D"); 
+  m_tree->Branch("trkm_pz", &m_trkm_pz, "trkm_pz/D"); 
+  m_tree->Branch("trkm_theta", &m_trkm_theta, "trkm_theta/D"); 
+  m_tree->Branch("trkm_phi", &m_trkm_phi, "trkm_phi/D"); 
+  m_tree->Branch("trkm_eraw", &m_trkm_eraw, "trkm_eraw/D"); 
+	  
+  //vertex
+  m_tree->Branch("vr0", &m_vr0, "vr0/D");
+  m_tree->Branch("vz0", &m_vz0, "vz0/D");
 	  
   //netual tracks
   m_tree->Branch("nshow", &m_nshow, "nshow/I");
@@ -335,7 +486,48 @@ void Chic2invi::book_tree() {
   m_tree->Branch("raw_module", &m_raw_module);
   m_tree->Branch("raw_secmom", &m_raw_secmom);
   m_tree->Branch("raw_time", &m_raw_time);
+  m_tree->Branch("raw_trigger", &m_raw_trigger);
 
+    // PID info
+  m_tree->Branch("prob_ep", &m_prob_ep, "prob_ep/D"); 
+  m_tree->Branch("prob_em", &m_prob_em, "prob_em/D"); 
+  m_tree->Branch("prob_kp", &m_prob_kp, "prob_kp/D"); 
+  m_tree->Branch("prob_km", &m_prob_km, "prob_km/D"); 
+  m_tree->Branch("prob_p", &m_prob_p, "prob_p/D"); 
+  m_tree->Branch("prob_pb", &m_prob_pb, "prob_pb/D"); 
+
+  // save pion info
+  m_tree->Branch("ep_px", &m_ep_px, "ep_px/D");
+  m_tree->Branch("ep_py", &m_ep_py, "ep_py/D");
+  m_tree->Branch("ep_pz", &m_ep_pz, "ep_pz/D");
+
+  m_tree->Branch("em_px", &m_em_px, "em_px/D");
+  m_tree->Branch("em_py", &m_em_py, "em_py/D");
+  m_tree->Branch("em_pz", &m_em_pz, "em_pz/D");
+
+  // fitted info
+  m_tree->Branch("vtx_ep_px", &m_vtx_ep_px, "vtx_ep_px/D");
+  m_tree->Branch("vtx_ep_py", &m_vtx_ep_py, "vtx_ep_py/D");
+  m_tree->Branch("vtx_ep_pz", &m_vtx_ep_pz, "vtx_ep_pz/D");
+  m_tree->Branch("vtx_ep_p", &m_vtx_ep_p, "vtx_ep_p/D");
+  m_tree->Branch("vtx_ep_e", &m_vtx_ep_e, "vtx_ep_e/D");
+  m_tree->Branch("vtx_ep_costheta", &m_vtx_ep_costheta, "vtx_ep_costheta/D");
+  m_tree->Branch("vtx_ep_phi", &m_vtx_ep_phi, "vtx_ep_phi/D");
+
+  m_tree->Branch("vtx_em_px", &m_vtx_em_px, "vtx_em_px/D");
+  m_tree->Branch("vtx_em_py", &m_vtx_em_py, "vtx_em_py/D");
+  m_tree->Branch("vtx_em_pz", &m_vtx_em_pz, "vtx_em_pz/D");
+  m_tree->Branch("vtx_em_p", &m_vtx_em_p, "vtx_em_p/D");
+  m_tree->Branch("vtx_em_e", &m_vtx_em_e, "vtx_em_e/D");
+  m_tree->Branch("vtx_em_costheta", &m_vtx_em_costheta, "vtx_em_costheta/D");
+  m_tree->Branch("vtx_em_phi", &m_vtx_em_phi, "vtx_em_phi/D");
+
+  m_tree->Branch("vtx_mepem", &m_vtx_mepem, "vtx_mepem/D");
+  m_tree->Branch("vtx_mrecepem", &m_vtx_mrecepem, "vtx_mrecepem/D");
+  m_tree->Branch("vtx_cosepem", &m_vtx_cosepem, "vtx_cosepem/D");
+  m_tree->Branch("vtx_cos2esys", &m_vtx_cos2esys, "vtx_cos2esys/D");
+
+  // MC truth info
   if (!m_isMonteCarlo) return;
   m_tree->Branch("indexmc",&m_indexmc, "m_indexmc/I"); 
   m_tree->Branch("pdgid", m_pdgid, "m_pdgid[100]/I");
@@ -365,6 +557,7 @@ void Chic2invi::clearVariables() {
   m_raw_module->clear();
   m_raw_secmom->clear();
   m_raw_time->clear();
+  m_raw_trigger->clear();
 
   //MC Topology
   m_indexmc = 0;
@@ -387,11 +580,18 @@ bool Chic2invi::buildChicToInvisible() {
 	h_evtflw->Fill(9);
 
 	m_ncharged = evtRecEvent->totalCharged();
-	if (m_ncharged != 0) return false;
+	if (m_ncharged != 2) return false;
 	h_evtflw->Fill(1); // N_{Good} = 0
 
-	if (evtRecEvent->totalNeutral() != 2) return false;
+	if (evtRecEvent->totalNeutral() != 1) return false;
 	h_evtflw->Fill(2); // N_{Shower} = 2
+
+	std::vector<int> iPGood, iMGood;
+	selectChargedTracks(evtRecEvent, evtRecTrkCol, iPGood, iMGood);
+
+//	cout<<"select charged tracks done"<<endl;
+	if(selectElectronPositron(evtRecTrkCol, iPGood, iMGood)!=1) return false;
+//	cout<<"select e+e- done"<<endl;
 
 	std::vector<int> iGam;
 	iGam.clear();
@@ -399,13 +599,20 @@ bool Chic2invi::buildChicToInvisible() {
 	iShow.clear();
 
 	selectNeutralTracks(evtRecEvent, evtRecTrkCol, iGam, iShow);
-	if (iGam.size() != 2) return false;
-	//if( isCosmicRay() ) return false;
+//	cout<<"select neutral tracks done"<<endl;
+//	cout<<"Ngam = "<<iGam.size()<<endl;
+	if (iGam.size() != 1) return false;
+	cout<<"Ngam = 1 done"<<endl;
+//	if( isCosmicRay(iGam, evtRecTrkCol) ) return false;
+//	if (iGam.size() != 2) return false;
+
 	saveGamInfo(iGam, evtRecTrkCol);
+//	cout<<"save gam info done"<<endl;
 	m_ngam = iGam.size();
 	m_nshow = iShow.size();
 
-	kmFit(iGam, evtRecTrkCol);
+//	kmFit(iGam, evtRecTrkCol);
+//	cout<<"fit done"<<endl;
 
 	h_evtflw->Fill(8); // N_{#gamma} < 10 
 
@@ -542,14 +749,14 @@ void Chic2invi::selectNeutralTracks(SmartDataPtr<EvtRecEvent> evtRecEvent,
 		iGam.push_back((*itTrk)->trackId());
 	} // end loop neutral tracks     
 
-	/*  if(iGam.size() == 2) {
+/*	  if(iGam.size() == 1) {
 		m_ngam = iGam.size();
 		m_nshow = iShow.size();
 
 		}
-	//saveGamInfo(iGam, evtRecTrkCol);   
-	*/
-	//return iGam.size(); 
+	saveGamInfo(iGam, evtRecTrkCol);   
+*/	
+//	return iGam.size(); 
 }
 
 
@@ -655,4 +862,386 @@ void Chic2invi::kmFit(std::vector<int> iGam,
 
 	m_chic2_1c->push_back(kmchisq);
 
+}
+
+bool Chic2invi::isCosmicRay(std::vector<int> iGam,
+		SmartDataPtr<EvtRecTrackCol> evtRecTrkCol){
+
+	// cosmic veto
+	double time1 = -99, time2 = -99;
+	for(vector<int>::size_type i=0;i<2;i++){
+		EvtRecTrackIterator itTrk = evtRecTrkCol->begin() + iGam[i];
+		if ((*itTrk)->isTofTrackValid()){
+			SmartRefVector<RecTofTrack> tofTrkCol=(*itTrk)->tofTrack();
+			SmartRefVector<RecTofTrack>::iterator iter_tof=tofTrkCol.begin();
+			for(;iter_tof!=tofTrkCol.end();iter_tof++){
+				TofHitStatus* status = new TofHitStatus;
+				status->setStatus( (*iter_tof)->status() );
+				if (status->is_cluster()){
+					if (i==0)
+					time1 = (*iter_tof)->tof();
+					else
+					time2 = (*iter_tof)->tof();
+				}
+				delete status;
+			}	
+		}
+	}
+	if( time1!=-99 && time2!=-99 && fabs(time1-time2)>5)
+	return true;
+}
+
+int Chic2invi::selectChargedTracks(SmartDataPtr<EvtRecEvent> evtRecEvent,
+									SmartDataPtr<EvtRecTrackCol> evtRecTrkCol,
+									std::vector<int> & iPGood,
+									std::vector<int> & iMGood){
+	CLHEP::Hep3Vector xorigin = getOrigin();
+
+	std::vector<int> iGood;
+	iGood.clear();
+	iPGood.clear();
+	iMGood.clear();
+
+	// loop through charged tracks
+	for(int i=0; i<evtRecEvent->totalCharged(); i++){
+		// get mdcTrk
+		EvtRecTrackIterator itTrk=evtRecTrkCol->begin()+i;
+
+		// Good Kalman Track
+		if(!(*itTrk)->isMdcKalTrackValid()) continue;
+		if(!(*itTrk)->isMdcTrackValid()) continue;
+		RecMdcKalTrack* mdcTrk = (*itTrk)->mdcKalTrack();
+
+		// No Good Vertex
+		// if(!passVertexSelection(xorigin, mdcTrk)) continue;
+//		if(passVertexSelection(xorigin, mdcTrk)) continue;
+
+		// Polar angle cut
+		if(fabs(cos(mdcTrk->theta()))>m_cha_costheta_cut) continue;
+		iGood.push_back((*itTrk)->trackId());
+		if(mdcTrk->charge()>0) iPGood.push_back((*itTrk)->trackId());
+		if(mdcTrk->charge()<0) iMGood.push_back((*itTrk)->trackId());
+	} // end charged tracks
+
+	m_ncharged = iGood.size();
+	m_nptrk = iPGood.size();
+	m_nmtrk = iMGood.size();
+
+	if(m_nptrk>0 && m_nmtrk>0){
+		EvtRecTrackIterator itTrk_p = evtRecTrkCol->begin() + iPGood[0];
+		EvtRecTrackIterator itTrk_m = evtRecTrkCol->begin() + iMGood[0];
+		saveTrkInfo(itTrk_p, itTrk_m);
+	}
+	return iGood.size();
+}
+
+void Chic2invi::saveTrkInfo(EvtRecTrackIterator itTrk_p, EvtRecTrackIterator itTrk_m){
+	RecMdcTrack* mdcTrk_p = (*itTrk_p)->mdcTrack();
+	m_trkp_p = mdcTrk_p->p();
+	m_trkp_px = mdcTrk_p->px();
+	m_trkp_py = mdcTrk_p->py();
+	m_trkp_pz = mdcTrk_p->pz();
+	m_trkp_theta = mdcTrk_p->theta();
+	m_trkp_phi = mdcTrk_p->phi();
+
+	RecMdcTrack* mdcTrk_m = (*itTrk_m)->mdcTrack();
+	m_trkm_p = mdcTrk_m->p();
+	m_trkm_px = mdcTrk_m->px();
+	m_trkm_py = mdcTrk_m->py();
+	m_trkm_pz = mdcTrk_m->pz();
+	m_trkm_theta = mdcTrk_m->theta();
+	m_trkm_phi = mdcTrk_m->phi();
+
+	if((*itTrk_m)->isEmcShowerValid()){
+		RecEmcShower *emcTrk_p = (*itTrk_m)->emcShower();
+		m_trkp_eraw = emcTrk_p->energy();
+	}
+}
+
+CLHEP::Hep3Vector Chic2invi::getOrigin(){
+	CLHEP::Hep3Vector xorigin(0,0,0);
+	IVertexDbSvc* vtxsvc;
+	Gaudi::svcLocator()->service("VertexDbSvc", vtxsvc);
+	if(vtxsvc->isVertexValid()){
+		double *dbv = vtxsvc->PrimaryVertex();
+		xorigin.setX(dbv[0]);
+		xorigin.setY(dbv[1]);
+		xorigin.setZ(dbv[2]);
+	}
+	return xorigin;
+}
+
+bool Chic2invi::passVertexSelection(CLHEP::Hep3Vector xorigin, RecMdcKalTrack* mdcTrk){
+	HepVector a = mdcTrk->helix();
+	HepSymMatrix Ea = mdcTrk->err();
+	HepPoint3D point0(0.,0.,0.);
+	VFHelix helixip(point0,a,Ea);
+	HepPoint3D IP(xorigin[0],xorigin[1],xorigin[2]);
+	helixip.pivot(IP);
+	HepVector vecipa = helixip.a();
+
+	m_vz0 = vecipa[3];
+	m_vr0 = vecipa[0];
+
+	if(fabs(m_vz0) >= m_vz0cut) return false;
+	if(fabs(m_vr0) >= m_vr0cut) return false;
+
+	//******second vertex fit
+	VertexFit *vtxfit_s = VertexFit::instance();
+	WTrackParameter  wvks = vtxfit_s->wVirtualTrack(0);
+	SecondVertexFit *vtxfit2 = SecondVertexFit::instance();
+	double ks_2chis, ks_lchue;
+	ks_2chis=-100;
+	ks_lchue =-100;
+	HepPoint3D newvx(0., 0., 0.);
+	HepSymMatrix newEvx(3, 0);
+	VertexParameter primaryVpar;
+	IVertexDbSvc*  vtxsvc;
+	Gaudi::svcLocator()->service("VertexDbSvc", vtxsvc);
+	if(!(vtxsvc->isVertexValid())) {
+			cout<<"Attention --!(vtxsvc->isVertexValid())"<<endl;
+	}
+	double* db_vx = vtxsvc->PrimaryVertex();
+	double* db_vx_err = vtxsvc->SigmaPrimaryVertex();
+	newvx.setX(db_vx[0]);
+	newvx.setY(db_vx[1]);
+	newvx.setZ(db_vx[2]);
+	newEvx[0][0] = db_vx_err[0]*db_vx_err[0];
+	newEvx[1][1] = db_vx_err[1]*db_vx_err[1];
+	newEvx[2][2] = db_vx_err[2]*db_vx_err[2];
+	primaryVpar.setVx(newvx);
+	primaryVpar.setEvx(newEvx);
+	vtxfit2->init();
+	vtxfit2->setPrimaryVertex(primaryVpar);
+	vtxfit2->AddTrack(0, wvks);
+	vtxfit2->setVpar(vtxfit_s->vpar(0));
+	bool okv2=vtxfit2->Fit();
+	if(!okv2) return false;
+
+	ks_2chis= vtxfit2->chisq();
+	//WTrackParameter wks;
+	//wks = vtxfit2->wpar();
+	//p4_ks_2s=wks.p();
+
+	double ks_dl  = vtxfit2->decayLength();
+	double ks_dle = vtxfit2->decayLengthError();
+	ks_lchue = ks_dl/ks_dle;
+
+
+	return true;
+}
+
+int Chic2invi::selectElectronPositron(SmartDataPtr<EvtRecTrackCol> evtRecTrkCol, 
+										std::vector<int> iPGood,
+										std::vector<int> iMGood){
+	int nee = 0;
+	bool evtflw_filled = false;
+
+//	cout<<"select ee start"<<endl;
+	for(unsigned int i1=0; i1<iPGood.size(); i1++){
+		EvtRecTrackIterator itTrk_p = evtRecTrkCol->begin() + iPGood[i1];
+		RecMdcTrack* mdcTrk_p = (*itTrk_p)->mdcTrack();
+		if(mdcTrk_p->charge()<0) continue; //only positive charged tracks
+
+		for(unsigned int i2=0; i2<iMGood.size(); i2++){
+			EvtRecTrackIterator itTrk_m = evtRecTrkCol->begin() + iMGood[i2];
+			RecMdcTrack* mdcTrk_m = (*itTrk_m)->mdcTrack();
+			if (mdcTrk_m->charge()>0) continue; // only negative charged tracks
+
+			//polar angle for both pions
+			if( !(fabs(cos(mdcTrk_p->theta())) < m_pion_polar_angle_max && 
+				  fabs(cos(mdcTrk_m->theta())) < m_pion_polar_angle_max )) continue;
+			if (!evtflw_filled) h_evtflw->Fill(2); // |cos#theta| cut
+
+			// ee momentum
+			if ( !(fabs(mdcTrk_p->p()) < m_pion_momentum_max && 
+				   fabs(mdcTrk_m->p()) < m_pion_momentum_max )) continue;
+
+			if (!evtflw_filled) h_evtflw->Fill(3); // |p| cut
+
+			// track PID
+			double prob_ep, prob_kp, prob_em, prob_km, prob_p, prob_pb;
+			double prob_mup, prob_pip, prob_mum, prob_pim;
+//			cout<<"calcTrackPID start"<<endl;
+			calcTrackPID(itTrk_p, prob_ep, prob_mup, prob_pip, prob_kp, prob_p);
+			calcTrackPID(itTrk_m, prob_em, prob_mum, prob_pim, prob_km, prob_pb);
+//			cout<<"calcTrackPID done"<<endl;
+
+			m_prob_ep = prob_ep;
+			m_prob_mup = prob_mup;
+			m_prob_pip = prob_pip;
+			m_prob_kp = prob_kp;
+			m_prob_p = prob_p;
+
+			m_prob_em = prob_em;
+			m_prob_mum = prob_mum;
+			m_prob_pim = prob_pim;
+			m_prob_km = prob_km;
+			m_prob_pb = prob_pb;
+
+//			cout<<m_prob_ep<<endl;
+//			cout<<m_prob_mup<<endl;
+//			cout<<m_prob_pip<<endl;
+//			cout<<m_prob_kp<<endl;
+//			cout<<m_prob_p<<endl;
+//			cout<<m_prob_em<<endl;
+//			cout<<m_prob_mum<<endl;
+//			cout<<m_prob_pim<<endl;
+//			cout<<m_prob_km<<endl;
+//			cout<<m_prob_pb<<endl;
+//			cout<<"judge epem start"<<endl;
+			
+			if( !(prob_ep > m_prob_e_min && prob_em > m_prob_e_min && 
+				  prob_ep > m_prob_mup && prob_em > m_prob_mum && 
+				  prob_ep > m_prob_pip && prob_em > m_prob_pim && 
+				  prob_ep > m_prob_kp && prob_em > m_prob_km && 
+				  prob_ep > m_prob_p && prob_em > m_prob_pb ) ) continue;
+//			cout<<"judge epem done"<<endl;
+
+			if (!evtflw_filled) h_evtflw->Fill(4); // PID
+
+			// apply vertex fit
+//			cout<<"kmfit on epem"<<endl;
+			RecMdcKalTrack *epTrk = (*(evtRecTrkCol->begin()+iPGood[i1]))->mdcKalTrack();
+			RecMdcKalTrack *emTrk = (*(evtRecTrkCol->begin()+iMGood[i2]))->mdcKalTrack();
+
+			if (!hasGoodEeVertex(epTrk, emTrk, evtflw_filled)) continue;
+//			cout<<"ee vertex done"<<endl;
+
+			saveEeInfo(epTrk, emTrk);
+//			cout<<"save ee info done"<<endl;
+
+			nee++;
+			evtflw_filled = true;
+		}
+	}
+	return nee;
+}
+
+void Chic2invi::saveEeInfo(RecMdcKalTrack *epTrk, RecMdcKalTrack *emTrk){
+
+	m_ep_px = epTrk->px();
+	m_ep_py = epTrk->py();
+	m_ep_pz = epTrk->pz();
+
+	m_em_px = emTrk->px();
+	m_em_py = emTrk->py();
+	m_em_pz = emTrk->pz();
+}
+
+bool Chic2invi::hasGoodEeVertex(RecMdcKalTrack *epTrk, RecMdcKalTrack *emTrk, bool evtflw_filled){
+//	cout<<"ee vertex start"<<endl;	
+	HepLorentzVector pcms = HepLorentzVector(0.011*m_ecms, -0.001, 0.005, m_ecms);
+	HepLorentzVector p4_vtx_ep, p4_vtx_em, p4_vtx_epem, p4_vtx_recepem;
+	WTrackParameter wvepTrk, wvemTrk;
+	epTrk->setPidType(RecMdcKalTrack::pion);
+	wvepTrk = WTrackParameter(E_MASS, epTrk->getZHelix(), epTrk->getZError());
+
+	emTrk->setPidType(RecMdcKalTrack::pion);
+	wvemTrk = WTrackParameter(E_MASS, emTrk->getZHelix(), emTrk->getZError());
+
+	HepPoint3D vx(0., 0., 0.);
+	HepSymMatrix Evx(3, 0);
+
+	double bx = 1E+6;
+	double by = 1E+6;
+	double bz = 1E+6;
+	Evx[0][0] = bx*bx;
+	Evx[1][1] = by*by;
+	Evx[2][2] = bz*bz;
+	
+	VertexParameter vxpar;
+	vxpar.setVx(vx);
+	vxpar.setEvx(Evx);
+
+//	cout<<"1"<<endl;	
+	VertexFit* vtxfit = VertexFit::instance();
+	vtxfit->init();
+	vtxfit->AddTrack(0,  wvepTrk);
+	vtxfit->AddTrack(1,  wvemTrk);
+	vtxfit->AddVertex(0, vxpar,0,1);
+
+	if(!vtxfit->Fit(0)) return false;
+
+	vtxfit->Swim(0);
+//	cout<<"2"<<endl;	
+		
+	WTrackParameter wep = vtxfit->wtrk(0);
+	WTrackParameter wem = vtxfit->wtrk(1);
+	p4_vtx_ep = vtxfit->pfit(0) ;
+	p4_vtx_em = vtxfit->pfit(1) ;
+	p4_vtx_recepem = pcms - p4_vtx_ep - p4_vtx_em;
+	p4_vtx_epem = p4_vtx_ep + p4_vtx_em;
+
+	double angle_epem = p4_vtx_ep.vect().angle(p4_vtx_em.vect());
+	// double cos2esys = (p4_vtx_ep + p4_vtx_em).cosTheta();
+
+//	cout<<"angle_epem = "<<angle_epem<<endl;
+//	if( ! (angle_epem < m_epem_theta_max) ) return false;
+	if( !evtflw_filled ) h_evtflw->Fill(5); // "cos#theta_{#pi^{+}#pi^{-}}<0.99"
+
+	psi_pair = (p4_vtx_ep.phi() - p4_vtx_em.phi()) / angle_epem;
+//	cout<<"psi_pair = "<<psi_pair<<endl;
+//	if( ! (psi_pair < psi_pair_max ) ) return false;
+	if( !evtflw_filled ) h_evtflw->Fill(6); // cos#theta_{#pi#pi sys}<0.99 
+
+//	if( ! ( p4_vtx_recepem.m() >= m_dipion_mass_min &&
+//		p4_vtx_recepem.m() <= m_dipion_mass_max) ) return false;
+	if( !evtflw_filled ) h_evtflw->Fill(7); // 3<M_{#pi#pi}^{rec}<3.2
+
+//	cout<<"save vtx info start"<<endl;
+	saveVtxInfo(p4_vtx_ep, p4_vtx_em); 
+	m_vtx_mrecepem = p4_vtx_recepem.m();
+	m_vtx_mepem = p4_vtx_epem.m();
+	m_vtx_cosepem = cosepem;
+	// m_vtx_cos2esys = cos2esys; 
+
+//	cout<<"123"<<endl;	
+	return true;
+}
+
+void Chic2invi::saveVtxInfo(HepLorentzVector p4_vtx_ep,
+			    HepLorentzVector p4_vtx_em){
+
+	m_vtx_ep_px = p4_vtx_ep.px();
+	m_vtx_ep_py = p4_vtx_ep.py();
+	m_vtx_ep_pz = p4_vtx_ep.pz();
+	m_vtx_ep_p = p4_vtx_ep.rho();
+	m_vtx_ep_e = p4_vtx_ep.e();
+	m_vtx_ep_costheta = p4_vtx_ep.cosTheta();
+	m_vtx_ep_phi = p4_vtx_ep.phi();
+
+	m_vtx_em_px = p4_vtx_em.px();
+	m_vtx_em_py = p4_vtx_em.py();
+	m_vtx_em_pz = p4_vtx_em.pz();
+	m_vtx_em_p = p4_vtx_em.rho();
+	m_vtx_em_e = p4_vtx_em.e();
+	m_vtx_em_costheta = p4_vtx_em.cosTheta();
+	m_vtx_em_phi = p4_vtx_em.phi();
+
+}
+
+void Chic2invi::calcTrackPID(EvtRecTrackIterator itTrk_p, double& prob_ep, double& prob_mup, 
+							double& prob_pip, double& prob_kp, double& prob_p){
+	prob_ep = 999.;
+	prob_mup = 999.;
+	prob_pip = 999.;
+	prob_kp = 999.;
+	prob_p = 999.;
+	ParticleID* pidp = ParticleID::instance();
+	pidp->init();
+	pidp->setMethod(pidp->methodProbability());
+	pidp->setChiMinCut(4);
+	pidp->setRecTrack(*itTrk_p);
+	// use PID sub-system
+	pidp->usePidSys(pidp->useDedx() | pidp->useTof1() | pidp->useTof2());
+	pidp->identify(pidp->onlyPionKaonProton());
+	pidp->calculate();
+	if(pidp->IsPidInfoValid()){
+		prob_ep = pidp->probElectron();
+		prob_mup = pidp->probMuon();
+		prob_pip = pidp->probPion();
+		prob_kp = pidp->probKaon();
+		prob_p = pidp->probProton();
+	}
 }

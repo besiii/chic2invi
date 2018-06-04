@@ -92,7 +92,6 @@ case $option in
 
     0.1.2) echo "Generate Condor jobs on incl MC ---- 1..."
 	    mkdir run/chic2incl/job_text/inclusiveMC
-	    mkdir run/chic2incl/rootfile_inclusiveMC
 		cd scripts/gen_script
 		./make_jobOption_file_inclusiveMC.sh
 		cd ../../run/chic2incl/job_text/inclusiveMC
@@ -118,7 +117,7 @@ case $option in
     0.1.4) echo "Submit Condor jobs on incl MC ---- 2..."
         cd run/chic2incl/job_text/inclusiveMC
         find . -name "*.txt.*" | xargs rm
-        rm ../../rootfile_inclusiveMC/chic2invi_psip_mc-*
+        rm ../../rootfile_inclusiveMC/chic2incl_psip_mc-*
 		boss.condor -g physics -n 394 jobOptions_inclusive_psip_mc-%{ProcId}.txt
         cd $HOME/bes/chic2invi/v0.1	    
         ;;
@@ -133,7 +132,6 @@ case $option in
 
     0.1.7) echo "Generate Condor jobs on MC event..."
         mkdir -p run/chic2incl/job_text/inclusiveMC_event
-        mkdir -p run/chic2incl/event_inclusiveMC
         cd scripts/gen_script
         rm ../../run/chic2incl/job_text/inclusiveMC_event/jobOptions_chic2incl_inclusive_mc_event-*
         ./make_jobOption_file_inclusiveMC_event.sh
@@ -156,7 +154,6 @@ case $option in
 	   ;;
 
 	0.1.10) echo  "Merge rootfile on MC event..."
-	   mkdir run/chic2incl/hist_inclusiveMC
        rm run/chic2incl/hist_inclusiveMC/chic2incl_psip_mc_event_merged_1.root
 	   ./python/mrg_rootfiles.py run/chic2incl/event_inclusiveMC run/chic2incl/hist_inclusiveMC
 	   ;;
@@ -176,7 +173,6 @@ case $option in
 
     0.2.2) echo "Generate Condor jobs on con3650 data ---- 1..."
 	    mkdir run/chic2incl/job_text/data3650
-	    mkdir run/chic2incl/rootfile_data3650
 		cd scripts/gen_script
 		./make_jobOption_file_data3650.sh
 		cd ../../run/chic2incl/job_text/data3650
@@ -218,7 +214,6 @@ case $option in
 
     0.2.7) echo "Generate Condor jobs on con3650 data event ---- 1..."
         mkdir -p run/chic2incl/job_text/data3650_event
-        mkdir -p run/chic2incl/event_data3650
         cd scripts/gen_script
         rm ../../run/chic2incl/job_text/data3650_event/jobOptions_chic2incl_data3650_event-*
         ./make_jobOption_file_data3650_event.sh
@@ -241,7 +236,6 @@ case $option in
 	   ;;
 
 	0.2.10) echo  "Merge rootfile on con3650 data event..."
-	   mkdir run/chic2incl/hist_data3650
        rm run/chic2incl/hist_data3650/chic2incl_data3650_event_merged_1.root
 	   ./python/mrg_rootfiles.py run/chic2incl/event_data3650 run/chic2incl/hist_data3650
 	   ;;
@@ -336,10 +330,16 @@ case $option in
 
     0.4.3) echo "run on signal MC sample..."
 	    cd scripts/chic0_invi/jobs_chic0
+        find . -name "*.txt.*" | xargs rm
+        rm ../rootfile_chic0/chic0_gam2invi_gen_mc.root
         boss.condor -g physics jobOptions_chic0_gam2invi_gen_mc.txt
         cd ../../chic1_invi/jobs_chic1
+        find . -name "*.txt.*" | xargs rm
+        rm ../rootfile_chic1/chic1_gam2invi_gen_mc.root
         boss.condor -g physics jobOptions_chic1_gam2invi_gen_mc.txt
-        cd ../../chic2_invi/jobs_chic2        
+        cd ../../chic2_invi/jobs_chic2 
+        find . -name "*.txt.*" | xargs rm
+        rm ../rootfile_chic2/chic2_gam2invi_gen_mc.root       
         boss.condor -g physics jobOptions_chic2_gam2invi_gen_mc.txt
         cd $HOME/bes/chic2invi/v0.1
 	    ;;
@@ -364,12 +364,11 @@ case $option in
     0.5.1) echo "Split data 2012 with each group 20G ..."
 	    mkdir run/samples/data
 	    ./python/get_samples.py /bes3fs/offline/data/664p03/psip/dst run/samples/data/data_664p03_psip.txt 20G
-	    # made 84 groups 
+	    # made 633 groups 
 	    ;;
  
     0.5.2) echo "Generate Condor jobs on data 2012 ---- 1..."
 	    mkdir run/chic2incl/job_text/data
-	    mkdir run/chic2incl/rootfile_data
 		cd scripts/gen_script
 		./make_jobOption_file_data.sh
 		cd ../../run/chic2incl/job_text/data
@@ -395,6 +394,7 @@ case $option in
     0.5.4) echo "Submit Condor jobs on data 2012 ---- 2..."
         cd run/chic2incl/job_text/data
         find . -name "*.txt.*" | xargs rm
+        rm ../../rootfile_data/chic2incl_psip_data-*
 		boss.condor -g physics -n 633 jobOptions_inclusive_psip_data-%{ProcId}.txt
         cd $HOME/bes/chic2invi/v0.1	    
         ;;
@@ -409,8 +409,8 @@ case $option in
 
     0.5.7) echo "Generate Condor jobs on data 2012 event ---- 1..."
         mkdir -p run/chic2incl/job_text/data_event
-        mkdir -p run/chic2incl/event_data
         cd scripts/gen_script
+        rm ../../run/chic2incl/job_text/data_event/jobOptions_chic2incl_data_event-*
         ./make_jobOption_file_data_event.sh
         cd ../../run/chic2incl/job_text/data_event
         chmod 755 jobOptions_chic2incl_data_event-*
@@ -421,7 +421,7 @@ case $option in
     0.5.8) echo "Submit Condor jobs on data 2012 event ---- 2..."
         cd run/chic2incl/job_text/data_event
         rm ../../event_data/chic2incl_psip_data_event-*
-        #find . -name "*.sh.*" | xargs rm
+        find . -name "*.sh.*" | xargs rm
         hep_sub -g physics -n 633 jobOptions_chic2incl_data_event-%{ProcId}.sh
         cd $HOME/bes/chic2invi/v0.1
         ;;
@@ -431,7 +431,6 @@ case $option in
 	   ;;
 
 	0.5.10) echo  "Merge rootfile on data 2012 event..."
-	   mkdir run/chic2incl/hist_data
        rm run/chic2incl/hist_data/chic2incl_psip_data_event_merged_1.root
 	   ./python/mrg_rootfiles.py run/chic2incl/event_data run/chic2incl/hist_data
 	   ;;
@@ -512,6 +511,8 @@ case $option in
         # boss.condor -g physics jobOptions_GEBhabha.txt
         # boss.condor -g physics jobOptions_GBBhabha.txt
         # boss.condor -g physics jobOptions_GDiphoton.txt
+        find . -name "*.txt.*" | xargs rm
+        rm ../rootfile/GDimuon.root
         boss.condor -g physics jobOptions_GDimuon.txt
         cd $HOME/bes/chic2invi/v0.1
 	    ;;
@@ -522,6 +523,83 @@ case $option in
         # ./python/sel_events.py scripts/ee_decay/rootfile/GDiphoton.root scripts/ee_decay/event/GDiphoton.root
         ./python/sel_events.py scripts/ee_decay/rootfile/GDimuon.root scripts/ee_decay/event/GDimuon.root
 	    ;;
+
+    0.8) echo "run on data 2009..."
+	 ;;
+
+    0.8.1) echo "Split data 2009 with each group 20G ..."
+	    mkdir run/samples/data09
+	    ./python/get_samples.py /bes3fs/offline/data/664-1/psip/dst run/samples/data09/data09_664-1_psip.txt 20G
+	    # made 314 groups 
+	    ;;
+ 
+    0.8.2) echo "Generate Condor jobs on data 2009 ---- 1..."
+	    mkdir run/chic2incl/job_text/data09
+		cd scripts/gen_script
+		./make_jobOption_file_data09.sh
+		cd ../../run/chic2incl/job_text/data09
+		mv jobOptions_inclusive_psip_data09-314.txt jobOptions_inclusive_psip_data09-0.txt
+        cd $HOME/bes/chic2invi/v0.1	 
+        ;;   
+
+    0.8.3) echo "Test on data 2009..."
+        echo "have you changed test number?(yes / NO)
+        ./run/chic2incl/job_text/data09/jobOptions_inclusive_psip_data09-0.txt"
+        read opt
+        if [ $opt == "yes" ]
+            then
+            echo "now in yes"  
+            cd run/chic2incl/job_text/data09
+            boss.exe jobOptions_inclusive_psip_data09-0.txt
+            cd $HOME/bes/chic2invi/v0.1
+        else
+            echo "Default value is 'NO', please change test number."
+        fi
+        ;;
+
+    0.8.4) echo "Submit Condor jobs on data 2009 ---- 2..."
+        cd run/chic2incl/job_text/data09
+        find . -name "*.txt.*" | xargs rm
+        rm ../../rootfile_data09/chic2incl_psip_data09-*
+		boss.condor -g physics -n 314 jobOptions_inclusive_psip_data09-%{ProcId}.txt
+        cd $HOME/bes/chic2invi/v0.1	    
+        ;;
+
+    0.8.5) echo "Check Condor jobs on data 2009..."
+	   ./python/chk_condorjobs.py run/chic2incl/rootfile_data09  314
+	   ;;
+
+    0.8.6) echo "Test 1 job on data 2009 event..."
+        ./python/sel_events.py run/chic2incl/rootfile_data09/chic2incl_psip_data09-1.root run/chic2incl/event_data09/chic2incl_psip_data09_event-1.root                                                              
+	   ;;
+
+    0.8.7) echo "Generate Condor jobs on data 2009 event ---- 1..."
+        mkdir -p run/chic2incl/job_text/data09_event
+        cd scripts/gen_script
+        rm ../../run/chic2incl/job_text/data09_event/jobOptions_chic2incl_data09_event-*
+        ./make_jobOption_file_data09_event.sh
+        cd ../../run/chic2incl/job_text/data09_event
+        chmod 755 jobOptions_chic2incl_data09_event-*
+        mv jobOptions_chic2incl_data09_event-314.sh jobOptions_chic2incl_data09_event-0.sh
+        cd $HOME/bes/chic2invi/v0.1	    
+	   ;;
+
+    0.8.8) echo "Submit Condor jobs on data 2009 event ---- 2..."
+        cd run/chic2incl/job_text/data09_event
+        rm ../../event_data09/chic2incl_psip_data09_event-*
+        find . -name "*.sh.*" | xargs rm
+        hep_sub -g physics -n 314 jobOptions_chic2incl_data09_event-%{ProcId}.sh
+        cd $HOME/bes/chic2invi/v0.1
+        ;;
+
+    0.8.9) echo "Check Condor jobs on data 2009 event..."
+	   ./python/chk_condorjobs.py run/chic2incl/event_data09  314
+	   ;;
+
+	0.8.10) echo  "Merge rootfile on data 2009 event..."
+       rm run/chic2incl/hist_data09/chic2incl_psip_data09_event_merged_1.root
+	   ./python/mrg_rootfiles.py run/chic2incl/event_data09 run/chic2incl/hist_data09
+	   ;;
 
 
 
