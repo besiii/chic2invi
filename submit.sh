@@ -601,6 +601,85 @@ case $option in
 	   ./python/mrg_rootfiles.py run/chic2incl/event_data09 run/chic2incl/hist_data09
 	   ;;
 
+    0.9) echo "run on data_by_number 5..."
+	 ;;
+
+    0.9.1) echo "Split data_by_number 5 ..."
+	    mkdir run/samples/data_by_number
+	    ./python/get_samples.py /bes3fs/offline/data/664-1/psip/dst run/samples/data_by_number/data_664p03_psip_total.txt 5
+	    # made 2753 groups 
+	    ;;
+ 
+    0.9.2) echo "Generate Condor jobs on data_by_number 5 ---- 1..."
+	    mkdir run/chic2incl/job_text/data_by_5
+		cd scripts/gen_script
+        rm ../../run/chic2incl/job_text/data_by_5/jobOptions_inclusive_psip_data_by_5-*
+		./make_jobOption_file_data_by_5.sh
+		cd ../../run/chic2incl/job_text/data_by_5
+		mv jobOptions_inclusive_psip_data_by_5-2753.txt jobOptions_inclusive_psip_data_by_5-0.txt
+        cd $HOME/bes/chic2invi/v0.1	 
+        ;;   
+
+    0.9.3) echo "Test on data_by_number 5..."
+        echo "have you changed test number?(yes / NO)
+        ./run/chic2incl/job_text/data_by_5/jobOptions_inclusive_psip_data_by_5-0.txt"
+        read opt
+        if [ $opt == "yes" ]
+            then
+            echo "now in yes"  
+            cd run/chic2incl/job_text/data_by_5
+            boss.exe jobOptions_inclusive_psip_data_by_5-0.txt
+            cd $HOME/bes/chic2invi/v0.1
+        else
+            echo "Default value is 'NO', please change test number."
+        fi
+        ;;
+
+    0.9.4) echo "Submit Condor jobs on data_by_number 5 ---- 2..."
+        cd run/chic2incl/job_text/data_by_5
+        find . -name "*.txt.*" | xargs rm
+        rm ../../rootfile_data_by_5/chic2incl_psip_data_by_5-*
+		boss.condor -g physics -n 2753 jobOptions_inclusive_psip_data_by_5-%{ProcId}.txt
+        cd $HOME/bes/chic2invi/v0.1	    
+        ;;
+
+    0.9.5) echo "Check Condor jobs on data_by_number 5..."
+	   ./python/chk_condorjobs.py run/chic2incl/rootfile_data_by_5  2753
+	   ;;
+
+    0.9.6) echo "Test 1 job on data_by_number 5 event..."
+        ./python/sel_events.py run/chic2incl/rootfile_data_by_5/chic2incl_psip_data_by_5-2753.root run/chic2incl/event_data_by_5/chic2incl_psip_data_by_5_event-2753.root                                                              
+	   ;;
+
+    0.9.7) echo "Generate Condor jobs on data_by_number 5 event ---- 1..."
+        mkdir -p run/chic2incl/job_text/data_by_5_event
+        cd scripts/gen_script
+        rm ../../run/chic2incl/job_text/data_by_5_event/jobOptions_chic2incl_data_by_5_event-*
+        ./make_jobOption_file_data_by_5_event.sh
+        cd ../../run/chic2incl/job_text/data_by_5_event
+        chmod 755 jobOptions_chic2incl_data_by_5_event-*
+        mv jobOptions_chic2incl_data_by_5_event-2753.sh jobOptions_chic2incl_data_by_5_event-0.sh
+        cd $HOME/bes/chic2invi/v0.1	    
+	   ;;
+
+    0.9.8) echo "Submit Condor jobs on data_by_number 5 event ---- 2..."
+        cd run/chic2incl/job_text/data_by_5_event
+        rm ../../event_data_by_5/chic2incl_psip_data_by_5_event-*
+        find . -name "*.sh.*" | xargs rm
+        hep_sub -g physics -n 2753 jobOptions_chic2incl_data_by_5_event-%{ProcId}.sh
+        cd $HOME/bes/chic2invi/v0.1
+        ;;
+
+    0.9.9) echo "Check Condor jobs on data_by_number 5 event..."
+	   ./python/chk_condorjobs.py run/chic2incl/event_data_by_5  2753
+	   ;;
+
+	0.9.10) echo  "Merge rootfile on data_by_number 5 event..."
+       rm run/chic2incl/hist_data_by_5/chic2incl_psip_data_by_5_event_merged_1.root
+	   ./python/mrg_rootfiles.py run/chic2incl/event_data_by_5 run/chic2incl/hist_data_by_5
+	   ;;
+
+
 
 
 esac

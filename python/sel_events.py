@@ -49,6 +49,9 @@ raw_gpz = ROOT.vector('double')()
 raw_ge = ROOT.vector('double')()
 gam1_E = ROOT.vector('double')()
 gam2_E = ROOT.vector('double')()
+mgamgam = ROOT.vector('double')()
+mrec_gam1 = ROOT.vector('double')()
+mrec_gamgam = ROOT.vector('double')()
 raw_costheta = ROOT.vector('double')()
 m_chic2_1c = ROOT.vector('double')()
 angle_gamgam = ROOT.vector('double')()
@@ -77,6 +80,9 @@ fout = ROOT.TFile(outfile, "RECREATE")
 t_out = ROOT.TTree('tree', 'tree')
 t_out.Branch('gam1_E', gam1_E)
 t_out.Branch('gam2_E', gam2_E)
+t_out.Branch('mgamgam', mgamgam)
+t_out.Branch('mrec_gam1', mrec_gam1)
+t_out.Branch('mrec_gamgam', mrec_gamgam)
 t_out.Branch("raw_gpx", raw_gpx)
 t_out.Branch("raw_gpy", raw_gpy)
 t_out.Branch("raw_gpz", raw_gpz)
@@ -91,7 +97,7 @@ n_run = array('i',[0])
 n_event = array('i',[0])
 n_indexmc = array('i',[0])
 t_out.Branch("run", n_run, "run/I")
-t_out.Branch("Event", n_event, "event/I")
+t_out.Branch("event", n_event, "event/I")
 t_out.Branch("indexmc", n_indexmc, "indexmc/I")
 n_pdgid = array('i', 100*[-99])
 n_motheridx = array('i', 100*[-99])
@@ -163,6 +169,9 @@ for jentry in xrange(entries):
             
             gam1_E.push_back(t.raw_ge.at(gam1_index))
             gam2_E.push_back(t.raw_ge.at(gam2_index))
+            mgamgam.push_back(Mgamgam)
+            mrec_gam1.push_back(mrec_gam1_raw)
+            mrec_gamgam.push_back(mrec_gamgam_raw)
             angle_gamgam.push_back(theta_gamgam)
 
             h_Mgamgam_d.Fill(Mgamgam)
@@ -182,6 +191,7 @@ for jentry in xrange(entries):
             
             
 #            print t.run
+#            print t.event
             if (t.run < 0):   # judge whether this run is MonteCarlo
                 n_run[0] = t.run
                 n_event[0] = t.event
@@ -197,6 +207,9 @@ for jentry in xrange(entries):
             t_out.Fill()
             gam1_E.clear()
             gam2_E.clear()
+            mgamgam.clear()
+            mrec_gam1.clear()
+            mrec_gamgam.clear()
             angle_gamgam.clear()
   
 t_out.Write()
