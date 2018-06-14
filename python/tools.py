@@ -96,6 +96,28 @@ def group_files_by_size(name_list, size_max='20G'):
 
     return groups
 
+def group_files_by_number(name_list, number_max='5'):
+    number_max = 5 
+    groups = []
+    group = []
+    number_sum = 0 
+    for name in name_list:
+        number = 1
+        if number_sum < number_max:
+            group.append(name)
+            number_sum += float(number)
+        else:
+            groups.append(group)
+            group = []
+            number_sum = 0 
+            group.append(name)
+            number_sum += float(number)
+
+        if name == name_list[-1]:
+            groups.append(group)
+
+    return groups
+
 def proc_cmd(cmd, test=False, verbose=1, procdir=None, shell=False):
     if test:
         sys.stdout.write(cmd+'\n')

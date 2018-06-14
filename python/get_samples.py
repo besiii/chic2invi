@@ -9,7 +9,7 @@ __created__ = "[2016-05-30 Mon 09:19]"
 
 import sys
 import os
-from tools import save_list_into_file, group_files_by_size
+from tools import save_list_into_file, group_files_by_size, group_files_by_number
 
 
 def usage():
@@ -50,7 +50,8 @@ def main():
     if len(args) == 3:
         size = args[2]
         sys.stdout.write('Size limit per list: %s\n' %size)
-        groups = group_files_by_size(file_list, size)
+#        groups = group_files_by_size(file_list, size)
+        groups = group_files_by_number(file_list, size)
         path, name = os.path.split(dst)
         dst_com = name.split('.')[0] 
         dst_ext = name.split('.')[1]
