@@ -517,10 +517,10 @@ case $option in
 	    ;;
 
      0.7.4) echo "select events on ee, mumu, gamgam data 2012..."
-        # ./python/sel_events.py scripts/ee_decay/rootfile/GEBhabha.root scripts/ee_decay/event/GEBhabha.root
-        # ./python/sel_events.py scripts/ee_decay/rootfile/GBBhabha.root scripts/ee_decay/event/GBBhabha.root
-        # ./python/sel_events.py scripts/ee_decay/rootfile/GDiphoton.root scripts/ee_decay/event/GDiphoton.root
-        ./python/sel_events.py scripts/ee_decay/rootfile/GDimuon.root scripts/ee_decay/event/GDimuon_veto.root
+        # ./python/sel_events.py scripts/ee_decay/rootfile/GEBhabha.root scripts/ee_decay/event/GEBhabha_event.root
+        # ./python/sel_events.py scripts/ee_decay/rootfile/GBBhabha.root scripts/ee_decay/event/GBBhabha_event.root
+        # ./python/sel_events.py scripts/ee_decay/rootfile/GDiphoton.root scripts/ee_decay/event/GDiphoton_event.root
+        ./python/sel_events.py scripts/ee_decay/rootfile/GDimuon.root scripts/ee_decay/event/GDimuon_event.root
 	    ;;
 
     0.8) echo "run on data 2009..."
