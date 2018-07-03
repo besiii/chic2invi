@@ -11,7 +11,7 @@ usage() {
     printf "\n\t%-5s\n" "./build.sh [OPTION]" 
     printf "\nOPTIONS\n" 
     printf "\n\t%-5s  %-40s\n"  "1"  "build Chic2invi analyzer" 
-#    printf "\n\t%-5s  %-40s\n"  "2"  "build Jpsi2incl analyzer"
+    printf "\n\t%-5s  %-40s\n"  "2"  "build ChicNoTDC analyzer"
 #    printf "\n\t%-5s  %-40s\n"  "3"  "build Jpsi2pnpi analyzer"
 #    printf "\n\t%-5s  %-40s\n"  "4"  "build Jpsi2lplm analyzer"
     printf "\n\n" 
@@ -31,10 +31,10 @@ case $option in
        cd Analysis/Physics/Chic2invi/Chic2invi/Chic2invi-00-00-01/cmt 
        gmake  
        ;;
-#    2) echo "Building Jpsi2incl module..."
-#       cd Analysis/Physics/PsiPrime/Jpsi2incl/Jpsi2incl-00-00-01/cmt 
-#       gmake  
-#       ;;
+    2) echo "Building ChicNoTDC module..."
+       cd Analysis/Physics/Chic2invi/ChicNoTDC/ChicNoTDC-00-00-01/cmt 
+       gmake  
+       ;;
 #    3) echo "Building Jpsi2pnpi module..."
 #       cd Analysis/Physics/PsiPrime/Jpsi2pnpi/Jpsi2pnpi-00-00-01/cmt 
 #       gmake 

@@ -28,6 +28,7 @@ h_mrec_gam1_n = ROOT.TH1D('h_mrec_gam1_n', 'mrec_gam1_n', 100, 3.3, 3.7)
 h_mrec_gamgam_d = ROOT.TH1D('h_mrec_gamgam_d', 'mrec_gamgam_d', 100, 0.0, 3.8)
 h_mrec_gamgam_n = ROOT.TH1D('h_mrec_gamgam_n', 'mrec_gamgam_n', 100, 2.9, 3.8)
 h_Mgamgam_d = ROOT.TH1D('h_Mgamgam_d', 'Mgamgam_d', 100, 0, 5) 
+h_Mgamgam_chi = ROOT.TH1D('h_Mgamgam_chi', 'Mgamgam_chi', 100, 3, 4) 
 h_Mgamgam_n = ROOT.TH1D('h_Mgamgam_n', 'Mgamgam_n', 100, 0, 0.7) 
 h_gam1_p = ROOT.TH1D('h_gam1_p', 'gam1_p', 100, 0.0, 0.5) 
 h_gam2_p = ROOT.TH1D('h_gam2_p', 'gam2_p', 100, 0.0, 0.5) 
@@ -40,7 +41,8 @@ h_ngam = ROOT.TH1D('h_ngam', 'ngam', 100, 0, 11)
 h_chic2_1c_d = ROOT.TH1D('h_chic2_1c_d', 'm_chic2_1c', 100, 0, 0.0001)
 h_chic2_1c_n = ROOT.TH1D('h_chic2_1c_n', 'm_chic2_1c', 100, 0, 0.00001)
 h_angle_gamgam = ROOT.TH1D('h_angle_gamgam', 'angle_gamgam', 100, 0, 3.15)
-h_trigger = ROOT.TH1D('h_trigger', 'raw_trigger', 16, 1, 17)
+h_trigger = ROOT.TH1D('h_trigger', 'raw_trigger', 16, 0, 16)
+h_time = ROOT.TH1D('h_time', 'raw_mdc', 30, 0, 29)
 
 # Global items
 raw_gpx = ROOT.vector('double')()
@@ -56,6 +58,7 @@ raw_costheta = ROOT.vector('double')()
 m_chic2_1c = ROOT.vector('double')()
 angle_gamgam = ROOT.vector('double')()
 raw_trigger = ROOT.vector('double')()
+raw_time = ROOT.vector('double')()
 
 args = sys.argv[1:]
 
@@ -91,6 +94,7 @@ t_out.Branch("raw_costheta", raw_costheta)
 t_out.Branch("m_chic2_1c", m_chic2_1c)
 t_out.Branch("angle_gamgam", angle_gamgam)
 t_out.Branch("raw_trigger", raw_trigger)
+t_out.Branch("raw_time", raw_time)
 
 
 n_run = array('i',[0])
@@ -141,8 +145,10 @@ for jentry in xrange(entries):
         cut_cos = (abs(t.raw_costheta.at(gam1_index)) < 0.75 and abs(t.raw_costheta.at(gam2_index)) < 0.75)
         cut_egam = (t.raw_ge.at(gam1_index) < t.raw_ge.at(gam2_index))
         cut_chisq_2 = (t.m_chic2_1c.at(0) < 0.000001)
-        cut_angle_gamgam = (gam1_p4_raw.Angle(gam2_p4_raw.Vect())>0.65 and gam1_p4_raw.Angle(gam2_p4_raw.Vect())<2.9)
+        cut_angle_gamgam = (gam1_p4_raw.Angle(gam2_p4_raw.Vect())<2.9)
         cut_egam2 = (t.raw_ge.at(gam2_index) > 0.5)
+        cut_TDC = (t.raw_time.at(0)>4 and t.raw_time.at(0)<10)
+        cut_jpsi = (rec_gams_p4_raw.M()<3.07 or rec_gams_p4_raw.M()>3.14)
 
         Mgamgam = gams_p4_raw.M()
         mrec_gam1_raw = rec_gam1_p4_raw.M()
@@ -152,8 +158,11 @@ for jentry in xrange(entries):
         # cut on energe of gam2
         # if (cut_ngam and cut_egam and cut_pi0 and cut_eta and cut_chic and cut_angle_gamgam and cut_egam2):
 
+        # TDC cut
+        if (cut_ngam and cut_egam and cut_pi0 and cut_eta and cut_chic and cut_angle_gamgam and cut_TDC):
+
         # angle_gamgam
-        if (cut_ngam and cut_egam and cut_pi0 and cut_eta and cut_chic and cut_angle_gamgam):
+        # if (cut_ngam and cut_egam and cut_pi0 and cut_eta and cut_chic and cut_angle_gamgam):
 
         # chisq on chic2
         # if (cut_ngam and cut_egam and cut_pi0 and cut_eta and cut_chic and cut_chisq_2):
@@ -173,8 +182,12 @@ for jentry in xrange(entries):
             mrec_gam1.push_back(mrec_gam1_raw)
             mrec_gamgam.push_back(mrec_gamgam_raw)
             angle_gamgam.push_back(theta_gamgam)
+            if (t.run > 0):
+                raw_trigger.push_back(t.raw_trigger.at(0))
+            raw_time.push_back(t.raw_time.at(0))
 
             h_Mgamgam_d.Fill(Mgamgam)
+            h_Mgamgam_chi.Fill(Mgamgam)
             h_Mgamgam_n.Fill(Mgamgam)
             h_mrec_gam1_d.Fill(mrec_gam1_raw)
             h_mrec_gam1_n.Fill(mrec_gam1_raw)
@@ -188,6 +201,7 @@ for jentry in xrange(entries):
             h_chic2_1c_d.Fill(t.m_chic2_1c.at(0))
             h_chic2_1c_n.Fill(t.m_chic2_1c.at(0))
             h_angle_gamgam.Fill(gam1_p4_raw.Angle(gam2_p4_raw.Vect()))
+            h_time.Fill(t.raw_mdc.at(0))
             
             
 #            print t.run
@@ -204,21 +218,24 @@ for jentry in xrange(entries):
                 n_event[0] = t.event
                 h_trigger.Fill(t.raw_trigger.at(0))
 
-            t_out.Fill()
+            # t_out.Fill()
             gam1_E.clear()
             gam2_E.clear()
             mgamgam.clear()
             mrec_gam1.clear()
             mrec_gamgam.clear()
             angle_gamgam.clear()
+            raw_trigger.clear()
+            raw_time.clear()
   
-t_out.Write()
+# t_out.Write()
 h_evtflw.Write()
 h_mrec_gam1_d.Write()
 h_mrec_gam1_n.Write()
 h_mrec_gamgam_d.Write()
 h_mrec_gamgam_n.Write()
 h_Mgamgam_d.Write()
+h_Mgamgam_chi.Write()
 h_Mgamgam_n.Write()
 h_gam1_costhe.Write()
 h_gam1_E_d.Write()
@@ -230,6 +247,7 @@ h_chic2_1c_d.Write()
 h_chic2_1c_n.Write()
 h_angle_gamgam.Write()
 h_trigger.Write()
+h_time.Write()
 fout.Close()
 pbar.finish()
                 

@@ -51,11 +51,11 @@
 // class declaration
 //
 
-class Chic2invi : public Algorithm {
+class ChicNoTDC : public Algorithm {
   
 public:
-  Chic2invi(const std::string&, ISvcLocator*);
-  ~Chic2invi(); 
+  ChicNoTDC(const std::string&, ISvcLocator*);
+  ~ChicNoTDC(); 
   StatusCode initialize();
   StatusCode execute();
   StatusCode finalize();
@@ -124,7 +124,7 @@ private:
   std::vector<double> *m_raw_gpy; 
   std::vector<double> *m_raw_gpz; 
   std::vector<double> *m_raw_ge; 
-//  std::vector<double> *m_mdc; 
+  std::vector<double> *m_mdc; 
 
   std::vector<double> *m_raw_phi;
   std::vector<double> *m_chic2_1c;
@@ -185,12 +185,12 @@ private:
 // module declare
 //
 
-DECLARE_ALGORITHM_FACTORY( Chic2invi )
-DECLARE_FACTORY_ENTRIES( Chic2invi ) {
-  DECLARE_ALGORITHM(Chic2invi);
+DECLARE_ALGORITHM_FACTORY( ChicNoTDC )
+DECLARE_FACTORY_ENTRIES( ChicNoTDC ) {
+  DECLARE_ALGORITHM(ChicNoTDC);
 }
 
-LOAD_FACTORY_ENTRIES( Chic2invi )
+LOAD_FACTORY_ENTRIES( ChicNoTDC )
 
 
 //
@@ -207,14 +207,14 @@ static long m_cout_everat(0);
 //
 // member functions
 //
-Chic2invi::Chic2invi(const std::string& name, ISvcLocator* pSvcLocator) :
+ChicNoTDC::ChicNoTDC(const std::string& name, ISvcLocator* pSvcLocator) :
   Algorithm(name, pSvcLocator),
   m_tree(0),
   m_raw_gpx(0), 
   m_raw_gpy(0), 
   m_raw_gpz(0), 
   m_raw_ge(0),  
-//  m_mdc(0),  
+  m_mdc(0),  
   m_raw_phi(0),
   m_chic2_1c(0),
   m_raw_theta(0),
@@ -256,7 +256,7 @@ Chic2invi::Chic2invi(const std::string& name, ISvcLocator* pSvcLocator) :
 
 
 
-StatusCode Chic2invi::initialize(){ MsgStream log(msgSvc(), name());
+StatusCode ChicNoTDC::initialize(){ MsgStream log(msgSvc(), name());
   log << MSG::INFO << ">>>>>>> in initialize()" << endmsg;
 
   StatusCode status;
@@ -272,7 +272,7 @@ StatusCode Chic2invi::initialize(){ MsgStream log(msgSvc(), name());
 }
 
 
-StatusCode Chic2invi::execute() {
+StatusCode ChicNoTDC::execute() {
   MsgStream log(msgSvc(), name());
   log << MSG::INFO << "in execute()" << endreq;
   
@@ -324,7 +324,7 @@ if (buildChicToInvisible()) {
 return StatusCode::SUCCESS; 
 }
 
-StatusCode Chic2invi::finalize() {
+StatusCode ChicNoTDC::finalize() {
   MsgStream log(msgSvc(), name());
   log << MSG::INFO << "in finalize()" << endmsg;
 
@@ -337,11 +337,11 @@ StatusCode Chic2invi::finalize() {
 }
 
 
-Chic2invi::~Chic2invi() {
+ChicNoTDC::~ChicNoTDC() {
 }
 
 
-void Chic2invi::book_histogram() {
+void ChicNoTDC::book_histogram() {
 
   h_evtflw = new TH1F("hevtflw", "eventflow", 13, 0, 13);
   if (!h_evtflw) return;
@@ -358,9 +358,9 @@ void Chic2invi::book_histogram() {
 }
 
 
-void Chic2invi::book_tree() {
+void ChicNoTDC::book_tree() {
 
-  m_tree=new TTree("tree", "Chic2invi");
+  m_tree=new TTree("tree", "ChicNoTDC");
   if (!m_tree) return; 
 
   //commom info
@@ -375,7 +375,7 @@ void Chic2invi::book_tree() {
   m_tree->Branch("raw_gpy", &m_raw_gpy);
   m_tree->Branch("raw_gpz", &m_raw_gpz);
   m_tree->Branch("raw_ge", &m_raw_ge);
-//  m_tree->Branch("raw_mdc", &m_mdc);
+  m_tree->Branch("raw_mdc", &m_mdc);
   
   m_tree->Branch("raw_phi", &m_raw_phi);
   m_tree->Branch("m_chic2_1c", &m_chic2_1c);
@@ -400,14 +400,14 @@ void Chic2invi::book_tree() {
   m_tree->Branch("mc_costhe_gam2", &m_mc_costhe_gam2, "mc_costhe_gam2/D");
 }
 
-void Chic2invi::clearVariables() {
+void ChicNoTDC::clearVariables() {
 
   // EMC Info
   m_raw_gpx->clear();
   m_raw_gpy->clear();
   m_raw_gpz->clear();
   m_raw_ge->clear();
-//  m_mdc->clear();
+  m_mdc->clear();
 
   m_raw_phi->clear();
   m_chic2_1c->clear();
@@ -430,7 +430,7 @@ void Chic2invi::clearVariables() {
   m_event = 0;
 }
 
-bool Chic2invi::buildChicToInvisible() {
+bool ChicNoTDC::buildChicToInvisible() {
 
 	SmartDataPtr<EvtRecEvent>evtRecEvent(eventSvc(),"/Event/EvtRec/EvtRecEvent");
 	if(!evtRecEvent) return false;
@@ -452,6 +452,7 @@ bool Chic2invi::buildChicToInvisible() {
 	std::vector<int> iShow;
 	iShow.clear();
 
+//	selectNeutralTracks(evtRecEvent, evtRecTrkCol, iGam, iShow, *m_mdc);
 	selectNeutralTracks(evtRecEvent, evtRecTrkCol, iGam, iShow);
 	if (iGam.size() != 2) return false;
 	if( isCosmicRay(iGam, evtRecTrkCol) ) return false;
@@ -470,7 +471,7 @@ bool Chic2invi::buildChicToInvisible() {
 	return true; 
 }
 
-void Chic2invi::saveGenInfo(){
+void ChicNoTDC::saveGenInfo(){
 
 	SmartDataPtr<Event::McParticleCol> mcParticleCol(eventSvc(), "/Event/MC/McParticleCol");
 	HepLorentzVector mc_psip, mc_gam1, mc_gam2;
@@ -526,7 +527,8 @@ void Chic2invi::saveGenInfo(){
 }
 
 
-void Chic2invi::selectNeutralTracks(SmartDataPtr<EvtRecEvent> evtRecEvent,
+void ChicNoTDC::selectNeutralTracks(SmartDataPtr<EvtRecEvent> evtRecEvent,
+//		SmartDataPtr<EvtRecTrackCol> evtRecTrkCol, std::vector<int>& iGam, std::vector<int>& iShow, std::vector<double>& *m_mdc) {
 		SmartDataPtr<EvtRecTrackCol> evtRecTrkCol, std::vector<int>& iGam, std::vector<int>& iShow) {
 
 
@@ -540,10 +542,10 @@ void Chic2invi::selectNeutralTracks(SmartDataPtr<EvtRecEvent> evtRecEvent,
 		iShow.push_back((*itTrk)->trackId());
 
 		// TDC window
-		if ( !(emcTrk->time() >= m_min_emctime && emcTrk->time() <= m_max_emctime) )
-		continue; 
+//		if ( !(emcTrk->time() >= m_min_emctime && emcTrk->time() <= m_max_emctime) )
+//		continue; 
 
-//		m_mdc->push_back(emcTrk->());
+		m_mdc->push_back(emcTrk->time());
 
 		// Energy threshold
 		double abs_costheta(fabs(cos(emcTrk->theta())));
@@ -611,7 +613,7 @@ void Chic2invi::selectNeutralTracks(SmartDataPtr<EvtRecEvent> evtRecEvent,
 }
 
 
-void Chic2invi::saveGamInfo(std::vector<int> iGam,
+void ChicNoTDC::saveGamInfo(std::vector<int> iGam,
 		SmartDataPtr<EvtRecTrackCol> evtRecTrkCol){
 
 
@@ -658,7 +660,7 @@ void Chic2invi::saveGamInfo(std::vector<int> iGam,
 
 
 
-void Chic2invi::kmFit(std::vector<int> iGam,
+void ChicNoTDC::kmFit(std::vector<int> iGam,
 		SmartDataPtr<EvtRecTrackCol> evtRecTrkCol){
 
 	double eraw;
@@ -715,7 +717,7 @@ void Chic2invi::kmFit(std::vector<int> iGam,
 
 }
 
-bool Chic2invi::isCosmicRay(std::vector<int> iGam,
+bool ChicNoTDC::isCosmicRay(std::vector<int> iGam,
 		SmartDataPtr<EvtRecTrackCol> evtRecTrkCol){
 
 	// cosmic veto
