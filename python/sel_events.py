@@ -142,13 +142,14 @@ for jentry in xrange(entries):
         cut_pi0 = (gams_p4_raw.M() < 0.10 or gams_p4_raw.M() > 0.16)
         cut_eta = (gams_p4_raw.M() < 0.50 or gams_p4_raw.M() > 0.57)
         cut_chic = (gams_p4_raw.M() < 3.22 or gams_p4_raw.M() > 3.75)
-        cut_cos = (abs(t.raw_costheta.at(gam1_index)) < 0.75 and abs(t.raw_costheta.at(gam2_index)) < 0.75)
+        cut_cos = (abs(t.raw_costheta.at(gam1_index)) < 0.6 and abs(t.raw_costheta.at(gam2_index)) < 0.8)
         cut_egam = (t.raw_ge.at(gam1_index) < t.raw_ge.at(gam2_index))
         cut_chisq_2 = (t.m_chic2_1c.at(0) < 0.000001)
         cut_angle_gamgam = (gam1_p4_raw.Angle(gam2_p4_raw.Vect())<2.9)
         cut_egam2 = (t.raw_ge.at(gam2_index) > 0.5)
         cut_TDC = (t.raw_time.at(0)>4 and t.raw_time.at(0)<10)
         cut_jpsi = (rec_gams_p4_raw.M()<3.07 or rec_gams_p4_raw.M()>3.14)
+        cut_trigger = (t.raw_trigger.at(0) == 8 or t.raw_trigger.at(0) == 11)
 
         Mgamgam = gams_p4_raw.M()
         mrec_gam1_raw = rec_gam1_p4_raw.M()
@@ -158,8 +159,17 @@ for jentry in xrange(entries):
         # cut on energe of gam2
         # if (cut_ngam and cut_egam and cut_pi0 and cut_eta and cut_chic and cut_angle_gamgam and cut_egam2):
 
+        # cos & trig cut
+        if (cut_ngam and cut_egam and cut_pi0 and cut_eta and cut_chic and cut_angle_gamgam and cut_TDC and cut_cos and cut_trigger):
+
+        # cos cut
+        # if (cut_ngam and cut_egam and cut_pi0 and cut_eta and cut_chic and cut_angle_gamgam and cut_TDC and cut_cos):
+
+        # trigger cut
+        # if (cut_ngam and cut_egam and cut_pi0 and cut_eta and cut_chic and cut_angle_gamgam and cut_TDC and cut_trigger):
+
         # TDC cut
-        if (cut_ngam and cut_egam and cut_pi0 and cut_eta and cut_chic and cut_angle_gamgam and cut_TDC):
+        # if (cut_ngam and cut_egam and cut_pi0 and cut_eta and cut_chic and cut_angle_gamgam and cut_TDC):
 
         # angle_gamgam
         # if (cut_ngam and cut_egam and cut_pi0 and cut_eta and cut_chic and cut_angle_gamgam):
@@ -169,9 +179,6 @@ for jentry in xrange(entries):
 
         # veto
         # if (cut_ngam and cut_egam and cut_pi0 and cut_eta and cut_chic):
-        
-        # cos
-        # if (cut_ngam and cut_egam and cut_pi0 and cut_eta and cut_chic and cut_cos):
         
         # n
         # if (cut_ngam and cut_egam):

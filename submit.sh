@@ -841,9 +841,9 @@ case $option in
 	    ;;
 
     1.4.4) echo "select events on signal MC sample..."
-        ./python/sel_events.py scripts/chic0_invi/rootfile_chic0/chic0_gam2invi_gen_mc_noTDC.root scripts/chic0_invi/event_chic0/chic0_gam2invi_gen_mc_noTDC_event.root
-        ./python/sel_events.py scripts/chic1_invi/rootfile_chic1/chic1_gam2invi_gen_mc_noTDC.root scripts/chic1_invi/event_chic1/chic1_gam2invi_gen_mc_noTDC_event.root
-        ./python/sel_events.py scripts/chic2_invi/rootfile_chic2/chic2_gam2invi_gen_mc_noTDC.root scripts/chic2_invi/event_chic2/chic2_gam2invi_gen_mc_noTDC_event.root
+        ./python/sel_events.py scripts/chic0_invi/rootfile_chic0/chic0_gam2invi_gen_mc_noTDC.root scripts/chic0_invi/event_chic0/chic0_gam2invi_gen_mc_noTDC_event_trigger.root
+        ./python/sel_events.py scripts/chic1_invi/rootfile_chic1/chic1_gam2invi_gen_mc_noTDC.root scripts/chic1_invi/event_chic1/chic1_gam2invi_gen_mc_noTDC_event_trigger.root
+        ./python/sel_events.py scripts/chic2_invi/rootfile_chic2/chic2_gam2invi_gen_mc_noTDC.root scripts/chic2_invi/event_chic2/chic2_gam2invi_gen_mc_noTDC_event_trigger.root
 	    ;;
 
     1.5) echo "run on data 2012..."
@@ -934,7 +934,7 @@ case $option in
         # ./python/sel_events.py scripts/ee_decay/rootfile/GEBhabha_noTDC.root scripts/ee_decay/event/GEBhabha_noTDC_event.root
         # ./python/sel_events.py scripts/ee_decay/rootfile/GBBhabha_noTDC.root scripts/ee_decay/event/GBBhabha_noTDC_event.root
         # ./python/sel_events.py scripts/ee_decay/rootfile/GDiphoton_noTDC.root scripts/ee_decay/event/GDiphoton_noTDC_event.root
-        ./python/sel_events.py scripts/ee_decay/rootfile/GDimuon_noTDC.root scripts/ee_decay/event/GDimuon_noTDC_event.root
+        ./python/sel_events.py scripts/ee_decay/rootfile/GDimuon_noTDC.root scripts/ee_decay/event/GDimuon_noTDC_event_costrig.root
 	    ;;
 
 
