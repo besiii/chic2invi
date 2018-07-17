@@ -310,8 +310,8 @@ StatusCode ChicNoTDC::execute() {
 				if(trigData->getTrigChannel(j)){
 					m_trig_tot ++;
 					m_trig_which = j+1;
-					//m_raw_trigger->push_back(m_trig_which);
-					m_raw_trigger->push_back(j);
+					m_raw_trigger->push_back(m_trig_which);
+					// m_raw_trigger->push_back(j);
 				}
 			}
 		}
