@@ -308,23 +308,43 @@ case $option in
 	 ;;
 
     0.4.1) echo "simulation -- generate signal MC sample..."
-	    cd scripts/chic0_invi/jobs_chic0
+	    mkdir scripts/chic0_invi
+	    cd scripts/chic0_invi
+        mkdir /besfs/groups/nphy/users/$USER/bes/chic2invi/v0.1/run/gen_mc/chic0_invi/jobs_chic0
+        ln -s /besfs/groups/nphy/users/xiaosy/bes/chic2invi/v0.1/run/gen_mc/chic0_invi/jobs_chic0 ./jobs_chic0
+        cd jobs_chic0
+        cp $HOME/bes/chic2invi/v0.1/scripts/gen_script/gen_mc/jobOptions_sim_chic0.txt ./
         boss.condor -g physics jobOptions_sim_chic0.txt
-        cd ../../chic1_invi/jobs_chic1
+
+	    mkdir scripts/chic1_invi
+	    cd scripts/chic1_invi
+        mkdir /besfs/groups/nphy/users/$USER/bes/chic2invi/v0.1/run/gen_mc/chic1_invi/jobs_chic1
+        ln -s /besfs/groups/nphy/users/xiaosy/bes/chic2invi/v0.1/run/gen_mc/chic1_invi/jobs_chic1 ./jobs_chic1
+        cd jobs_chic1
+        cp $HOME/bes/chic2invi/v0.1/scripts/gen_script/gen_mc/jobOptions_sim_chic1.txt ./
         boss.condor -g physics jobOptions_sim_chic1.txt
-        cd ../../chic2_invi/jobOptions_chic2
+        
+	    mkdir scripts/chic2_invi
+	    cd scripts/chic2_invi
+        mkdir /besfs/groups/nphy/users/$USER/bes/chic2invi/v0.1/run/gen_mc/chic2_invi/jobs_chic2
+        ln -s /besfs/groups/nphy/users/xiaosy/bes/chic2invi/v0.1/run/gen_mc/chic2_invi/jobs_chic2 ./jobs_chic2
+        cd jobs_chic2
+        cp $HOME/bes/chic2invi/v0.1/scripts/gen_script/gen_mc/jobOptions_sim_chic2.txt ./
         boss.condor -g physics jobOptions_sim_chic2.txt
-        cd $HOME/bes/chic2invi/v0.1
 	    ;;
 
     0.4.2) echo "reconstruction -- generate signal MC sample..."
 	    cd scripts/chic0_invi/jobs_chic0
+        cp $HOME/bes/chic2invi/v0.1/scripts/gen_script/gen_mc/jobOptions_rec_chic0.txt ./
         boss.condor -g physics jobOptions_rec_chic0.txt
-        cd ../../chic1_invi/jobs_chic1
+
+	    cd scripts/chic1_invi/jobs_chic1
+        cp $HOME/bes/chic2invi/v0.1/scripts/gen_script/gen_mc/jobOptions_rec_chic1.txt ./
         boss.condor -g physics jobOptions_rec_chic1.txt
-        cd ../../chic2_invi/jobOptions_chic2
+
+	    cd scripts/chic2_invi/jobs_chic2
+        cp $HOME/bes/chic2invi/v0.1/scripts/gen_script/gen_mc/jobOptions_rec_chic2.txt ./
         boss.condor -g physics jobOptions_rec_chic2.txt
-        cd $HOME/bes/chic2invi/v0.1
 	    ;;
 
     0.4.3) echo "run on signal MC sample..."
