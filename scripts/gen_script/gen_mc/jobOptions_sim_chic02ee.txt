@@ -28,7 +28,7 @@ RealizationSvc.RunIdList = {-25338,0,-27090};
 
 
 #include "$ROOTIOROOT/share/jobOptions_Digi2Root.txt"
-RootCnvSvc.digiRootOutputFile = "../rtraw_chic02ee/chic02ee.rtraw";
+RootCnvSvc.digiRootOutputFile = "../../chic02ee/rtraw_chic02ee/chic02ee.rtraw";
 
 
 // OUTPUT PRINTOUT LEVEL
