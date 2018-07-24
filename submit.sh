@@ -1045,6 +1045,10 @@ case $option in
         cp $HOME/bes/chic2invi/v0.1/scripts/gen_script/gen_mc/jobOptions_sim_chic02ee.txt ./
         boss.condor -g physics jobOptions_sim_chic02ee.txt
 	;;
-
-
+        2.0.2) echo "reconstruction -- generate signal MC sample..."
+            
+	cd scripts/chic0_invi/jobs_chic0
+        cp $HOME/bes/chic2invi/v0.1/scripts/gen_script/gen_mc/jobOptions_rec_chic02ee.txt ./
+        boss.condor -g physics jobOptions_rec_chic02ee.txt
+        ;;
 esac
