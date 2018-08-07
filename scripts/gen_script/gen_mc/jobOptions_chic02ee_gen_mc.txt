@@ -1,0 +1,21 @@
+#include "$ROOTIOROOT/share/jobOptions_ReadRec.txt"        
+#include "$VERTEXFITROOT/share/jobOptions_VertexDbSvc.txt" 
+#include "$MAGNETICFIELDROOT/share/MagneticField.txt"      
+#include "$ABSCORROOT/share/jobOptions_AbsCor.txt"         
+#include "$HOME/bes/chic2invi/v0.1/scripts/chic0_invi/samples_chic0/gen_mc_chic0_gam2invi.txt" 
+                                                              
+                                                              
+ApplicationMgr.DLLs += {"Chic2invi"};                       
+ApplicationMgr.TopAlg += { "Chic2invi" };                   
+                                                              
+// Set output level threshold (2=DEBUG, 3=INFO, 4=WARNING, 5=ERROR, 6=FATAL ) 
+MessageSvc.OutputLevel = 5;                                   
+                                                              
+// Number of events to be processed (default is 10)           
+//ApplicationMgr.EvtMax = 5000;                               
+ApplicationMgr.EvtMax = -1;                                   
+                                                              
+Chic2invi.IsMonteCarlo="true";                             
+Chic2invi.OutputFileName="../rootfile_chic02ee/chic02ee_gen_mc.root"; 
+                                                              
+                                                              
