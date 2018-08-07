@@ -60,16 +60,32 @@ public:
   StatusCode finalize();
 
 private:
-}; 
+
+
+//output file
+std::string m_output_filename;
+  bool m_isMonteCarlo; 
+  bool m_eventrate;
+  TFile* m_fout; 
 
 
 //define Trees
-TTree* m_trees;
+TTree* m_tree;
 
 //common info
 int m_run;
 int m_event;
 
+//
+//functions
+//
+void book_histogram();
+void book_tree();
+void clearVariables();
+}
+//
+//module declare 
+//
 
 
 DECLARE_ALGORITHM_FACTORY( Chic02ee )
@@ -79,19 +95,46 @@ DECLARE_FACTORY_ENTRIES( Chic02ee ) {
 
 LOAD_FACTORY_ENTRIES( Chic02ee )
 
+//
+//member functions
+//
+
+
 Chic02ee::Chic02ee(const std::string& name, ISvcLocator* pSvcLocator) :
-  Algorithm(name, pSvcLocator)
+  Algorithm(name, pSvcLocator),
+m_tree(0)
 {
 }
 
 
 
 StatusCode Chic02ee::initialize(){ MsgStream log(msgSvc(), name());
-  return StatusCode::SUCCESS;
+ log << MSG::INFO << ">>>>>>> in initialize()" << endmsg;
+
+  StatusCode status;
+  
+  m_fout = new TFile(m_output_filename.c_str(), "RECREATE");
+  m_fout->cd(); 
+
+  book_histogram(); 
+  book_tree(); 
+
+  log << MSG::INFO << "successfully return from initialize()" <<endmsg; 
+
+ return StatusCode::SUCCESS;
 }
 
 
 StatusCode Chic02ee::execute() {
+ MsgStream log(msgSvc(), name());
+  log << MSG::INFO << "in execute()" << endreq;
+  
+  // clear variables 
+   clearVariables();
+       
+        h_evtflw->Fill(0); // raw 
+        SmartDataPtr<Event::EventHeader>eventHeader(eventSvc(),"/Event/EventHeader");
+        if(!eventHeader) return StatusCode::FAILURE;
 
 m_run = eventHeader->runNumber();
 m_event = eventHeader->eventNumber();

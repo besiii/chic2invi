@@ -1057,9 +1057,9 @@ case $option in
 	cd scripts/chic02ee
 	mkdir /besfs/users/$USER/bes/chic2invi/v0.1/scripts/chic02ee/rootfile_chic02ee
 	ln -s /besfs/users/$USER/bes/chic2invi/v0.1/scripts/chic02ee/rootfile_chic02ee ./rootfile_chic02ee
-	cd jobs_chic02ee
+	cd jobs_chic0
 	cp $HOME/bes/chic2invi/v0.1/scripts/chic02ee/jobs_chic0/jobOptions_chic02ee_gen_mc.txt ./
-	boss.condor -g physics jobOptions_chic02ee_gen_mc.txt
+	boss.exe jobOptions_chic02ee_gen_mc.txt
 
 	;;
 

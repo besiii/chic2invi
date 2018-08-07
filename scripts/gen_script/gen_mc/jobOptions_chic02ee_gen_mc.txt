@@ -5,8 +5,8 @@
 #include "$HOME/bes/chic2invi/v0.1/scripts/chic0_invi/samples_chic0/gen_mc_chic0_gam2invi.txt" 
                                                               
                                                               
-ApplicationMgr.DLLs += {"Chic2invi"};                       
-ApplicationMgr.TopAlg += { "Chic2invi" };                   
+ApplicationMgr.DLLs += {"Chic02ee"};                       
+ApplicationMgr.TopAlg += { "Chic02ee" };                   
                                                               
 // Set output level threshold (2=DEBUG, 3=INFO, 4=WARNING, 5=ERROR, 6=FATAL ) 
 MessageSvc.OutputLevel = 5;                                   
