@@ -63,7 +63,13 @@ usage() {
     printf "\n\t%-9s  %-40s"  "0.6.4"    "Select events on ee, mumu, gamgam MC sample"
     printf "\n\t%-9s  %-40s"  "0.6.5"    "Generate plots of ee, mumu, gamgam and inclusive MC samples"
 
+    printf "\n\t%-9s  %-40s"  "2.0"      "[run on chic02ee]"
+    printf "\n\t%-9s  %-40s"  "2.0.1"    "Generate 100 chic02ee MC signal events"
+    printf "\n\t%-9s  %-40s"  "2.0.2"    "Reconstruction 100 chic02ee MC signal events"
+    printf "\n\t%-9s  %-40s"  "2.0.3"    "Preselection of the events and generate root file"
     printf "\n\n" 
+
+
 }
 
 
@@ -1031,7 +1037,29 @@ case $option in
 	   ./python/mrg_rootfiles.py run/chicNoTDC/event_data_by_5 run/chicNoTDC/hist_data_by_5
 	   ;;
 
+        2.0.1) echo "simulation --100 signal MC sample chic02ee events..."
+        mkdir scripts/chic02ee 
+	cd scripts/chic02ee
+	mkdir /besfs/users/$USER/bes/chic2invi/v0.1/scripts/chic02ee/jobs_chic0
+        ln -s /besfs/users/$USER/bes/chic2invi/v0.1/scripts/chic02ee/jobs_chic0 ./jobs_chic0
+        cd jobs_chic0
+        cp $HOME/bes/chic2invi/v0.1/scripts/gen_script/gen_mc/jobOptions_sim_chic02ee.txt ./
+        boss.condor -g physics jobOptions_sim_chic02ee.txt
+	;;
+        2.0.2) echo "reconstruction -- generate signal MC sample..."
+            
+	cd scripts/chic02ee/jobs_chic0
+        cp $HOME/bes/chic2invi/v0.1/scripts/gen_script/gen_mc/jobOptions_rec_chic02ee.txt ./
+        boss.condor -g physics jobOptions_rec_chic02ee.txt
+        ;;
+	
+	2.0.3) echo "Preselection of the event -- generate root file..."
+	cd scripts/chic02ee
+	mkdir /besfs/users/$USER/bes/chic2invi/v0.1/scripts/chic02ee/rootfile_chic02ee
+	ln -s /besfs/users/$USER/bes/chic2invi/v0.1/scripts/chic02ee/rootfile_chic02ee ./rootfile_chic02ee
+	cd jobs_chic0
+	boss.condor -g physics jobOptions_chic02ee_gen_mc.txt
 
-
+	;;
 
 esac
