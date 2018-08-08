@@ -86,6 +86,7 @@ int m_event;
 void book_histogram();
 void book_tree();
 void clearVariables();
+bool buildChic02ee();
 };
 //
 //module declare 
@@ -108,6 +109,8 @@ Chic02ee::Chic02ee(const std::string& name, ISvcLocator* pSvcLocator) :
   Algorithm(name, pSvcLocator),
 m_tree(0)
 {
+declareProperty("OutputFileName",m_output_filename);
+declareProperty("IsMonteCarlo",m_isMonteCarlo);
 }
 
 
@@ -140,8 +143,16 @@ StatusCode Chic02ee::execute() {
         SmartDataPtr<Event::EventHeader>eventHeader(eventSvc(),"/Event/EventHeader");
         if(!eventHeader) return StatusCode::FAILURE;
 
+
 m_run = eventHeader->runNumber();
 m_event = eventHeader->eventNumber();
+
+
+
+
+if (buildChic02ee()) {
+m_tree->Fill();// only fill tree for the selected events 
+}
 
 
 return StatusCode::SUCCESS; 
@@ -185,4 +196,8 @@ void Chic02ee::clearVariables(){
 m_run=0;
 m_event=0;
 }
+bool Chic02ee::buildChic02ee() {
+return true;
+}
+
 
