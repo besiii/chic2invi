@@ -97,7 +97,7 @@ f3 = TFile('run/chicNoTDC/hist_inclusiveMC/chicNoTDC_psip_mc_event_merged_cos.ro
 # f1 = TFile("3signal_n/chic1_gam2invi_gen_mc_noTDC_event_n.root")
 # f2 = TFile("3signal_n/chic2_gam2invi_gen_mc_noTDC_event_n.root")
 # f3 = TFile('run/chicNoTDC/hist_inclusiveMC/chicNoTDC_psip_mc_event_merged_n.root')
-f4 = TFile('run/chicNoTDC/hist_data/chicNoTDC_psip_data_event_merged_costrig.root')
+f4 = TFile('run/chicNoTDC/hist_data/chicNoTDC_psip_data_event_merged_trigger.root')
 f5 = TFile('run/chicNoTDC/hist_data3650/chicNoTDC_data3650_event_merged_costrig.root')
 f6 = TFile('scripts/ee_decay/event/GDimuon_noTDC_event_costrig.root')
 
