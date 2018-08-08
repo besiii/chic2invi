@@ -148,7 +148,7 @@ return StatusCode::SUCCESS;
 }
 
 StatusCode Chic02ee::finalize() {
-Msgstream log(msgSvc(), name());
+MsgStream log(msgSvc(), name());
 log << MSG::INFO << "in finalize()" << endmsg;
 
 m_fout->cd();
