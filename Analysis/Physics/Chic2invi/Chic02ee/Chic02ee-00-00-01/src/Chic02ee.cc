@@ -69,6 +69,10 @@ std::string m_output_filename;
   TFile* m_fout; 
 
 
+//define Histograms
+TH1F* h_evtflw;
+
+
 //define Trees
 TTree* m_tree;
 
@@ -82,7 +86,7 @@ int m_event;
 void book_histogram();
 void book_tree();
 void clearVariables();
-}
+};
 //
 //module declare 
 //
@@ -131,8 +135,8 @@ StatusCode Chic02ee::execute() {
   
   // clear variables 
    clearVariables();
-       
-        h_evtflw->Fill(0); // raw 
+   h_evtflw->Fill(0); //raw
+ 
         SmartDataPtr<Event::EventHeader>eventHeader(eventSvc(),"/Event/EventHeader");
         if(!eventHeader) return StatusCode::FAILURE;
 
@@ -144,12 +148,28 @@ return StatusCode::SUCCESS;
 }
 
 StatusCode Chic02ee::finalize() {
-  return StatusCode::SUCCESS;
+Msgstream log(msgSvc(), name());
+log << MSG::INFO << "in finalize()" << endmsg;
+
+m_fout->cd();
+m_tree->Write();
+h_evtflw->Write();
+m_fout->Close();
+
+
+ return StatusCode::SUCCESS;
 }
 
 
 Chic02ee::~Chic02ee() {
 }
+
+void Chic02ee::book_histogram() {
+
+h_evtflw = new TH1F("hevtflw","eventflow",13,0,13);
+if (!h_evtflw) return;
+}
+
 
 void Chic02ee::book_tree(){
 m_tree=new TTree("tree", "Chic02ee");
