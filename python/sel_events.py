@@ -149,7 +149,15 @@ for jentry in xrange(entries):
         cut_egam2 = (t.raw_ge.at(gam2_index) > 0.5)
         cut_TDC = (t.raw_time.at(0)>4 and t.raw_time.at(0)<10)
         cut_jpsi = (rec_gams_p4_raw.M()<3.07 or rec_gams_p4_raw.M()>3.14)
-        cut_trigger = (t.raw_trigger.at(0) == 8 or t.raw_trigger.at(0) == 11)
+        # cut_trigger = (t.raw_trigger.at(0) == 8 or t.raw_trigger.at(0) == 11)
+        # cut_trigger = !(t.raw_trigger.at(0) == 0 or t.raw_trigger.at(0) == 1 or t.raw_trigger.at(0) == 2 or t.raw_trigger.at(0) == 3 or t.raw_trigger.at(0) == 4 or t.raw_trigger.at(0) == 5 or t.raw_trigger.at(0) == 6 or t.raw_trigger.at(0) == 7 or t.raw_trigger.at(0) == 9 or t.raw_trigger.at(0) == 10 )
+        # cut_trigger = (t.raw_trigger.at(0) != 0 and t.raw_trigger.at(0) != 1 and t.raw_trigger.at(0) != 2 and t.raw_trigger.at(0) != 3 and t.raw_trigger.at(0) != 4 and t.raw_trigger.at(0) != 5 and t.raw_trigger.at(0) != 6 and t.raw_trigger.at(0) != 7 and t.raw_trigger.at(0) != 9 and t.raw_trigger.at(0) != 10 )
+
+        len_trig = len(t.raw_trigger)
+        count = 0
+        while (count < len_trig):
+            cut_trigger = (t.raw_trigger.at(count) != 0 and t.raw_trigger.at(count) != 1 and t.raw_trigger.at(count) != 2 and t.raw_trigger.at(count) != 3 and t.raw_trigger.at(count) != 4 and t.raw_trigger.at(count) != 5 and t.raw_trigger.at(count) !=6 and t.raw_trigger.at(count) !=7 and t.raw_trigger.at(count) !=9 and t.raw_trigger.at(count) !=10 and t.raw_trigger.at(count) !=11)
+            count = count + 1
 
         Mgamgam = gams_p4_raw.M()
         mrec_gam1_raw = rec_gam1_p4_raw.M()
