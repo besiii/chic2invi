@@ -156,7 +156,8 @@ for jentry in xrange(entries):
         len_trig = len(t.raw_trigger)
         count = 0
         while (count < len_trig):
-            cut_trigger = (t.raw_trigger.at(count) != 0 and t.raw_trigger.at(count) != 1 and t.raw_trigger.at(count) != 2 and t.raw_trigger.at(count) != 3 and t.raw_trigger.at(count) != 4 and t.raw_trigger.at(count) != 5 and t.raw_trigger.at(count) !=6 and t.raw_trigger.at(count) !=7 and t.raw_trigger.at(count) !=9 and t.raw_trigger.at(count) !=10 and t.raw_trigger.at(count) !=11)
+            cut_trigger = (t.raw_trigger.at(count) != 0 and t.raw_trigger.at(count) != 1 and t.raw_trigger.at(count) != 2 and t.raw_trigger.at(count) != 3 and t.raw_trigger.at(count) != 5 )
+            # cut_trigger = (t.raw_trigger.at(count) != 0 and t.raw_trigger.at(count) != 1 and t.raw_trigger.at(count) != 2 and t.raw_trigger.at(count) != 3 and t.raw_trigger.at(count) != 4 and t.raw_trigger.at(count) != 5 and t.raw_trigger.at(count) !=6 and t.raw_trigger.at(count) !=7 and t.raw_trigger.at(count) !=9 and t.raw_trigger.at(count) !=10 and t.raw_trigger.at(count) !=11)
             count = count + 1
 
         Mgamgam = gams_p4_raw.M()
