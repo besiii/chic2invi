@@ -61,6 +61,10 @@ public:
 
 private:
 
+// declare r0, z0 cut for charged tracks
+double m_ecms;
+double m_vr0cut, m_vz0cut;
+double m_total_number_of_charged_max;
 
 //output file
 std::string m_output_filename;
@@ -79,6 +83,17 @@ TTree* m_tree;
 //common info
 int m_run;
 int m_event;
+//
+//Neutral Tracks
+//
+int m_ncharged;
+
+//
+//chic02ee
+//
+int m_ntrk;
+int m_npho;
+
 
 //
 //functions
@@ -87,6 +102,13 @@ void book_histogram();
 void book_tree();
 void clearVariables();
 bool buildChic02ee();
+int selectChargedTracks(SmartDataPtr<EvtRecEvent>,
+			SmartDataPtr<EvtRecTrackCol>,
+			std::vector<int> &,
+			std::vector<int> &);
+void kmFit(std::vector<int>,
+	SmartDataPtr<EvtRecTrackCol>);
+
 };
 //
 //module declare 
@@ -111,6 +133,9 @@ m_tree(0)
 {
 declareProperty("OutputFileName",m_output_filename);
 declareProperty("IsMonteCarlo",m_isMonteCarlo);
+declareProperty("Ecms",m_ecms = 3.686);
+declareProperty("TotalNumberOfChargedMax",m_total_number_of_charged_max = 50);
+
 }
 
 
@@ -197,7 +222,28 @@ m_run=0;
 m_event=0;
 }
 bool Chic02ee::buildChic02ee() {
+
+	SmartDataPtr<EvtRecEvent>evtRecEvent(eventSvc(),"/Event/EvtRec/EvtRecEvent");
+	if(!evtRecEvent) return false;
+
+	SmartDataPtr<EvtRecTrackCol> evtRecTrkCol(eventSvc(), "/Event/EvtRec/EvtRecTrackCol");
+	if(!evtRecTrkCol) return false;
+
+	h_evtflw->Fill(9);
+
+	m_ncharged = evtRecEvent->totalCharged();
+	if (m_ncharged != 0) return false;
+	h_evtflw->Fill(1); // N_{Good} = 0
+
+	std::vector<int> iGam;
+	iGam.clear();
+	std::vector<int> iShow;
+	iShow.clear();
+
+
+
+
 return true;
+
+
 }
-
-
