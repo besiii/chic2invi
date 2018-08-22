@@ -2,7 +2,7 @@
 //
 // Description: chic02ee -> e+ e- 
 //
-// Original Author:  Amit pathak <amitraahul@itp.ac.cn>
+// Original Author:  Amit pathak <amit@ihep.ac.cn>
 //         Created:  [2018-07-25 Mon 16:30] 
 //         Inspired by SHI Xin's code 
 //         Helped by maoqiang
