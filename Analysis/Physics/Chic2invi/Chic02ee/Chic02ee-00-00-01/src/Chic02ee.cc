@@ -181,7 +181,6 @@ m_tree->Write();
 h_evtflw->Write();
 m_fout->Close();
 
-
  return StatusCode::SUCCESS;
 }
 
