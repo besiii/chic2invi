@@ -38,10 +38,10 @@
 #include "VertexFit/WTrackParameter.h"
 #include "VertexFit/VertexFit.h"
 
-#include "ParticleID/ParticleID.h"
-#include "McTruth/McParticle.h"
+//#include "ParticleID/ParticleID.h"
+//#include "McTruth/McParticle.h"
 
-#include "VertexFit/KalmanKinematicFit.h"
+//#include "VertexFit/KalmanKinematicFit.h"
 
 #include <TFile.h>
 #include <TH1.h>
@@ -81,9 +81,6 @@ TTree* m_tree;
 //common info
 int m_run;
 int m_event;
-//
-//Neutral Tracks
-//
 int m_ncharged;
 
 //
@@ -163,7 +160,6 @@ m_run = eventHeader->runNumber();
 m_event = eventHeader->eventNumber();
 
 
-
 if (buildChic02ee()) {
 m_tree->Fill();// only fill tree for the selected events 
 }
@@ -202,12 +198,13 @@ if (!m_tree) return;
 // common info
 m_tree->Branch("run",&m_run,"run/I");
 m_tree->Branch("event",&m_event,"event/I");
-
+m_tree->Branch("nchargedTrack",&m_ncharged,"charged/I");
 }
 
 void Chic02ee::clearVariables(){
 m_run=0;
 m_event=0;
+m_ncharged=0;
 }
 bool Chic02ee::buildChic02ee() {
 
@@ -219,12 +216,6 @@ SmartDataPtr<EvtRecEvent>evtRecEvent(eventSvc(),"/Event/EvtRec/EvtRecEvent");
 	m_ncharged = evtRecEvent->totalCharged();
 	if (m_ncharged != 0) return false;
 	h_evtflw->Fill(1); // N_{Good} = 0
-
-	std::vector<int> iGam;
-	iGam.clear();
-	std::vector<int> iShow;
-	iShow.clear();
-
 
 
 
