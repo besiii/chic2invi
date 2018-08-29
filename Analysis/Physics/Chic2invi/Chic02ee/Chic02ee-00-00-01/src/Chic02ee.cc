@@ -195,7 +195,7 @@ m_tree->Branch("nchargedTrack",&m_ncharged,"charged/I");
 void Chic02ee::clearVariables(){
 m_run=0;
 m_event=0;
-m_ncharged=0;
+m_ncharged=-1;
 }
 bool Chic02ee::buildChic02ee() {
 
