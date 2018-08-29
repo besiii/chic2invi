@@ -33,6 +33,18 @@
 
 #include "DstEvent/TofHitStatus.h"
 
+<<<<<<< HEAD
+=======
+#include "VertexFit/IVertexDbSvc.h"
+#include "VertexFit/Helix.h"
+#include "VertexFit/WTrackParameter.h"
+#include "VertexFit/VertexFit.h"
+
+//#include "ParticleID/ParticleID.h"
+//#include "McTruth/McParticle.h"
+
+//#include "VertexFit/KalmanKinematicFit.h"
+>>>>>>> 81004ac418d2e81224e590c9fc5b104a60fb6599
 
 #include <TFile.h>
 #include <TH1.h>
@@ -195,7 +207,11 @@ m_tree->Branch("nchargedTrack",&m_ncharged,"charged/I");
 void Chic02ee::clearVariables(){
 m_run=0;
 m_event=0;
+<<<<<<< HEAD
 m_ncharged=-1;
+=======
+m_ncharged=0;
+>>>>>>> 81004ac418d2e81224e590c9fc5b104a60fb6599
 }
 bool Chic02ee::buildChic02ee() {
 
