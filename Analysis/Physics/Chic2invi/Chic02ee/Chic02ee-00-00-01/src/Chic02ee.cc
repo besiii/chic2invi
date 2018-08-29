@@ -33,15 +33,6 @@
 
 #include "DstEvent/TofHitStatus.h"
 
-#include "VertexFit/IVertexDbSvc.h"
-#include "VertexFit/Helix.h"
-#include "VertexFit/WTrackParameter.h"
-#include "VertexFit/VertexFit.h"
-
-//#include "ParticleID/ParticleID.h"
-//#include "McTruth/McParticle.h"
-
-//#include "VertexFit/KalmanKinematicFit.h"
 
 #include <TFile.h>
 #include <TH1.h>
@@ -214,7 +205,6 @@ SmartDataPtr<EvtRecEvent>evtRecEvent(eventSvc(),"/Event/EvtRec/EvtRecEvent");
 	h_evtflw->Fill(9);
 
 	m_ncharged = evtRecEvent->totalCharged();
-	if (m_ncharged != 0) return false;
 	h_evtflw->Fill(1); // N_{Good} = 0
 
 
