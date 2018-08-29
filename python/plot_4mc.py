@@ -21,7 +21,7 @@ mbc.SetLeftMargin(0.15)
 mbc.SetRightMargin(0.15)
 mbc.SetTopMargin(0.1)
 mbc.SetBottomMargin(0.15)
-mbc.SetLogy()
+# mbc.SetLogy()
 # mbc.SetLogx()
 
 # histo = 'h_Mgamgam_d'
@@ -40,9 +40,9 @@ mbc.SetLogy()
 # xmin = 0.0
 # xmax = 2.0
 
-histo = 'h_gam1_E_n'
-xmin = 0.0
-xmax = 0.4
+# histo = 'h_gam1_E_n'
+# xmin = 0.0
+# xmax = 0.4
 
 # histo = 'h_gam2_E'
 # xmin = 0.0
@@ -74,7 +74,7 @@ xmax = 0.4
 
 # histo = 'h_angle_gamgam'
 
-# histo = 'h_trigger'
+histo = 'h_trigger'
 
 # histo = 'h_time'
 
@@ -97,7 +97,7 @@ f3 = TFile('run/chicNoTDC/hist_inclusiveMC/chicNoTDC_psip_mc_event_merged_cos.ro
 # f1 = TFile("3signal_n/chic1_gam2invi_gen_mc_noTDC_event_n.root")
 # f2 = TFile("3signal_n/chic2_gam2invi_gen_mc_noTDC_event_n.root")
 # f3 = TFile('run/chicNoTDC/hist_inclusiveMC/chicNoTDC_psip_mc_event_merged_n.root')
-f4 = TFile('run/chicNoTDC/hist_data/chicNoTDC_psip_data_event_merged_costrig.root')
+f4 = TFile('run/chicNoTDC/hist_data/chicNoTDC_psip_data_event_merged_trigger.root')
 f5 = TFile('run/chicNoTDC/hist_data3650/chicNoTDC_data3650_event_merged_costrig.root')
 f6 = TFile('scripts/ee_decay/event/GDimuon_noTDC_event_costrig.root')
 
@@ -109,10 +109,10 @@ h4_E = f4.Get(histo)
 h5_E = f5.Get(histo)
 h6_E = f6.Get(histo)
 
-xbins = 100.0
-ytitle = "Events/%dMeV" %((xmax - xmin) / xbins * 1000.0)
-h4_E.GetYaxis().SetTitle(ytitle)
-h4_E.GetYaxis().SetRangeUser(1, 100000000)
+# xbins = 100.0
+# ytitle = "Events/%dMeV" %((xmax - xmin) / xbins * 1000.0)
+# h4_E.GetYaxis().SetTitle(ytitle)
+h4_E.GetYaxis().SetRangeUser(1, 100000)
 
 h4_E.SetTitle("")
 
@@ -220,10 +220,10 @@ legend.Draw()
 # mbc.SaveAs("python/plots/Mgamgam_chi_n.pdf")
 
 # h4_E.GetXaxis().SetTitle("E_{#gamma1} (GeV)")
-# mbc.SaveAs("python/plots/egam1_d_no.pdf")
+# mbc.SaveAs("python/plots/egam1_d_costrig.pdf")
 
-h4_E.GetXaxis().SetTitle("E_{#gamma1} (GeV)")
-mbc.SaveAs("python/plots/egam1_n_costrig.pdf")
+# h4_E.GetXaxis().SetTitle("E_{#gamma1} (GeV)")
+# mbc.SaveAs("python/plots/egam1_n_costrig.pdf")
 
 # h4_E.GetXaxis().SetTitle("E_{#gamma2} (GeV)")
 # mbc.SaveAs("python/plots/egam2_tdc.pdf")
@@ -253,8 +253,8 @@ mbc.SaveAs("python/plots/egam1_n_costrig.pdf")
 # h4_E.GetXaxis().SetTitle("#theta_{#gamma#gamma}")
 # mbc.SaveAs("python/plots/theta_veto.pdf")
 
-# h1_E.GetXaxis().SetTitle("trigger")
-# mbc.SaveAs("python/plots/trigger_no.pdf")
+h1_E.GetXaxis().SetTitle("trigger")
+mbc.SaveAs("python/plots/trigger_no.pdf")
 
 # h4_E.GetXaxis().SetTitle("time")
 # mbc.SaveAs("python/plots/time.pdf")
