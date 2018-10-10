@@ -86,23 +86,7 @@ int m_event;
 //charged tracks
 //
 int m_ncharged;
-//int m_nGoodCharged;
-int m_nlptrk;
-int m_nlmtrk;
-double m_trklp_p;
-double m_trklp_px;
-double m_trklp_py;
-double m_trklp_pz;
-double m_trklp_theta;
-double m_trklp_phi;
-double m_trklp_eraw;
-double m_trklm_p;
-double m_trklm_px;
-double m_trklm_py;
-double m_trklm_pz;
-double m_trklm_theta;
-double m_trklm_phi;
-double m_trklm_eraw; 
+int m_nGoodChargedTrack;
 
 //
 // vertex
@@ -247,10 +231,7 @@ if (!m_tree) return;
 m_tree->Branch("run",&m_run,"run/I");
 m_tree->Branch("event",&m_event,"event/I");
 m_tree->Branch("nchargedTrack",&m_ncharged,"charged/I");
-// m_tree->Branch("nlptrk", &m_nlptrk, "nlptrk/I");
-// m_tree->Branch("nlmtrk", &m_nlmtrk, "nlmtrk/I");
-
-
+m_tree->Branch("nGoodChargedTrack" , &m_nGoodChargedTrack, "charged/I");
 }
 
 
@@ -258,7 +239,7 @@ void Chic02ee::clearVariables(){
 m_run=0;
 m_event=0;
 m_ncharged=-1;
-
+m_nGoodChargedTrack=-1;
 }
 bool Chic02ee::buildChic02ee() {
 
@@ -272,21 +253,11 @@ std::vector<int> iLepPGood, iLepMGood;
 selectChargedTracks(evtRecEvent, evtRecTrkCol,
 		    iLepPGood, iLepMGood);
 
-//selectChargedTracks(evtRecEvent, evtRecTrkCol, iPGood, iMGood);
 
- // if ( (m_nlptrk != 1) || (m_nlmtrk != 1) ) return false;
- // h_evtflw->Fill(1); //  N_LeptonP=1, N_LeptonM=1
-
-
-  /* if(selectLeptonPlusLeptonMinus(evtRecTrkCol, iLepPGood, iLepMGood) != 1) return false; */ 
      
 m_ncharged = evtRecEvent->totalCharged();
 h_evtflw->Fill(2); // N_{Good} = 0
 
-	// m_ncharged = evtRecEvent->totalCharged();
-	// if (m_ncharged = 0) return false;
-	// h_evtflw->Fill(2); // N_{Good} = 2
-	
 return true;
 
 }
@@ -331,8 +302,7 @@ CLHEP::Hep3Vector xorigin = getOrigin();
 
 std::vector<int> iGood;
   iGood.clear();
-  iLepPGood.clear();
-  iLepMGood.clear();
+  
 
     // loop through charged tracks 
     //cout<<evtRecEvent->totalCharged() <<endl; 
@@ -342,112 +312,22 @@ std::vector<int> iGood;
     EvtRecTrackIterator itTrk=evtRecTrkCol->begin() + i;
 
     // Good Kalman Track 
-    if((*itTrk)->isMdcKalTrackValid()) continue; // changed the condition from not equals to equals
-         printf("\n Checking the loop \n ");
-    if((*itTrk)->isMdcTrackValid()) continue; // changed the condition from not equals to equals
+    if(!(*itTrk)->isMdcKalTrackValid()) continue; 
+      
+    if(!(*itTrk)->isMdcTrackValid()) continue; 
     RecMdcKalTrack* mdcTrk = (*itTrk)->mdcKalTrack();
-    
-    // Good Vertex 
-    if (passVertexSelection(xorigin, mdcTrk) ) continue; // changed the condition from not equals to equals
-
-    // Polar angle cut
+      // Good Vertex 
+    if (!passVertexSelection(xorigin, mdcTrk) ) continue;
+      // Polar angle cut
     if(fabs(cos(mdcTrk->theta())) > m_cha_costheta_cut) continue;
-
+    
     iGood.push_back((*itTrk)->trackId());
 
-
-     // lepton candidates
-      if(mdcTrk->charge()>0) iLepPGood.push_back((*itTrk)->trackId());
-      if(mdcTrk->charge()<0) iLepMGood.push_back((*itTrk)->trackId());
     } // end charged tracks
 
 
  m_ncharged = iGood.size();
- m_nlptrk = iLepPGood.size();
- m_nlmtrk = iLepMGood.size(); 
-
-/*if (m_nlptrk > 0 && m_nlmtrk > 0) {
-    EvtRecTrackIterator itTrk_lp = evtRecTrkCol->begin() + iLepPGood[0];
-    EvtRecTrackIterator itTrk_lm = evtRecTrkCol->begin() + iLepMGood[0];
-    saveTrkInfo(itTrk_lp, itTrk_lm);
-  }*/
+ 
   return iGood.size(); 
 
 }
-/*
-int Chic02ee::selectLeptonPlusLeptonMinus(SmartDataPtr<EvtRecTrackCol> evtRecTrkCol,
-					   std::vector<int> iPGood,
-					   std::vector<int> iMGood) {
-  int nlplm = 0;
-  bool evtflw_filled = false;
-  
-  for(unsigned int i1 = 0; i1 < iPGood.size(); i1++) {
-    EvtRecTrackIterator itTrk_p = evtRecTrkCol->begin() + iPGood[i1];
-    RecMdcTrack* mdcTrk_p = (*itTrk_p)->mdcTrack();
-    if (mdcTrk_p->charge() < 0) continue; // only positive charged tracks
-
-    for(unsigned int i2 = 0; i2 < iMGood.size(); i2++) {
-      EvtRecTrackIterator itTrk_m = evtRecTrkCol->begin() + iMGood[i2];
-      RecMdcTrack* mdcTrk_m = (*itTrk_m)->mdcTrack();
-      if (mdcTrk_m->charge() > 0) continue; // only negative charged tracks
-
-      /*
-	// lepton momentum 
-      if ( ! ( fabs(mdcTrk_p->p()) < m_lepton_momentum_max  &&
-      	       fabs(mdcTrk_m->p()) < m_lepton_momentum_max )) continue;
-
-      if ( !evtflw_filled ) h_evtflw->Fill(8); //|p| cut 
-      
-      // apply vertex fit
-      RecMdcKalTrack *lpTrk = (*(evtRecTrkCol->begin()+iPGood[i1]))->mdcKalTrack();
-      RecMdcKalTrack *lmTrk = (*(evtRecTrkCol->begin()+iMGood[i2]))->mdcKalTrack();
-
-      saveLeptonInfo(lpTrk, lmTrk);
-      
-      int ee_flag=0, mumu_flag=0;
-      if ( hasGoodLpLmVertex(lpTrk, lmTrk, Electron_Hypothesis_Fit, evtflw_filled) ) ee_flag=1;
-      if ( hasGoodLpLmVertex(lpTrk, lmTrk, Muon_Hypothesis_Fit, evtflw_filled) ) mumu_flag=1; 
-      
-      m_Chic02ee_flag = ee_flag;
-      m_Chic02ee_flag = mumu_flag;
-      if(ee_flag==1 || mumu_flag==1) nlplm++;
-      evtflw_filled = true;
-    }
-  } 
-
-  return nlplm; 
-}
-}
-
-
-void Chic02ee::saveTrkInfo(EvtRecTrackIterator itTrk_lp,
-			    EvtRecTrackIterator itTrk_lm) {
-         RecMdcTrack* mdcTrk_lp = (*itTrk_lp)->mdcTrack(); 
-  m_trklp_p = mdcTrk_lp->p();
-  m_trklp_px = mdcTrk_lp->px();
-  m_trklp_py = mdcTrk_lp->py();
-  m_trklp_pz = mdcTrk_lp->pz();
-  m_trklp_theta = mdcTrk_lp->theta();
-  m_trklp_phi = mdcTrk_lp->phi();
-  
-  if((*itTrk_lp)->isEmcShowerValid()){
-    RecEmcShower *emcTrk_lp = (*itTrk_lp)->emcShower();
-    m_trklp_eraw = emcTrk_lp->energy();
-  }
-  else{ m_trklp_eraw = -99.0; }
-
-  RecMdcTrack* mdcTrk_lm = (*itTrk_lm)->mdcTrack();
-  m_trklm_p = mdcTrk_lm->p();
-  m_trklm_px = mdcTrk_lm->px();
-  m_trklm_py = mdcTrk_lm->py();
-  m_trklm_pz = mdcTrk_lm->pz();
-  m_trklm_theta = mdcTrk_lm->theta();
-  m_trklm_phi = mdcTrk_lm->phi();
-  
-  if((*itTrk_lm)->isEmcShowerValid()){
-    RecEmcShower *emcTrk_lm = (*itTrk_lm)->emcShower();
-    m_trklm_eraw = emcTrk_lm->energy();
-  }
-  else{ m_trklm_eraw = -99.0; }
-
-}   */
