@@ -249,11 +249,6 @@ SmartDataPtr<EvtRecTrackCol> evtRecTrkCol(eventSvc(), "/Event/EvtRec/EvtRecTrack
 	if(!evtRecTrkCol) return false;
 
 	h_evtflw->Fill(9);
-std::vector<int> iLepPGood, iLepMGood;
-selectChargedTracks(evtRecEvent, evtRecTrkCol,
-		    iLepPGood, iLepMGood);
-
-
      
 m_ncharged = evtRecEvent->totalCharged();
 h_evtflw->Fill(2); // N_{Good} = 0
