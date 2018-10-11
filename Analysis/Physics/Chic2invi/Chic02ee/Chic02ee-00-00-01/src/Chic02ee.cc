@@ -116,12 +116,8 @@ void saveTrkInfo(EvtRecTrackIterator,
 		   EvtRecTrackIterator);
 int selectChargedTracks(SmartDataPtr<EvtRecEvent>,
 			  SmartDataPtr<EvtRecTrackCol>,
-			  std::vector<int> &,
 			  std::vector<int> &);
 
-int selectLeptonPlusLeptonMinus(SmartDataPtr<EvtRecTrackCol>,
-				  std::vector<int>,
-				  std::vector<int>);
 bool passVertexSelection(CLHEP::Hep3Vector,
 			RecMdcKalTrack*);
 CLHEP::Hep3Vector getOrigin();
@@ -230,8 +226,8 @@ if (!m_tree) return;
 // common info
 m_tree->Branch("run",&m_run,"run/I");
 m_tree->Branch("event",&m_event,"event/I");
-m_tree->Branch("nchargedTrack",&m_ncharged,"charged/I");
-m_tree->Branch("nGoodChargedTrack" , &m_nGoodChargedTrack, "charged/I");
+m_tree->Branch("nchargedTrack",&m_ncharged,"nchargedTrack/I");
+m_tree->Branch("nGoodChargedTrack" , &m_nGoodChargedTrack, "nGoodChargedTrack/I");
 }
 
 
@@ -248,7 +244,9 @@ SmartDataPtr<EvtRecEvent>evtRecEvent(eventSvc(),"/Event/EvtRec/EvtRecEvent");
 SmartDataPtr<EvtRecTrackCol> evtRecTrkCol(eventSvc(), "/Event/EvtRec/EvtRecTrackCol");
 	if(!evtRecTrkCol) return false;
 
-	h_evtflw->Fill(9);
+std::vector<int> iChargedGood;
+
+h_evtflw->Fill(9);
      
 m_ncharged = evtRecEvent->totalCharged();
 h_evtflw->Fill(2); // N_{Good} = 0
@@ -290,13 +288,13 @@ bool Chic02ee::passVertexSelection(CLHEP::Hep3Vector xorigin,
 
 int Chic02ee::selectChargedTracks(SmartDataPtr<EvtRecEvent> evtRecEvent,
 				   SmartDataPtr<EvtRecTrackCol> evtRecTrkCol,
-				   std::vector<int> & iLepPGood,
-				   std::vector<int> & iLepMGood) {
+				    std::vector<int> & iChargedGood) {
 
 CLHEP::Hep3Vector xorigin = getOrigin(); 
 
 std::vector<int> iGood;
   iGood.clear();
+  iChargedGood.clear();// added this vector and cleared
   
 
     // loop through charged tracks 
@@ -322,7 +320,8 @@ std::vector<int> iGood;
 
 
  m_ncharged = iGood.size();
- 
-  return iGood.size(); 
+ m_nGoodChargedTrack = iChargedGood.size();
+  
+return iGood.size(); 
 
 }
