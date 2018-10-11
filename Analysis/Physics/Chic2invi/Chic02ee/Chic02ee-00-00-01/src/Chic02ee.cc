@@ -245,6 +245,9 @@ SmartDataPtr<EvtRecTrackCol> evtRecTrkCol(eventSvc(), "/Event/EvtRec/EvtRecTrack
 	if(!evtRecTrkCol) return false;
 
 std::vector<int> iChargedGood;
+selectChargedTracks(evtRecEvent, evtRecTrkCol,
+            iChargedGood);
+//selectChargedTracks(evtRecEvent, evtRecTrkCol, iChargedGood);
 
 h_evtflw->Fill(9);
      
@@ -292,13 +295,10 @@ int Chic02ee::selectChargedTracks(SmartDataPtr<EvtRecEvent> evtRecEvent,
 
 CLHEP::Hep3Vector xorigin = getOrigin(); 
 
-std::vector<int> iGood;
-  iGood.clear();
-  iChargedGood.clear();// added this vector and cleared
+ iChargedGood.clear();
   
 
     // loop through charged tracks 
-    //cout<<evtRecEvent->totalCharged() <<endl; 
     for(int i = 0; i < evtRecEvent->totalCharged(); i++){
     
     // get mdcTrk 
@@ -314,14 +314,12 @@ std::vector<int> iGood;
       // Polar angle cut
     if(fabs(cos(mdcTrk->theta())) > m_cha_costheta_cut) continue;
     
-    iGood.push_back((*itTrk)->trackId());
+    iChargedGood.push_back((*itTrk)->trackId());
 
     } // end charged tracks
 
-
- m_ncharged = iGood.size();
- m_nGoodChargedTrack = iChargedGood.size();
+m_nGoodChargedTrack = iChargedGood.size();
   
-return iGood.size(); 
+return iChargedGood.size(); 
 
 }
