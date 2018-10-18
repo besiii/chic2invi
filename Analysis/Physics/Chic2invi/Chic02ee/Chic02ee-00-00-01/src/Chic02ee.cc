@@ -227,9 +227,8 @@ if (!m_tree) return;
 m_tree->Branch("run",&m_run,"run/I");
 m_tree->Branch("event",&m_event,"event/I");
 m_tree->Branch("nchargedTrack",&m_ncharged,"nchargedTrack/I");
-m_tree->Branch("nGoodChargedTrack" , &m_nGoodChargedTrack, "nGoodChargedTrack/I");
+m_tree->Branch("nGoodChargedTrack",&m_nGoodChargedTrack, "nGoodChargedTrack/I");
 }
-
 
 void Chic02ee::clearVariables(){
 m_run=0;
@@ -305,12 +304,17 @@ CLHEP::Hep3Vector xorigin = getOrigin();
     EvtRecTrackIterator itTrk=evtRecTrkCol->begin() + i;
 
     // Good Kalman Track 
-    if(!(*itTrk)->isMdcKalTrackValid()) continue; 
-      
+    if(!(*itTrk)->isMdcKalTrackValid()) continue;
+	cout<<"isMdcTrackValid"<<endl;
+     
     if(!(*itTrk)->isMdcTrackValid()) continue; 
     RecMdcKalTrack* mdcTrk = (*itTrk)->mdcKalTrack();
+	cout<<"mdcKalTrackValid"<<endl;
+
       // Good Vertex 
-    if (!passVertexSelection(xorigin, mdcTrk) ) continue;
+    if (!passVertexSelection(xorigin, mdcTrk)) continue;
+	cout<<"passVertexSelection"<<endl;
+
       // Polar angle cut
     if(fabs(cos(mdcTrk->theta())) > m_cha_costheta_cut) continue;
     
