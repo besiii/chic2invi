@@ -307,16 +307,13 @@ CLHEP::Hep3Vector xorigin = getOrigin();
 
     // Good Kalman Track 
     if(!(*itTrk)->isMdcKalTrackValid()) continue;
-	cout<<"isMdcTrackValid"<<endl;
-
-    if(!(*itTrk)->isMdcTrackValid()) continue; 
+	
+	if(!(*itTrk)->isMdcTrackValid()) continue; 
     RecMdcKalTrack* mdcTrk = (*itTrk)->mdcKalTrack();
-	cout<<"mdcKalTrackValid"<<endl;
-
+	
       // Good Vertex 
     if (!passVertexSelection(xorigin, mdcTrk)) continue;
-	cout<<"passVertexSelection"<<endl;
-
+	
       // Polar angle cut
     if(fabs(cos(mdcTrk->theta())) > m_cha_costheta_cut) continue;
     
