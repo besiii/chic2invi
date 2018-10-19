@@ -146,6 +146,8 @@ Chic02ee::Chic02ee(const std::string& name, ISvcLocator* pSvcLocator) :
 m_tree(0)
 {
 declareProperty("OutputFileName",m_output_filename);
+declareProperty("Vr0cut", m_vr0cut=1.0);
+declareProperty("Vz0cut", m_vz0cut=10.0);
 declareProperty("IsMonteCarlo",m_isMonteCarlo);
 declareProperty("TotalNumberOfChargedMax",m_total_number_of_charged_max = 50);
 declareProperty("ChaCosthetaCut", m_cha_costheta_cut = 0.93);
@@ -306,7 +308,7 @@ CLHEP::Hep3Vector xorigin = getOrigin();
     // Good Kalman Track 
     if(!(*itTrk)->isMdcKalTrackValid()) continue;
 	cout<<"isMdcTrackValid"<<endl;
-     
+
     if(!(*itTrk)->isMdcTrackValid()) continue; 
     RecMdcKalTrack* mdcTrk = (*itTrk)->mdcKalTrack();
 	cout<<"mdcKalTrackValid"<<endl;
