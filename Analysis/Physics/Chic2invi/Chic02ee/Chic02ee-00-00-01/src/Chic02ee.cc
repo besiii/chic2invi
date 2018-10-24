@@ -90,6 +90,7 @@ int m_ncharged;
 int m_nGoodChargedTrack;
 int m_nlptrk;
 int m_nlmtrk;
+/*
 double m_trklp_p; 
 double m_trklp_px; 
 double m_trklp_py; 
@@ -105,11 +106,12 @@ double m_trklm_pz;
 double m_trklm_theta; 
 double m_trklm_phi; 
 double m_trklm_eraw; 
-
+*/
 // vertex
 double m_vr0;
 double m_vz0;
 
+/*
 //lepton info
 double m_lp_px;
 double m_lp_py;
@@ -118,10 +120,7 @@ double m_lp_pz;
 double m_lm_px;
 double m_lm_py;
 double m_lm_pz;
-
-// fitted lepton info
-int m_chic02elel_flag;
-int m_chic02mumu_flag;
+*/
 
 //
 // MC truth info
@@ -141,8 +140,10 @@ void book_histogram();
 void book_tree();
 void clearVariables();
 bool buildChic02ee();
+/*
 void saveTrkInfo(EvtRecTrackIterator,
 		   EvtRecTrackIterator);
+*/
 void saveLeptonInfo(RecMdcKalTrack *,
 		   RecMdcKalTrack *);
 int selectChargedTracks(SmartDataPtr<EvtRecEvent>,
@@ -261,6 +262,7 @@ m_tree->Branch("nGoodChargedTrack",&m_nGoodChargedTrack, "nGoodChargedTrack/I");
 m_tree->Branch("nlptrk", &m_nlptrk, "nlptrk/I");
 m_tree->Branch("nlmtrk", &m_nlmtrk, "nlmtrk/I");
 
+/*
 m_tree->Branch("trklp_p", &m_trklp_p, "trklp_p/D"); 
 m_tree->Branch("trklp_px", &m_trklp_px, "trklp_px/D"); 
 m_tree->Branch("trklp_py", &m_trklp_py, "trklp_py/D"); 
@@ -285,7 +287,7 @@ m_tree->Branch("lp_pz", &m_lp_pz, "lp_pz/D");
 m_tree->Branch("lm_px", &m_lm_px, "lm_px/D");
 m_tree->Branch("lm_py", &m_lm_py, "lm_py/D");
 m_tree->Branch("lm_pz", &m_lm_pz, "lm_pz/D");
-
+*/
 }
 
 void Chic02ee::clearVariables(){
@@ -293,6 +295,8 @@ m_run=0;
 m_event=0;
 m_ncharged=-1;
 m_nGoodChargedTrack=-1;
+m_nlptrk=0;
+m_nlmtrk=0;
 }
 bool Chic02ee::buildChic02ee() {
 
@@ -302,17 +306,14 @@ SmartDataPtr<EvtRecTrackCol> evtRecTrkCol(eventSvc(), "/Event/EvtRec/EvtRecTrack
 	if(!evtRecTrkCol) return false;
 
 std::vector<int> iChargedGood;
-std::vector<int> iLepPGood, iLepMGood;
+std::vector<int> iPGood, iMGood;
 selectChargedTracks(evtRecEvent, evtRecTrkCol,
-            iLepPGood, iLepMGood,
+            iPGood, iMGood,
             iChargedGood);
-//selectChargedTracks(evtRecEvent, evtRecTrkCol, iChargedGood);
+//selectChargedTracks(evtRecEvent, evtRecTrkCol, iPGood, iMGood, iChargedGood);
 if ( (m_nlptrk != 1) || (m_nlmtrk != 1) ) return false;
 
 h_evtflw->Fill(1); // N_LeptonP=1, N_LeptonM=1
-h_evtflw->Fill(9);
-
-h_evtflw->Fill(2); // N_{Good} = 0
 
 return true;
 
@@ -352,11 +353,15 @@ bool Chic02ee::passVertexSelection(CLHEP::Hep3Vector xorigin,
 int Chic02ee::selectChargedTracks(SmartDataPtr<EvtRecEvent> evtRecEvent,
 				SmartDataPtr<EvtRecTrackCol> evtRecTrkCol,
 				std::vector<int> & iChargedGood,
-        std::vector<int> & iLepPGood,
-				std::vector<int> & iLepMGood) {
+        std::vector<int> & iPGood,
+				std::vector<int> & iMGood) {
 
-CLHEP::Hep3Vector xorigin = getOrigin(); 
+CLHEP::Hep3Vector xorigin = getOrigin();
 
+std::vector<int> iGood;
+iGood.clear();
+iPGood.clear();
+iMGood.clear();
 iChargedGood.clear();
   
 
@@ -383,17 +388,18 @@ iChargedGood.push_back((*itTrk)->trackId());
 } // end charged tracks
 
 m_nGoodChargedTrack = iChargedGood.size();
-m_nlptrk = iLepPGood.size();
-m_nlmtrk = iLepMGood.size(); 
+m_nlptrk = iPGood.size();
+m_nlmtrk = iMGood.size(); 
 
 if (m_nlptrk > 0 && m_nlmtrk > 0) {
-EvtRecTrackIterator itTrk_lp = evtRecTrkCol->begin() + iLepPGood[0];
-EvtRecTrackIterator itTrk_lm = evtRecTrkCol->begin() + iLepMGood[0];
-saveTrkInfo(itTrk_lp, itTrk_lm);
+EvtRecTrackIterator itTrk_lp = evtRecTrkCol->begin() + iPGood[0];
+EvtRecTrackIterator itTrk_lm = evtRecTrkCol->begin() + iMGood[0];
+//saveTrkInfo(itTrk_lp, itTrk_lm);
 }
 
 return iChargedGood.size();
 }
+/*
 void Chic02ee::saveTrkInfo(EvtRecTrackIterator itTrk_lp,
 EvtRecTrackIterator itTrk_lm) {
 RecMdcTrack* mdcTrk_lp = (*itTrk_lp)->mdcTrack(); 
@@ -436,3 +442,4 @@ m_lm_px = lmTrk->px();
 m_lm_py = lmTrk->py();
 m_lm_pz = lmTrk->pz();
 }
+*/
