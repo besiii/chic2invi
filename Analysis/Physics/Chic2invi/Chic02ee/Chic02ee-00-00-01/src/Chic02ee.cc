@@ -10,7 +10,7 @@
 
 
 //
-// system include files
+// system include files  
 //
 
 
@@ -55,15 +55,12 @@ public:
 
 private:
 
-
 double m_vr0cut, m_vz0cut;
 double m_ecms;
 double m_total_number_of_charged_max;
 double m_cha_costheta_cut;
 double m_lepton_momentum_min;
 double m_lepton_momentum_max;
-double m_dilepton_mass_min; 
-double m_dilepton_mass_max;
 
 //output file
 std::string m_output_filename;
@@ -100,6 +97,19 @@ double m_trklp_theta;
 double m_trklp_phi; 
 double m_trklp_eraw;
 
+double m_trklm_p; 
+double m_trklm_px; 
+double m_trklm_py; 
+double m_trklm_pz; 
+double m_trklm_theta; 
+double m_trklm_phi; 
+double m_trklm_eraw;
+
+double m_trklplm_p;
+double m_trklplm_px;
+double m_trklplm_py; 
+double m_trklplm_pz;
+
 // lepton info
 double m_lp_px;
 double m_lp_py;
@@ -108,10 +118,6 @@ double m_lp_pz;
 double m_lm_px;
 double m_lm_py;
 double m_lm_pz;
-
-// fitted lepton info
-int m_chic02elel_flag;
-int m_chic02mumu_flag;
 
 
 // vertex
@@ -136,8 +142,10 @@ void book_histogram();
 void book_tree();
 void clearVariables();
 bool buildChic02ee();
+void saveTrkInfo(EvtRecTrackIterator,
+		  EvtRecTrackIterator);
 void saveLeptonInfo(RecMdcKalTrack *,
-		      RecMdcKalTrack *);
+		  RecMdcKalTrack *);
 int selectChargedTracks(SmartDataPtr<EvtRecEvent>,
 			  SmartDataPtr<EvtRecTrackCol>,
        	std::vector<int> &,
@@ -147,9 +155,7 @@ int selectLeptonPlusLeptonMinus(SmartDataPtr<EvtRecTrackCol>,
 				  std::vector<int>,
 				  std::vector<int>);
 bool hasGoodLpLmVertex(RecMdcKalTrack *,
-			  RecMdcKalTrack *,
-			  int,
-			  bool);
+			  RecMdcKalTrack *);
 
 bool passVertexSelection(CLHEP::Hep3Vector,
 			  RecMdcKalTrack*);
@@ -169,8 +175,8 @@ LOAD_FACTORY_ENTRIES( Chic02ee )
 //
 //constants
 //
-const double ELECTRON_MASS = 0.000511;
-const double MUON_MASS = 0.105658;
+const double ELECTRON_MASS = 0.000511; //GeV
+const double MUON_MASS = 0.105658; //GeV
 const int Electron_Hypothesis_Fit=1;
 const int Muon_Hypothesis_Fit=2;
 
@@ -193,8 +199,7 @@ declareProperty("TotalNumberOfChargedMax",m_total_number_of_charged_max = 50);
 declareProperty("ChaCosthetaCut", m_cha_costheta_cut = 0.93);
 declareProperty("LeptonMomentumMax", m_lepton_momentum_min=0.6); 
 declareProperty("LeptonMomentumMin", m_lepton_momentum_max=2.5);
-declareProperty("DileptonMassMin", m_dilepton_mass_min=2.5); 
-declareProperty("DileptonMassMax", m_dilepton_mass_max=3.5); 
+
 }
 
 StatusCode Chic02ee::initialize(){ MsgStream log(msgSvc(), name());
@@ -279,10 +284,31 @@ m_tree->Branch("trklp_theta", &m_trklp_theta, "trklp_theta/D");
 m_tree->Branch("trklp_phi", &m_trklp_phi, "trklp_phi/D"); 
 m_tree->Branch("trklp_eraw", &m_trklp_eraw, "trklp_eraw/D"); 
 
-//vertex
-  m_tree->Branch("vr0", &m_vr0, "vr0/D");
-  m_tree->Branch("vz0", &m_vz0, "vz0/D");
+m_tree->Branch("trklm_p", &m_trklm_p, "trklm_p/D");
+m_tree->Branch("trklm_px", &m_trklm_px, "trklm_px/D"); 
+m_tree->Branch("trklm_py", &m_trklm_py, "trklm_py/D"); 
+m_tree->Branch("trklm_pz", &m_trklm_pz, "trklm_pz/D"); 
+m_tree->Branch("trklm_theta", &m_trklm_theta, "trklm_theta/D"); 
+m_tree->Branch("trklm_phi", &m_trklm_phi, "trklm_phi/D"); 
+m_tree->Branch("trklm_eraw", &m_trklm_eraw, "trklm_eraw/D");
 
+m_tree->Branch("trklplm_p", &m_trklplm_p, "trklplm_p/D");
+m_tree->Branch("trklplm_px", &m_trklplm_px, "trklplm_px/D");
+m_tree->Branch("trklplm_py", &m_trklplm_py, "trklplm_py/D");
+m_tree->Branch("trklplm_pz", &m_trklplm_pz, "trklplm_pz/D");
+
+//vertex
+m_tree->Branch("vr0", &m_vr0, "vr0/D");
+m_tree->Branch("vz0", &m_vz0, "vz0/D");
+
+// save lepton info
+m_tree->Branch("lp_px", &m_lp_px, "lp_px/D");
+m_tree->Branch("lp_py", &m_lp_py, "lp_py/D");
+m_tree->Branch("lp_pz", &m_lp_pz, "lp_pz/D");
+
+m_tree->Branch("lm_px", &m_lm_px, "lm_px/D");
+m_tree->Branch("lm_py", &m_lm_py, "lm_py/D");
+m_tree->Branch("lm_pz", &m_lm_pz, "lm_pz/D");
 }
 
 void Chic02ee::clearVariables(){
@@ -306,7 +332,7 @@ selectChargedTracks(evtRecEvent, evtRecTrkCol,
             iPGood, iMGood,
             iChargedGood);
 
-//selectChargedTracks(evtRecEvent, evtRecTrkCol, iPGood, iMGood, iChargedGood);
+selectChargedTracks(evtRecEvent, evtRecTrkCol, iPGood, iMGood, iChargedGood);
 
 if ( (m_nlptrk != 1) || (m_nlmtrk != 1) ) return false;
 
@@ -397,16 +423,17 @@ m_nlmtrk = iMGood.size();
 if (m_nlptrk > 0 && m_nlmtrk > 0) {
 EvtRecTrackIterator itTrk_lp = evtRecTrkCol->begin() + iPGood[0];
 EvtRecTrackIterator itTrk_lm = evtRecTrkCol->begin() + iMGood[0];
+saveTrkInfo(itTrk_lp, itTrk_lm);
 }
 
 return iGood.size();
 }
-
+    
 
 int Chic02ee::selectLeptonPlusLeptonMinus(SmartDataPtr<EvtRecTrackCol> evtRecTrkCol,
-					   std::vector<int> iPGood,
-					   std::vector<int> iMGood) {
-int nlplm = 0;
+				  std::vector<int> iPGood,
+					 std::vector<int> iMGood) {
+int nlplm = 1;
 bool evtflw_filled = false;
   
 for(unsigned int i1 = 0; i1 < iPGood.size(); i1++) {
@@ -419,23 +446,12 @@ EvtRecTrackIterator itTrk_m = evtRecTrkCol->begin() + iMGood[i2];
 RecMdcTrack* mdcTrk_m = (*itTrk_m)->mdcTrack();
 if (mdcTrk_m->charge() > 0) continue; // only negative charged tracks
 
-// lepton momentum 
-if ( ! ( fabs(mdcTrk_p->p()) < m_lepton_momentum_max  &&
-fabs(mdcTrk_m->p()) < m_lepton_momentum_max )) continue;
-
-if ( !evtflw_filled ) h_evtflw->Fill(8); //|p| cut 
       
 // apply vertex fit
 RecMdcKalTrack *lpTrk = (*(evtRecTrkCol->begin()+iPGood[i1]))->mdcKalTrack();
 RecMdcKalTrack *lmTrk = (*(evtRecTrkCol->begin()+iMGood[i2]))->mdcKalTrack();
+
 saveLeptonInfo(lpTrk, lmTrk);
-int ee_flag=0, mumu_flag=0;
-if ( hasGoodLpLmVertex(lpTrk, lmTrk, Electron_Hypothesis_Fit, evtflw_filled) ) ee_flag=1;
-if ( hasGoodLpLmVertex(lpTrk, lmTrk, Muon_Hypothesis_Fit, evtflw_filled) ) mumu_flag=1; 
-      
-m_chic02elel_flag = ee_flag;
-m_chic02mumu_flag = mumu_flag;
-if(ee_flag==1 || mumu_flag==1) nlplm++;
 
 evtflw_filled = true;
 }
@@ -454,29 +470,12 @@ m_lm_pz = lmTrk->pz();
 
 }
 bool Chic02ee::hasGoodLpLmVertex(RecMdcKalTrack *lpTrk,
-				  RecMdcKalTrack *lmTrk,
-				  int particle_flag,
-				  bool evtflw_filled) {
+				  RecMdcKalTrack *lmTrk) {
 
   HepLorentzVector pcms(0.011*m_ecms, 0., 0., m_ecms);
 
   HepLorentzVector p4_vtx_lp, p4_vtx_lm, p4_vtx_lplm;
   WTrackParameter wvlpTrk, wvlmTrk;
-
-  if( particle_flag  == Electron_Hypothesis_Fit ){ 
-    lpTrk->setPidType(RecMdcKalTrack::electron);
-    wvlpTrk = WTrackParameter(ELECTRON_MASS, lpTrk->getZHelixE(), lpTrk->getZErrorE());
-    
-    lmTrk->setPidType(RecMdcKalTrack::electron);
-    wvlmTrk = WTrackParameter(ELECTRON_MASS, lmTrk->getZHelixE(), lmTrk->getZErrorE());
-  }
-  if( particle_flag == Muon_Hypothesis_Fit ){
-    lpTrk->setPidType(RecMdcKalTrack::muon);
-    wvlpTrk = WTrackParameter(MUON_MASS, lpTrk->getZHelixMu(), lpTrk->getZErrorMu());
-    
-    lmTrk->setPidType(RecMdcKalTrack::muon);
-    wvlmTrk = WTrackParameter(MUON_MASS, lmTrk->getZHelixMu(), lmTrk->getZErrorMu());
-  }
   
   HepPoint3D vx(0., 0., 0.);
   HepSymMatrix Evx(3, 0);
@@ -508,17 +507,42 @@ bool Chic02ee::hasGoodLpLmVertex(RecMdcKalTrack *lpTrk,
   p4_vtx_lm = vtxfit->pfit(1) ;
   p4_vtx_lplm = p4_vtx_lp + p4_vtx_lm;
 
-  if( ! ( p4_vtx_lplm.m() >= m_dilepton_mass_min &&
-	  p4_vtx_lplm.m() <= m_dilepton_mass_max) ) return false; // 2.5<M_{ll}<3.5
-  
-  if( particle_flag  == Electron_Hypothesis_Fit ){ 
-    if( !evtflw_filled ) h_evtflw->Fill(9); 
-  }
-  if( particle_flag  == Muon_Hypothesis_Fit ){ 
-    if( !evtflw_filled ) h_evtflw->Fill(10); 
-  }
-  
- // saveLeptonVtxInfo(p4_vtx_lp, p4_vtx_lm, particle_flag); 
-
   return true;
+}
+void Chic02ee::saveTrkInfo(EvtRecTrackIterator itTrk_lp,
+			  EvtRecTrackIterator itTrk_lm) {
+ RecMdcTrack* mdcTrk_lp = (*itTrk_lp)->mdcTrack(); 
+  m_trklp_p = mdcTrk_lp->p();
+  m_trklp_px = mdcTrk_lp->px();
+  m_trklp_py = mdcTrk_lp->py();
+  m_trklp_pz = mdcTrk_lp->pz();
+  m_trklp_theta = mdcTrk_lp->theta();
+  m_trklp_phi = mdcTrk_lp->phi();
+  
+  if((*itTrk_lp)->isEmcShowerValid()){
+    RecEmcShower *emcTrk_lp = (*itTrk_lp)->emcShower();
+    m_trklp_eraw = emcTrk_lp->energy();
+  }
+  else{ m_trklp_eraw = -99.0; }
+  
+  RecMdcTrack* mdcTrk_lm = (*itTrk_lm)->mdcTrack();
+  m_trklm_p = mdcTrk_lm->p();
+  m_trklm_px = mdcTrk_lm->px();
+  m_trklm_py = mdcTrk_lm->py();
+  m_trklm_pz = mdcTrk_lm->pz();
+  m_trklm_theta = mdcTrk_lm->theta();
+  m_trklm_phi = mdcTrk_lm->phi();
+  
+  
+  m_trklplm_p = mdcTrk_lp->p()+mdcTrk_lm->p();
+  m_trklplm_px = mdcTrk_lp->px()+mdcTrk_lm->px();
+  m_trklplm_py = mdcTrk_lp->py()+mdcTrk_lm->py();
+  m_trklplm_pz = mdcTrk_lp->pz()+mdcTrk_lm->pz();
+
+  if((*itTrk_lm)->isEmcShowerValid()){
+    RecEmcShower *emcTrk_lm = (*itTrk_lm)->emcShower();
+    m_trklm_eraw = emcTrk_lm->energy();
+  }
+  else{ m_trklm_eraw = -99.0; }
+
 }
