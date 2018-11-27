@@ -105,21 +105,6 @@ double m_trklm_theta;
 double m_trklm_phi; 
 double m_trklm_eraw;
 
-double m_trklplm_p;
-double m_trklplm_px;
-double m_trklplm_py; 
-double m_trklplm_pz;
-
-// lepton info
-double m_lp_px;
-double m_lp_py;
-double m_lp_pz;
-
-double m_lm_px;
-double m_lm_py;
-double m_lm_pz;
-
-
 // vertex
 double m_vr0;
 double m_vz0;
@@ -144,8 +129,6 @@ void clearVariables();
 bool buildChic02ee();
 void saveTrkInfo(EvtRecTrackIterator,
 		  EvtRecTrackIterator);
-void saveLeptonInfo(RecMdcKalTrack *,
-		  RecMdcKalTrack *);
 int selectChargedTracks(SmartDataPtr<EvtRecEvent>,
 			  SmartDataPtr<EvtRecTrackCol>,
        	std::vector<int> &,
@@ -156,7 +139,6 @@ int selectLeptonPlusLeptonMinus(SmartDataPtr<EvtRecTrackCol>,
 				  std::vector<int>);
 bool hasGoodLpLmVertex(RecMdcKalTrack *,
 			  RecMdcKalTrack *);
-
 bool passVertexSelection(CLHEP::Hep3Vector,
 			  RecMdcKalTrack*);
 
@@ -292,23 +274,10 @@ m_tree->Branch("trklm_theta", &m_trklm_theta, "trklm_theta/D");
 m_tree->Branch("trklm_phi", &m_trklm_phi, "trklm_phi/D"); 
 m_tree->Branch("trklm_eraw", &m_trklm_eraw, "trklm_eraw/D");
 
-m_tree->Branch("trklplm_p", &m_trklplm_p, "trklplm_p/D");
-m_tree->Branch("trklplm_px", &m_trklplm_px, "trklplm_px/D");
-m_tree->Branch("trklplm_py", &m_trklplm_py, "trklplm_py/D");
-m_tree->Branch("trklplm_pz", &m_trklplm_pz, "trklplm_pz/D");
-
 //vertex
 m_tree->Branch("vr0", &m_vr0, "vr0/D");
 m_tree->Branch("vz0", &m_vz0, "vz0/D");
 
-// save lepton info
-m_tree->Branch("lp_px", &m_lp_px, "lp_px/D");
-m_tree->Branch("lp_py", &m_lp_py, "lp_py/D");
-m_tree->Branch("lp_pz", &m_lp_pz, "lp_pz/D");
-
-m_tree->Branch("lm_px", &m_lm_px, "lm_px/D");
-m_tree->Branch("lm_py", &m_lm_py, "lm_py/D");
-m_tree->Branch("lm_pz", &m_lm_pz, "lm_pz/D");
 }
 
 void Chic02ee::clearVariables(){
@@ -328,11 +297,9 @@ SmartDataPtr<EvtRecTrackCol> evtRecTrkCol(eventSvc(), "/Event/EvtRec/EvtRecTrack
 
 std::vector<int> iChargedGood;
 std::vector<int> iPGood, iMGood;
-selectChargedTracks(evtRecEvent, evtRecTrkCol,
-            iPGood, iMGood,
-            iChargedGood);
-
 selectChargedTracks(evtRecEvent, evtRecTrkCol, iPGood, iMGood, iChargedGood);
+
+//selectChargedTracks(evtRecEvent, evtRecTrkCol, iPGood, iMGood, iChargedGood);
 
 if ( (m_nlptrk != 1) || (m_nlmtrk != 1) ) return false;
 
@@ -458,17 +425,7 @@ evtflw_filled = true;
 } 
 return nlplm; 
 }
-void Chic02ee::saveLeptonInfo(RecMdcKalTrack *lpTrk,
-			       RecMdcKalTrack *lmTrk){
-m_lp_px = lpTrk->px();
-m_lp_py = lpTrk->py();
-m_lp_pz = lpTrk->pz();
 
-m_lm_px = lmTrk->px();
-m_lm_py = lmTrk->py();
-m_lm_pz = lmTrk->pz();
-
-}
 bool Chic02ee::hasGoodLpLmVertex(RecMdcKalTrack *lpTrk,
 				  RecMdcKalTrack *lmTrk) {
 
@@ -507,8 +464,10 @@ bool Chic02ee::hasGoodLpLmVertex(RecMdcKalTrack *lpTrk,
   p4_vtx_lm = vtxfit->pfit(1) ;
   p4_vtx_lplm = p4_vtx_lp + p4_vtx_lm;
 
-  return true;
+
+return true;
 }
+
 void Chic02ee::saveTrkInfo(EvtRecTrackIterator itTrk_lp,
 			  EvtRecTrackIterator itTrk_lm) {
  RecMdcTrack* mdcTrk_lp = (*itTrk_lp)->mdcTrack(); 
@@ -532,13 +491,7 @@ void Chic02ee::saveTrkInfo(EvtRecTrackIterator itTrk_lp,
   m_trklm_pz = mdcTrk_lm->pz();
   m_trklm_theta = mdcTrk_lm->theta();
   m_trklm_phi = mdcTrk_lm->phi();
-  
-  
-  m_trklplm_p = mdcTrk_lp->p()+mdcTrk_lm->p();
-  m_trklplm_px = mdcTrk_lp->px()+mdcTrk_lm->px();
-  m_trklplm_py = mdcTrk_lp->py()+mdcTrk_lm->py();
-  m_trklplm_pz = mdcTrk_lp->pz()+mdcTrk_lm->pz();
-
+    
   if((*itTrk_lm)->isEmcShowerValid()){
     RecEmcShower *emcTrk_lm = (*itTrk_lm)->emcShower();
     m_trklm_eraw = emcTrk_lm->energy();
