@@ -400,7 +400,7 @@ return iGood.size();
 int Chic02ee::selectLeptonPlusLeptonMinus(SmartDataPtr<EvtRecTrackCol> evtRecTrkCol,
 				  std::vector<int> iPGood,
 					 std::vector<int> iMGood) {
-int nlplm;
+int nlplm=0;
 bool evtflw_filled = false;
   
 for(unsigned int i1 = 0; i1 < iPGood.size(); i1++) {
