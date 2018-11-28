@@ -419,7 +419,7 @@ RecMdcKalTrack *lpTrk = (*(evtRecTrkCol->begin()+iPGood[i1]))->mdcKalTrack();
 RecMdcKalTrack *lmTrk = (*(evtRecTrkCol->begin()+iMGood[i2]))->mdcKalTrack();
 
 saveLeptonInfo(lpTrk, lmTrk);
-
+nlplm +=1;
 evtflw_filled = true;
 }
 } 
