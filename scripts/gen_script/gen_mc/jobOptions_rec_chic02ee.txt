@@ -1,4 +1,4 @@
-s/input ROOT MC data
+// input ROOT MC data
 #include "$ROOTIOROOT/share/jobOptions_ReadRoot.txt"
 #include "$OFFLINEEVENTLOOPMGRROOT/share/OfflineEventLoopMgr_Option.txt"
 

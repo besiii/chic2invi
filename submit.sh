@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+ #!/usr/bin/env bash
 
 # Main driver to submit jobs 
 # Author XIAO Suyu <xiaosuyu@ihep.ac.cn>
@@ -64,9 +64,19 @@ usage() {
     printf "\n\t%-9s  %-40s"  "0.6.5"    "Generate plots of ee, mumu, gamgam and inclusive MC samples"
 
     printf "\n\t%-9s  %-40s"  "2.0"      "[run on chic02ee]"
-    printf "\n\t%-9s  %-40s"  "2.0.1"    "Generate 100 chic02ee MC signal events"
-    printf "\n\t%-9s  %-40s"  "2.0.2"    "Reconstruction 100 chic02ee MC signal events"
+    printf "\n\t%-9s  %-40s"  "2.0.1"    "Generate -- 6000 chic02ee MC signal..."
+    printf "\n\t%-9s  %-40s"  "2.0.2"    "Reconstruction -- 6000 chic02ee MC signal..."
     printf "\n\t%-9s  %-40s"  "2.0.3"    "Preselection of the events and generate root file"
+    
+    printf "\n\t%-9s  %-40s"  "3.0"      "[run on chicj2gamgam for peaking background]"
+    printf "\n\t%-9s  %-40s"  "3.0.1"    "Generate -- 6000 chicj2gamgam MC signal for peaking background..."
+    printf "\n\t%-9s  %-40s"  "3.0.2"    "Reconstruction -- 6000 chicj2gamgam MC signal..."
+    printf "\n\t%-9s  %-40s"  "3.0.3"    "Preselection of the events and generate root file"
+   
+    printf "\n\t%-9s  %-40s"  "4.0.1"    "Generate Condor jobs on data 2012 ---- 1..."  
+    printf "\n\t%-9s  %-40s"  "4.0.2"    "Test on Data 2012..."
+    printf "\n\t%-9s  %-40s"  "4.0.3"    "Submit Condor jobs on data 2012 ---- 2..."
+
     printf "\n\n" 
 
 
@@ -1037,29 +1047,74 @@ case $option in
 	   ./python/mrg_rootfiles.py run/chicNoTDC/event_data_by_5 run/chicNoTDC/hist_data_by_5
 	   ;;
 
-        2.0.1) echo "simulation --100 signal MC sample chic02ee events..."
-        mkdir scripts/chic02ee 
-	cd scripts/chic02ee
-	mkdir /besfs/users/$USER/bes/chic2invi/v0.1/scripts/chic02ee/jobs_chic0
-        ln -s /besfs/users/$USER/bes/chic2invi/v0.1/scripts/chic02ee/jobs_chic0 ./jobs_chic0
-        cd jobs_chic0
-        cp $HOME/bes/chic2invi/v0.1/scripts/gen_script/gen_mc/jobOptions_sim_chic02ee.txt ./
+        
+    2.0.1) echo "simulation --6000 signal MC sample chic02ee events..."
+        
+	cd scripts/chic02ee/jobs_chic0
         boss.condor -g physics jobOptions_sim_chic02ee.txt
-	;;
-        2.0.2) echo "reconstruction -- generate signal MC sample..."
+        ;;
+    
+    2.0.2) echo "reconstruction -- generate 6000 signal MC sample..."
             
 	cd scripts/chic02ee/jobs_chic0
-        cp $HOME/bes/chic2invi/v0.1/scripts/gen_script/gen_mc/jobOptions_rec_chic02ee.txt ./
         boss.condor -g physics jobOptions_rec_chic02ee.txt
         ;;
-	
-	2.0.3) echo "Preselection of the event -- generate root file..."
-	cd scripts/chic02ee
-	mkdir /besfs/users/$USER/bes/chic2invi/v0.1/scripts/chic02ee/rootfile_chic02ee
-	ln -s /besfs/users/$USER/bes/chic2invi/v0.1/scripts/chic02ee/rootfile_chic02ee ./rootfile_chic02ee
-	cd jobs_chic0
-	boss.condor -g physics jobOptions_chic02ee_gen_mc.txt
 
+    2.0.3) echo "Preselection for 6000 events -- generate root file..."
+	
+	cd scripts/chic02ee/jobs_chic0
+	    boss.condor -g physics jobOptions_chic02ee_gen_mc.txt
+        ;;
+
+    3.0.1) echo "simulation --6000 signal MC sample chicj2gamgam events..."
+	cd scripts/chicj2gamgam/jobs_chicj2gamgam
+	boss.condor -g Physics jobOptions_sim_chicj2gamgam.txt
 	;;
+
+    3.0.2) echo "reconstruction -- generate 6000 signal MC sample for chicj2gamgam events..."
+        cd scripts/chicj2gamgam/jobs_chicj2gamgam
+        boss.condor -g Physics jobOptions_rec_chicj2gamgam.txt
+        ;;
+
+    3.0.3) echo "preselection for 6000 chicj2gamgam events -- generate rootfile..."
+        cd scripts/chicj2gamgam/jobs_chicj2gamgam
+        boss.condor -g Physics jobOptions_chicj2gamgam_gen_mc.txt
+        ;;
+    
+    4.0.1) echo "Generate Condor jobs on data 2012 ---- 1..."
+                cd /afs/ihep.ac.cn/users/a/amitraahul/bes/chic2invi/v0.1/Analysis/Physics/Chic2invi/JpsdarkUeta/JpsdarkUeta-00-00-02/scripts/ ./make_jobOption_file_data.sh
+                cd $HOME/bes/chic2invi/v0.1/Analysis/Physics/Chic2invi/JpsdarkUeta/JpsdarkUeta-00-00-02/run/data
+                mv job_514.txt jobOptions_inclusive_psip_data-0.txt
+        cd $HOME/bes/chic2invi/v0.1
+        ;;
+
+   
+     4.0.2) echo "Test on data 2012..."
+        echo "have you changed test number?(yes / NO)
+        ./Analysis/Physics/Chic2invi/JpsdarkUeta/JpsdarkUeta-00-00-02/run/data/jobOptions_inclusive_psip_data-0.txt"
+        read opt
+        if [ $opt == "yes" ]
+            then
+            echo "now in yes"  
+            cd  Analysis/Physics/Chic2invi/JpsdarkUeta/JpsdarkUeta-00-00-02/run/data
+            boss.exe jobOptions_inclusive_psip_data-0.txt
+            cd $HOME/bes/chic2invi/v0.1
+        else
+            echo "Default value is 'NO', please change test number."
+        fi
+        ;;
+
+
+    4.0.3) echo "Submit Condor jobs on data 2012 ---- 2..."
+	cd Analysis/Physics/Chic2invi/JpsdarkUeta/JpsdarkUeta-00-00-02/run/data
+
+        find . -name "*.txt.*" | xargs rm
+        rm ../rootfile_data/chic2incl_psip_data-*
+         boss.condor -g physics -n 514 jobOptions_inclusive_psip_data-%{ProcId}.txt
+        cd $HOME/bes/chic2invi/v0.1
+        ;;
+
+
+
 
 esac

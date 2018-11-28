@@ -2,7 +2,7 @@
 #include "$VERTEXFITROOT/share/jobOptions_VertexDbSvc.txt" 
 #include "$MAGNETICFIELDROOT/share/MagneticField.txt"      
 #include "$ABSCORROOT/share/jobOptions_AbsCor.txt"         
-#include "$HOME/bes/chic2invi/v0.1/scripts/gen_scripts/gen_mc/jobOptions_chic02ee_gen_mc_pathfile.txt" 
+#include "$HOME/bes/chic2invi/v0.1/scripts/gen_script/gen_mc/jobOptions_chic02ee_gen_mc_pathfile.txt" 
                                                               
                                                               
 ApplicationMgr.DLLs += {"Chic02ee"};                       
@@ -16,6 +16,6 @@ MessageSvc.OutputLevel = 5;
 ApplicationMgr.EvtMax = -1;                                   
                                                               
 Chic02ee.IsMonteCarlo="true";                             
-Chic02ee.OutputFileName="../../chic02ee/rootfile_chic02ee/chic02ee_gen_mc.root"; 
+Chic02ee.OutputFileName="../../rootfile_chic02ee/chic02ee_gen_mc.root"; 
                                                               
                                                               
