@@ -105,6 +105,7 @@ double m_trklm_theta;
 double m_trklm_phi; 
 double m_trklm_eraw;
 
+
 // vertex
 double m_vr0;
 double m_vz0;
@@ -130,17 +131,17 @@ bool buildChic02ee();
 void saveTrkInfo(EvtRecTrackIterator,
 		  EvtRecTrackIterator);
 int selectChargedTracks(SmartDataPtr<EvtRecEvent>,
-			  SmartDataPtr<EvtRecTrackCol>,
-       	std::vector<int> &,
-			  std::vector<int> &,
-			  std::vector<int> &);
+			SmartDataPtr<EvtRecTrackCol>,
+      std::vector<int> &,
+			std::vector<int> &,
+			std::vector<int> &);
 int selectLeptonPlusLeptonMinus(SmartDataPtr<EvtRecTrackCol>,
-				  std::vector<int>,
-				  std::vector<int>);
+			std::vector<int>,
+			std::vector<int>);
 bool hasGoodLpLmVertex(RecMdcKalTrack *,
-			  RecMdcKalTrack *);
+			RecMdcKalTrack *);
 bool passVertexSelection(CLHEP::Hep3Vector,
-			  RecMdcKalTrack*);
+			RecMdcKalTrack*);
 
 CLHEP::Hep3Vector getOrigin();
 
@@ -274,6 +275,7 @@ m_tree->Branch("trklm_theta", &m_trklm_theta, "trklm_theta/D");
 m_tree->Branch("trklm_phi", &m_trklm_phi, "trklm_phi/D"); 
 m_tree->Branch("trklm_eraw", &m_trklm_eraw, "trklm_eraw/D");
 
+
 //vertex
 m_tree->Branch("vr0", &m_vr0, "vr0/D");
 m_tree->Branch("vz0", &m_vz0, "vz0/D");
@@ -344,158 +346,175 @@ bool Chic02ee::passVertexSelection(CLHEP::Hep3Vector xorigin,
 }
 
 int Chic02ee::selectChargedTracks(SmartDataPtr<EvtRecEvent> evtRecEvent,
-				SmartDataPtr<EvtRecTrackCol> evtRecTrkCol,
-				std::vector<int> & iChargedGood,
-        std::vector<int> & iPGood,
-				std::vector<int> & iMGood) {
+		SmartDataPtr<EvtRecTrackCol> evtRecTrkCol,
+		std::vector<int> & iPGood,
+		std::vector<int> & iMGood,
+		std::vector<int> & iChargedGood) {
 
-CLHEP::Hep3Vector xorigin = getOrigin();
+	CLHEP::Hep3Vector xorigin = getOrigin();
 
-std::vector<int> iGood;
-iGood.clear();
-iPGood.clear();
-iMGood.clear();
-iChargedGood.clear();
-  
+	std::vector<int> iGood;
+	iGood.clear();
+	iPGood.clear();
+	iMGood.clear();
+	iChargedGood.clear();
 
-// loop through charged tracks 
-for(int i = 0; i < evtRecEvent->totalCharged(); i++){
-    
-// get mdcTrk 
-EvtRecTrackIterator itTrk=evtRecTrkCol->begin() + i;
 
-// Good Kalman Track 
-if(!(*itTrk)->isMdcKalTrackValid()) continue;
-	
-if(!(*itTrk)->isMdcTrackValid()) continue; 
-RecMdcKalTrack* mdcTrk = (*itTrk)->mdcKalTrack();
-	
-// Good Vertex 
-if (!passVertexSelection(xorigin, mdcTrk)) continue;
-	
-// Polar angle cut
-if(fabs(cos(mdcTrk->theta())) > m_cha_costheta_cut) continue;
-    
-iChargedGood.push_back((*itTrk)->trackId());
-iGood.push_back((*itTrk)->trackId());
-if(mdcTrk->charge()>0) iPGood.push_back((*itTrk)->trackId());
-if(mdcTrk->charge()<0) iMGood.push_back((*itTrk)->trackId());
+	// loop through charged tracks 
+	for(int i = 0; i < evtRecEvent->totalCharged(); i++){
 
-} // end charged tracks
+		// get mdcTrk 
+		EvtRecTrackIterator itTrk=evtRecTrkCol->begin() + i;
 
-m_nGoodChargedTrack = iChargedGood.size();
-m_nlptrk = iPGood.size();
-m_nlmtrk = iMGood.size(); 
+		// Good Kalman Track 
+		if(!(*itTrk)->isMdcKalTrackValid()) continue;
 
-if (m_nlptrk > 0 && m_nlmtrk > 0) {
-EvtRecTrackIterator itTrk_lp = evtRecTrkCol->begin() + iPGood[0];
-EvtRecTrackIterator itTrk_lm = evtRecTrkCol->begin() + iMGood[0];
-saveTrkInfo(itTrk_lp, itTrk_lm);
+		if(!(*itTrk)->isMdcTrackValid()) continue; 
+		RecMdcKalTrack* mdcTrk = (*itTrk)->mdcKalTrack();
+
+		// Good Vertex 
+		if (!passVertexSelection(xorigin, mdcTrk)) continue;
+
+		// Polar angle cut
+		if(fabs(cos(mdcTrk->theta())) > m_cha_costheta_cut) continue;
+
+		iChargedGood.push_back((*itTrk)->trackId());{
+			//iGood.push_back((*itTrk)->trackId());
+			//if(mdcTrk->charge()>0) iPGood.push_back((*itTrk)->trackId());
+			//if(mdcTrk->charge()<0) iMGood.push_back((*itTrk)->trackId());
+			if(mdcTrk->charge()>0) iPGood.push_back(i);
+			if(mdcTrk->charge()<0) iMGood.push_back(i);
+		}
+
+	} // end charged tracks
+
+	m_nGoodChargedTrack = iChargedGood.size();
+	m_nlptrk = iPGood.size();
+	m_nlmtrk = iMGood.size(); 
+
+	if (m_nlptrk > 0 && m_nlmtrk > 0) {
+		EvtRecTrackIterator itTrk_lp = evtRecTrkCol->begin() + iPGood[0];
+		EvtRecTrackIterator itTrk_lm = evtRecTrkCol->begin() + iMGood[0];
+		saveTrkInfo(itTrk_lp, itTrk_lm);
+	}
+
+	return iGood.size();
 }
 
-return iGood.size();
-}
-    
 
 int Chic02ee::selectLeptonPlusLeptonMinus(SmartDataPtr<EvtRecTrackCol> evtRecTrkCol,
-				  std::vector<int> iPGood,
-					 std::vector<int> iMGood) {
-int nlplm=0;
-bool evtflw_filled = false;
-  
-for(unsigned int i1 = 0; i1 < iPGood.size(); i1++) {
-EvtRecTrackIterator itTrk_p = evtRecTrkCol->begin() + iPGood[i1];
-RecMdcTrack* mdcTrk_p = (*itTrk_p)->mdcTrack();
-if (mdcTrk_p->charge() < 0) continue; // only positive charged tracks
+		std::vector<int> iPGood,
+		std::vector<int> iMGood) {
+	//cout<< "test for root" <<endl;
+	int nlplm=0;
+	bool evtflw_filled = false;
 
-for(unsigned int i2 = 0; i2 < iMGood.size(); i2++) {
-EvtRecTrackIterator itTrk_m = evtRecTrkCol->begin() + iMGood[i2];
-RecMdcTrack* mdcTrk_m = (*itTrk_m)->mdcTrack();
-if (mdcTrk_m->charge() > 0) continue; // only negative charged tracks
+	for(unsigned int i1 = 0; i1 < iPGood.size(); i1++) {
+		EvtRecTrackIterator itTrk_p = evtRecTrkCol->begin() + iPGood[i1];
+		RecMdcTrack* mdcTrk_p = (*itTrk_p)->mdcTrack();
+		if (mdcTrk_p->charge() < 0) continue; // only positive charged tracks
 
-      
-// apply vertex fit
-RecMdcKalTrack *lpTrk = (*(evtRecTrkCol->begin()+iPGood[i1]))->mdcKalTrack();
-RecMdcKalTrack *lmTrk = (*(evtRecTrkCol->begin()+iMGood[i2]))->mdcKalTrack();
+		//cout<<"2"<<endl;
+		//cout<<"iMGood size "<<iMGood.size()<<endl;
 
-saveLeptonInfo(lpTrk, lmTrk);
-nlplm +=1;
-evtflw_filled = true;
-}
-} 
-return nlplm; 
+		for(unsigned int i2 = 0; i2 < iMGood.size(); i2++) {
+			EvtRecTrackIterator itTrk_m = evtRecTrkCol->begin() + iMGood[i2];
+			RecMdcTrack* mdcTrk_m = (*itTrk_m)->mdcTrack();
+			//cout<<"mdcTrk_m->charge()"<<mdcTrk_m->charge()<<endl;
+			if (mdcTrk_m->charge() > 0) continue; // only negative charged tracks
+
+			//cout<<"3"<<endl;
+			// lepton momentum 
+			if ( ! ( fabs(mdcTrk_p->p()) < m_lepton_momentum_max  &&
+						fabs(mdcTrk_m->p()) < m_lepton_momentum_max )) continue;
+
+			//cout<<"4"<<endl;
+			if ( !evtflw_filled ) h_evtflw->Fill(8); //|p| cut
+
+			// apply vertex fit
+			RecMdcKalTrack *lpTrk = (*(evtRecTrkCol->begin()+iPGood[i1]))->mdcKalTrack();
+			RecMdcKalTrack *lmTrk = (*(evtRecTrkCol->begin()+iMGood[i2]))->mdcKalTrack();
+
+			//saveLeptonInfo(lpTrk, lmTrk);
+			nlplm +=1;
+
+			evtflw_filled = true;
+		}
+	} 
+	return nlplm; 
 }
 
 bool Chic02ee::hasGoodLpLmVertex(RecMdcKalTrack *lpTrk,
-				  RecMdcKalTrack *lmTrk) {
+		RecMdcKalTrack *lmTrk) {
 
-  HepLorentzVector pcms(0.011*m_ecms, 0., 0., m_ecms);
+	HepLorentzVector pcms(0.011*m_ecms, 0., 0., m_ecms);
 
-  HepLorentzVector p4_vtx_lp, p4_vtx_lm, p4_vtx_lplm;
-  WTrackParameter wvlpTrk, wvlmTrk;
-  
-  HepPoint3D vx(0., 0., 0.);
-  HepSymMatrix Evx(3, 0);
-  
-  double bx = 1E+6;
-  double by = 1E+6;
-  double bz = 1E+6;
-  Evx[0][0] = bx*bx;
-  Evx[1][1] = by*by;
-  Evx[2][2] = bz*bz;
-  
-  VertexParameter vxpar;
-  vxpar.setVx(vx);
-  vxpar.setEvx(Evx);
-  
-  VertexFit* vtxfit = VertexFit::instance();
-  vtxfit->init();
-  vtxfit->AddTrack(0,  wvlpTrk);
-  vtxfit->AddTrack(1,  wvlmTrk);
-  vtxfit->AddVertex(0, vxpar,0,1);
-  
-  if(!vtxfit->Fit(0)) return false;
-  
-  vtxfit->Swim(0);
-  
-  WTrackParameter wlp = vtxfit->wtrk(0);
-  WTrackParameter wlm = vtxfit->wtrk(1);
-  p4_vtx_lp = vtxfit->pfit(0) ;
-  p4_vtx_lm = vtxfit->pfit(1) ;
-  p4_vtx_lplm = p4_vtx_lp + p4_vtx_lm;
+	HepLorentzVector p4_vtx_lp, p4_vtx_lm, p4_vtx_lplm;
+	WTrackParameter wvlpTrk, wvlmTrk;
+
+	HepPoint3D vx(0., 0., 0.);
+	HepSymMatrix Evx(3, 0);
+
+	double bx = 1E+6;
+	double by = 1E+6;
+	double bz = 1E+6;
+	Evx[0][0] = bx*bx;
+	Evx[1][1] = by*by;
+	Evx[2][2] = bz*bz;
+
+	VertexParameter vxpar;
+	vxpar.setVx(vx);
+	vxpar.setEvx(Evx);
+
+	VertexFit* vtxfit = VertexFit::instance();
+	vtxfit->init();
+	vtxfit->AddTrack(0,  wvlpTrk);
+	vtxfit->AddTrack(1,  wvlmTrk);
+	vtxfit->AddVertex(0, vxpar,0,1);
+
+	if(!vtxfit->Fit(0)) return false;
+
+	vtxfit->Swim(0);
+
+	WTrackParameter wlp = vtxfit->wtrk(0);
+	WTrackParameter wlm = vtxfit->wtrk(1);
+	p4_vtx_lp = vtxfit->pfit(0) ;
+	p4_vtx_lm = vtxfit->pfit(1) ;
+	p4_vtx_lplm = p4_vtx_lp + p4_vtx_lm;
 
 
-return true;
+	return true;
 }
 
 void Chic02ee::saveTrkInfo(EvtRecTrackIterator itTrk_lp,
-			  EvtRecTrackIterator itTrk_lm) {
- RecMdcTrack* mdcTrk_lp = (*itTrk_lp)->mdcTrack(); 
-  m_trklp_p = mdcTrk_lp->p();
-  m_trklp_px = mdcTrk_lp->px();
-  m_trklp_py = mdcTrk_lp->py();
-  m_trklp_pz = mdcTrk_lp->pz();
-  m_trklp_theta = mdcTrk_lp->theta();
-  m_trklp_phi = mdcTrk_lp->phi();
-  
-  if((*itTrk_lp)->isEmcShowerValid()){
-    RecEmcShower *emcTrk_lp = (*itTrk_lp)->emcShower();
-    m_trklp_eraw = emcTrk_lp->energy();
-  }
-  else{ m_trklp_eraw = -99.0; }
-  
-  RecMdcTrack* mdcTrk_lm = (*itTrk_lm)->mdcTrack();
-  m_trklm_p = mdcTrk_lm->p();
-  m_trklm_px = mdcTrk_lm->px();
-  m_trklm_py = mdcTrk_lm->py();
-  m_trklm_pz = mdcTrk_lm->pz();
-  m_trklm_theta = mdcTrk_lm->theta();
-  m_trklm_phi = mdcTrk_lm->phi();
-    
-  if((*itTrk_lm)->isEmcShowerValid()){
-    RecEmcShower *emcTrk_lm = (*itTrk_lm)->emcShower();
-    m_trklm_eraw = emcTrk_lm->energy();
-  }
-  else{ m_trklm_eraw = -99.0; }
+		EvtRecTrackIterator itTrk_lm) {
+	RecMdcTrack* mdcTrk_lp = (*itTrk_lp)->mdcTrack(); 
+	m_trklp_p = mdcTrk_lp->p();
+	m_trklp_px = mdcTrk_lp->px();
+	m_trklp_py = mdcTrk_lp->py();
+	m_trklp_pz = mdcTrk_lp->pz();
+	m_trklp_theta = mdcTrk_lp->theta();
+	m_trklp_phi = mdcTrk_lp->phi();
+
+	if((*itTrk_lp)->isEmcShowerValid()){
+		RecEmcShower *emcTrk_lp = (*itTrk_lp)->emcShower();
+		m_trklp_eraw = emcTrk_lp->energy();
+	}
+	else{ m_trklp_eraw = -99.0; }
+
+	RecMdcTrack* mdcTrk_lm = (*itTrk_lm)->mdcTrack();
+	m_trklm_p = mdcTrk_lm->p();
+	m_trklm_px = mdcTrk_lm->px();
+	m_trklm_py = mdcTrk_lm->py();
+	m_trklm_pz = mdcTrk_lm->pz();
+	m_trklm_theta = mdcTrk_lm->theta();
+	m_trklm_phi = mdcTrk_lm->phi();
+
+	if((*itTrk_lm)->isEmcShowerValid()){
+		RecEmcShower *emcTrk_lm = (*itTrk_lm)->emcShower();
+		m_trklm_eraw = emcTrk_lm->energy();
+	}
+	else{ m_trklm_eraw = -99.0; }
 
 }
+
