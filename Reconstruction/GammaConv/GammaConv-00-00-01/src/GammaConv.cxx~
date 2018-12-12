@@ -1,0 +1,297 @@
+#include "VertexFit/Helix.h"
+#include "GammaConv/GammaConv.h"
+
+#include <vector>
+
+typedef std::vector<double> Vdouble;
+
+GammaConv::GammaConv(HepVector helixp, HepVector helixe, HepPoint3D ip, HepLorentzVector pgamma){
+  //cout<<"helixp:"<<helixp[0]<<","<<helixp[1]<<","<<helixp[2]<<endl;
+  cout<<"helixp:"<<endl;
+  for(int i=0; i<5; i++){
+    cout<<fixed<<showpoint;
+    cout<<setprecision(5)<<helixp[i];
+  }
+  cout<<endl;
+
+  DeltaXY(helixp, helixe);
+  //cout<<"helixp:"<<helixp[0]<<","<<helixp[1]<<","<<helixp[2]<<endl;
+
+  DeltaZ(helixp, helixe);
+  //cout<<"helixp:"<<helixp[0]<<","<<helixp[1]<<","<<helixp[2]<<endl;
+  //DeltaZ2(helixp, helixe);
+  GGeom();
+  DGamma(pgamma, ip);
+}
+GammaConv::~GammaConv(){
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+void GammaConv::DeltaXY(HepVector helixp, HepVector helixe){
+  //int qp =1;
+  //int qe = -1;
+  //double ptp, pte, rp, re;
+  //ptp = qp/helixp[2];
+  //pte = qe/helixe[2];
+  //rp  = fabs(ptp/(acon*qp));
+  //re  = fabs(pte/(acon*qe));
+  HepPoint3D pivot = HepPoint3D(0.,0.,0.);
+  VFHelix hp = VFHelix(pivot, helixp);
+  VFHelix he = VFHelix(pivot, helixe);
+  //Helix hp = Helix(pivot, helixp);
+  //Helix he = Helix(pivot, helixe);
+
+  double rp = fabs(hp.radius());
+  double re = he.radius();
+  //cout<<"rp, re: "<<rp<<","<<re<<endl;
+  cout<<"rp    re"<<endl;
+  cout<<fixed<<showpoint;
+  cout<<setprecision(5)<<rp<<endl;
+  cout<<setprecision(5)<<re<<endl;
+
+  double xp, yp, xe, ye;
+  //xp = (helixp[0]+rp)*cos(helixp[1]);
+  //yp = (helixp[0]+rp)*sin(helixp[1]);
+  //xe = (helixe[0]+re)*cos(helixe[1]);
+  //ye = (helixe[0]+re)*sin(helixe[1]);
+  xp = hp.center().x();
+  yp = hp.center().y();
+  xe = he.center().x();
+  ye = he.center().y();
+  cout<<"xp, yp, xe, ye: "<<xp<<","<<yp<<","<<xe<<","<<ye<<endl;
+  double xa, ya, xb, yb;
+  double lep;
+  lep = sqrt((xp-xe)*(xp-xe)+(yp-ye)*(yp-ye));
+  cout<<"lep: "<<lep;
+  xa = xe+(xp-xe)*re/lep;
+  ya = ye+(yp-ye)*re/lep;
+  xb = xp-(xp-xe)*rp/lep;
+  yb = yp-(yp-ye)*rp/lep;
+  cout<<"xa, ya, xb, yb: "<<xa<<","<<ya<<","<<xb<<","<<yb<<endl;
+  _coordie.setX(xa);
+  _coordie.setY(ya);
+  _coordip.setX(xb);
+  _coordip.setY(yb);
+  double len;
+  len = sqrt((xa-xb)*(xa-xb)+(ya-yb)*(ya-yb));
+  cout<<"len: "<<len<<endl;
+  if(lep >= rp+re) m_deltaxy = len;
+  else m_deltaxy = -len;
+  cout<<"deltaxy: "<<m_deltaxy<<endl;
+}
+
+/*
+void GammaConv::DeltaXY(HepVector helixp, HepVector helixe){
+  HepPoint3D pivot = HepPoint3D(0.,0.,0.);
+  VFHelix hp = VFHelix(pivot, helixp);
+  VFHelix he = VFHelix(pivot, helixe);
+  double rp = hp.radius();
+  double re = he.radius();
+  double xp, yp, xe, ye;
+  xp = hp.center().x();
+  yp = hp.center().y();
+  xe = he.center().x();
+  ye = he.center().y();
+
+  double k, b;
+  k = (yp-ye)/(xp-xe);
+  b = yp-k*xp;
+  double ap, bp, cp;
+  ap = 1+k*k;
+  bp = 2*(b-yp)*k-2*xp;
+  cp = (b-yp)*(b-yp)-rp*rp+xp*xp;
+  Vdouble solvp, solve;
+  solvp.clear();
+  solve.clear();
+  double temp1, temp2;
+  temp1 = (-bp-sqrt(bp*bp-4*ap*cp))/2/ap;
+  temp2 = (-bp+sqrt(bp*bp-4*ap*cp))/2/ap;
+  solvp.push_back(temp1);
+  solvp.push_back(temp2);
+  double ae, be, ce;
+  ae = 1+k*k;
+  be = 2*(b-ye)*k-2*xe;
+  ce = (b-ye)*(b-ye)-re*re+xe*xe;
+  double teme1, teme2;
+  teme1 = (-be-sqrt(be*be-4*ae*ce))/2/ae;
+  teme2 = (-be+sqrt(be*be-4*ae*ce))/2/ae;
+  solve.push_back(teme1);
+  solve.push_back(teme2);
+  Vdouble lenSort;
+  lenSort.clear();
+  double len1, len2, len3, len4;
+  double yp0, yp1, ye0, ye1;
+  yp0 = k*solvp[0]+b;
+  yp1 = k*solvp[1]+b;
+  ye0 = k*solve[0]+b;
+  ye1 = k*solve[1]+b;
+  len1= sqrt((yp0-ye0)*(yp0-ye0)+(solvp[0]-solve[0])*(solvp[0]-solve[0]));
+  len2= sqrt((yp0-ye1)*(yp0-ye1)+(solvp[0]-solve[1])*(solvp[0]-solve[1]));
+  len3= sqrt((yp1-ye0)*(yp1-ye0)+(solvp[1]-solve[0])*(solvp[1]-solve[0]));
+  len4= sqrt((yp1-ye1)*(yp1-ye1)+(solvp[1]-solve[1])*(solvp[1]-solve[1]));
+  lenSort.push_back(len1);
+  lenSort.push_back(len2);
+  lenSort.push_back(len3);
+  lenSort.push_back(len4);
+
+  double lenmin = lenSort[0];
+  int lenno = 1;
+  for(int i=1; i<lenSort.size(); i++){
+    if(lenmin > lenSort[i]){
+      lenmin = lenSort[i];
+      lenno = i+1;
+    }
+  }
+
+  if(lenno==1){
+    _coordip.setX(solvp[0]);
+    _coordip.setY(yp0);
+    _coordie.setX(solve[0]);
+    _coordie.setY(ye0);
+  }
+  if(lenno==2){
+    _coordip.setX(solvp[0]);
+    _coordip.setY(yp0);
+    _coordie.setX(solve[1]);
+    _coordie.setY(ye1);
+  }
+  if(lenno==3){
+    _coordip.setX(solvp[1]);
+    _coordip.setY(yp1);
+    _coordie.setX(solve[0]);
+    _coordie.setY(ye0);
+  }
+  if(lenno==4){
+    _coordip.setX(solvp[1]);
+    _coordip.setY(yp1);
+    _coordie.setX(solve[1]);
+    _coordie.setY(ye1);
+  }
+  double dpe;
+  dpe = sqrt((xp-xe)*(xp-xe)+(yp-ye)*(yp-ye));
+  if(dpe>=rp+re) m_deltaxy = lenmin;
+  else m_deltaxy = -lenmin;
+}
+*/
+/*
+void GammaConv::DeltaZ(HepVector helixp, HepVector helixe){
+  // helix->tk
+  HepPoint3D pivot = HepPoint3D(0.,0.,0.);
+  VFHelix hp = VFHelix(pivot, helixp);
+  VFHelix he = VFHelix(pivot, helixe);
+  HepPoint3D posp = hp.x(0.);
+  HepPoint3D pose = he.x(0.);
+  double radp = hp.radius();
+  double rade = he.radius();
+  HepPoint3D xcp = hp.center();
+  HepPoint3D xce = he.center();
+
+  double qdot, qcross;
+  qdot = (posp.x()-xcp.x())*(_coordip.x()-xcp.x())+(posp.y()-xcp.y())*(_coordip.y()-xcp.y());
+  qcross = -(posp.y()-xcp.y())*(_coordip.x()-xcp.x())+(posp.x()-xcp.x())*(_coordip.y()-xcp.y());
+  double dphip = atan2(qcross, qdot);
+  double stp = dphip*radp;
+  double zp = posp.z()+stp*helixp[4];
+  qdot = (pose.x()-xce.x())*(_coordie.x()-xce.x())+(pose.y()-xce.y())*(_coordie.y()-xce.y());
+  qcross = -(pose.y()-xce.y())*(_coordie.x()-xce.x())+(pose.x()-xce.x())*(_coordie.y()-xce.y());
+  double dphie = atan2(qcross, qdot);
+  double ste = dphie*rade;
+  double ze = pose.z()+ste*helixe[4];
+
+  _coordip.setZ(zp);
+  _coordie.setZ(ze);
+  
+  m_deltaz = fabs(zp-ze);
+}
+*/
+void GammaConv::DeltaZ(HepVector helixp, HepVector helixe){
+  //_coordip.setX(_coordip.x());
+  //_coordip.setY(_coordip.y());
+  //_coordie.setX(_coordie.x());
+  //_coordie.setY(_coordie.y());
+
+  HepPoint3D pivot = HepPoint3D(0.,0.,0.);
+  VFHelix hp = VFHelix(pivot, helixp);
+  VFHelix he = VFHelix(pivot, helixe);
+  //Helix hp = Helix(pivot, helixp);
+  //Helix he = Helix(pivot, helixe);
+
+  HepPoint3D posp = hp.x(0.);
+  HepPoint3D pose = he.x(0.);
+  double radp = hp.radius();
+  double rade = he.radius();
+  cout<<"radp,rade: "<<radp<<","<<rade<<endl;
+
+  double jp;
+  Hep3Vector pp = hp.momentum(0.);
+  double aconp = sqrt(pp.x()*pp.x()+pp.y()*pp.y())/radp;
+  
+  cout<<"ap: "<<aconp<<endl;
+
+  jp = aconp*((_coordip.x()-posp.x())*pp.x()+(_coordip.y()-posp.y())*pp.y())/(pp.x()*pp.x()+pp.y()*pp.y());
+  double zp;
+  zp = hp.dz()+pp.z()*asin(jp)/aconp;
+
+  double je;
+  Hep3Vector pe = he.momentum(0.);
+  double acone = sqrt(pe.x()*pe.x()+pe.y()*pe.y())/rade;
+
+  cout<<"ae: "<<acone<<endl;
+
+  je = acone*((_coordie.x()-pose.x())*pe.x()+(_coordie.y()-pose.y())*pe.y())/(pe.x()*pe.x()+pe.y()*pe.y());
+  double ze;
+  ze = he.dz()+pe.z()*asin(je)/acone;
+
+  _coordip.setZ(zp);
+  _coordie.setZ(ze);
+  m_deltaz = fabs(zp-ze);
+  cout<<"zp,ze,deltaz: "<<zp<<","<<ze<<","<<m_deltaz<<endl;
+}
+void GammaConv::DGamma(HepLorentzVector pgamma, HepPoint3D ip){
+  double p;
+  //p = sqrt(pgamma.px()*pgamma.px()+pgamma.py()*pgamma.py()+pgamma.pz()*pgamma.pz());
+  p = pgamma.vect().mag();
+  //double x, y, z;
+  //x = (_coordip.x()+_coordie.x())/2;
+  //y = (_coordip.y()+_coordie.y())/2;
+  //z = (_coordip.z()+_coordie.z())/2;
+  double dipa;
+  dipa = (ip.x()-m_rx)*pgamma.px()/p+(ip.y()-m_ry)*pgamma.py()/p+(ip.z()-m_rz)*pgamma.pz()/p;
+  double dgp;
+  dgp = sqrt((ip.x()-m_rx)*(ip.x()-m_rx)+(ip.y()-m_ry)*(ip.y()-m_ry)+(ip.z()-m_rz)*(ip.z()-m_rz));
+  m_dgamma = sqrt(dgp*dgp-dipa*dipa);
+  m_R = dgp;
+  m_cthe = dipa/dgp;
+  cout<<"dgamma,dipa,dgp,cthe"<<m_dgamma<<","<<dipa<<","<<dgp<<","<<m_cthe<<endl;
+/*
+  double dipa2;
+  dipa2 = (ip.x()-m_rx2)*pgamma.px()/p+(ip.y()-m_ry2)*pgamma.py()/p+(ip.z()-m_rz2)*pgamma.pz()/p;
+  double dgp2;
+  dgp2  = sqrt((ip.x()-m_rx2)*(ip.x()-m_rx2)+(ip.y()-m_ry2)*(ip.y()-m_ry2)+(ip.z()-m_rz2)*(ip.z()-m_rz2));
+  m_dgamma2 = sqrt(dgp2*dgp2-dipa2*dipa2);
+  m_R2 = dgp2;
+*/
+}
+
+void GammaConv::GGeom(){
+  double x, y, zz;
+  x  = (_coordip.x()+_coordie.x())/2;
+  y  = (_coordip.y()+_coordie.y())/2;
+  zz = (_coordip.z()+_coordie.z())/2;
+  m_rx = x;
+  m_ry = y;
+  m_rz = zz;
+  m_rxy=sqrt(x*x+y*y);
+  cout<<"x,y,z"<<m_rx<<","<<m_ry<<","<<m_rz<<endl;
+/*
+  double x2, y2, z2;
+  x2  = (_coordip.x()+_coordie.x())/2;
+  y2  = (_coordip.y()+_coordie.y())/2;
+  z2  = (_coordip.z()+_coordie.z())/2;
+  m_rx2 = x2;
+  m_ry2 = y2;
+  m_rz2 = z2;
+  m_rxy2= sqrt(x2*x2+y2*y2);
+*/
+}

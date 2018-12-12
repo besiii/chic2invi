@@ -1,0 +1,8 @@
+#include "$VERTEXFITROOT/share/jobOptions_VertexDbSvc.txt"
+ApplicationMgr.DLLs += {"Chic02ll"};
+ApplicationMgr.TopAlg += {"Chic02ll"};
+
+
+ Chic02ll.TestMC     =  true;
+ 
+ Chic02ll.TestJPSMC  =  true;

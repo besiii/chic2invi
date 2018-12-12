@@ -1,0 +1,301 @@
+#-- start of make_header -----------------
+
+#====================================
+#  Library JpsdarkUeta
+#
+#   Generated Tue May  1 10:24:22 2018  by vindy
+#
+#====================================
+
+include ${CMTROOT}/src/Makefile.core
+
+ifdef tag
+CMTEXTRATAGS = $(tag)
+else
+tag       = $(CMTCONFIG)
+endif
+
+cmt_JpsdarkUeta_has_no_target_tag = 1
+
+#--------------------------------------------------------
+
+ifdef cmt_JpsdarkUeta_has_target_tag
+
+tags      = $(tag),$(CMTEXTRATAGS),target_JpsdarkUeta
+
+JpsdarkUeta_tag = $(tag)
+
+ifdef READONLY
+cmt_local_tagfile_JpsdarkUeta = /tmp/CMT_$(JpsdarkUeta_tag)_JpsdarkUeta.make$(cmt_lock_pid)
+else
+#cmt_local_tagfile_JpsdarkUeta = $(JpsdarkUeta_tag)_JpsdarkUeta.make
+cmt_local_tagfile_JpsdarkUeta = $(bin)$(JpsdarkUeta_tag)_JpsdarkUeta.make
+endif
+
+else
+
+tags      = $(tag),$(CMTEXTRATAGS)
+
+JpsdarkUeta_tag = $(tag)
+
+ifdef READONLY
+cmt_local_tagfile_JpsdarkUeta = /tmp/CMT_$(JpsdarkUeta_tag).make$(cmt_lock_pid)
+else
+#cmt_local_tagfile_JpsdarkUeta = $(JpsdarkUeta_tag).make
+cmt_local_tagfile_JpsdarkUeta = $(bin)$(JpsdarkUeta_tag).make
+endif
+
+endif
+
+-include $(cmt_local_tagfile_JpsdarkUeta)
+
+ifdef cmt_JpsdarkUeta_has_target_tag
+
+ifdef READONLY
+cmt_final_setup_JpsdarkUeta = /tmp/CMT_JpsdarkUeta_JpsdarkUetasetup.make
+cmt_local_JpsdarkUeta_makefile = /tmp/CMT_JpsdarkUeta$(cmt_lock_pid).make
+else
+cmt_final_setup_JpsdarkUeta = $(bin)JpsdarkUeta_JpsdarkUetasetup.make
+cmt_local_JpsdarkUeta_makefile = $(bin)JpsdarkUeta.make
+endif
+
+else
+
+ifdef READONLY
+cmt_final_setup_JpsdarkUeta = /tmp/CMT_JpsdarkUetasetup.make
+cmt_local_JpsdarkUeta_makefile = /tmp/CMT_JpsdarkUeta$(cmt_lock_pid).make
+else
+cmt_final_setup_JpsdarkUeta = $(bin)JpsdarkUetasetup.make
+cmt_local_JpsdarkUeta_makefile = $(bin)JpsdarkUeta.make
+endif
+
+endif
+
+ifdef READONLY
+cmt_final_setup = /tmp/CMT_JpsdarkUetasetup.make
+else
+cmt_final_setup = $(bin)JpsdarkUetasetup.make
+endif
+
+JpsdarkUeta ::
+
+
+ifdef READONLY
+JpsdarkUeta ::
+	@echo tags=$(tags)
+	@echo cmt_local_tagfile=$(cmt_local_tagfile)
+endif
+
+
+dirs ::
+	@if test ! -r requirements ; then echo "No requirements file" ; fi; \
+	  if test ! -d $(bin) ; then $(mkdir) -p $(bin) ; fi
+
+javadirs ::
+	@if test ! -d $(javabin) ; then $(mkdir) -p $(javabin) ; fi
+
+srcdirs ::
+	@if test ! -d $(src) ; then $(mkdir) -p $(src) ; fi
+
+help ::
+	$(echo) 'JpsdarkUeta'
+
+binobj = 
+ifdef STRUCTURED_OUTPUT
+binobj = JpsdarkUeta/
+JpsdarkUeta::
+	@if test ! -d $(bin)$(binobj) ; then $(mkdir) -p $(bin)$(binobj) ; fi
+	$(echo) "STRUCTURED_OUTPUT="$(bin)$(binobj)
+endif
+
+#-- end of make_header ------------------
+
+#-- start of libary_header ---------------
+
+JpsdarkUetalibname   = $(bin)$(library_prefix)JpsdarkUeta$(library_suffix)
+JpsdarkUetalib       = $(JpsdarkUetalibname).a
+JpsdarkUetastamp     = $(bin)JpsdarkUeta.stamp
+JpsdarkUetashstamp   = $(bin)JpsdarkUeta.shstamp
+
+JpsdarkUeta :: dirs  JpsdarkUetaLIB
+	$(echo) "JpsdarkUeta ok"
+
+#-- end of libary_header ----------------
+
+JpsdarkUetaLIB :: $(JpsdarkUetalib) $(JpsdarkUetashstamp)
+	@/bin/echo "------> JpsdarkUeta : library ok"
+
+$(JpsdarkUetalib) :: $(bin)JpsdarkUeta.o $(bin)JpsdarkUeta_load.o $(bin)JpsdarkUeta_entries.o
+	$(lib_echo) library
+	$(lib_silent) cd $(bin); \
+	  $(ar) $(JpsdarkUetalib) $?
+	$(lib_silent) $(ranlib) $(JpsdarkUetalib)
+	$(lib_silent) cat /dev/null >$(JpsdarkUetastamp)
+
+#------------------------------------------------------------------
+#  Future improvement? to empty the object files after
+#  storing in the library
+#
+##	  for f in $?; do \
+##	    rm $${f}; touch $${f}; \
+##	  done
+#------------------------------------------------------------------
+
+$(JpsdarkUetalibname).$(shlibsuffix) :: $(JpsdarkUetalib) $(JpsdarkUetastamps)
+	$(lib_silent) cd $(bin); QUIET=$(QUIET); $(make_shlib) "$(tags)" JpsdarkUeta $(JpsdarkUeta_shlibflags)
+
+$(JpsdarkUetashstamp) :: $(JpsdarkUetalibname).$(shlibsuffix)
+	@if test -f $(JpsdarkUetalibname).$(shlibsuffix) ; then cat /dev/null >$(JpsdarkUetashstamp) ; fi
+
+JpsdarkUetaclean ::
+	$(cleanup_echo) objects
+	$(cleanup_silent) cd $(bin); /bin/rm -f $(bin)JpsdarkUeta.o $(bin)JpsdarkUeta_load.o $(bin)JpsdarkUeta_entries.o
+
+#-----------------------------------------------------------------
+#
+#  New section for automatic installation
+#
+#-----------------------------------------------------------------
+
+ifeq ($(INSTALLAREA),)
+installarea = $(CMTINSTALLAREA)
+else
+ifeq ($(findstring `,$(INSTALLAREA)),`)
+installarea = $(shell $(subst `,, $(INSTALLAREA)))
+else
+installarea = $(INSTALLAREA)
+endif
+endif
+
+install_dir = ${installarea}/${CMTCONFIG}/lib
+JpsdarkUetainstallname = $(library_prefix)JpsdarkUeta$(library_suffix).$(shlibsuffix)
+
+JpsdarkUeta :: JpsdarkUetainstall
+
+install :: JpsdarkUetainstall
+
+JpsdarkUetainstall :: $(install_dir)/$(JpsdarkUetainstallname)
+	@if test ! "${installarea}" = ""; then\
+	  echo "installation done"; \
+	fi
+
+$(install_dir)/$(JpsdarkUetainstallname) :: $(bin)$(JpsdarkUetainstallname)
+	@if test ! "${installarea}" = ""; then \
+	  cd $(bin); \
+	  if test ! "$(install_dir)" = ""; then \
+	    if test ! -d "$(install_dir)"; then \
+	      mkdir -p $(install_dir); \
+	    fi ; \
+	    if test -d "$(install_dir)"; then \
+	      echo "Installing library $(JpsdarkUetainstallname) into $(install_dir)"; \
+	      if test -e $(install_dir)/$(JpsdarkUetainstallname); then \
+	        $(cmt_uninstall_area_command) $(install_dir)/$(JpsdarkUetainstallname); \
+	        $(cmt_uninstall_area_command) $(install_dir)/$(JpsdarkUetainstallname).cmtref; \
+	      fi; \
+	      $(cmt_install_area_command) `pwd`/$(JpsdarkUetainstallname) $(install_dir)/$(JpsdarkUetainstallname); \
+	      echo `pwd`/$(JpsdarkUetainstallname) >$(install_dir)/$(JpsdarkUetainstallname).cmtref; \
+	    fi \
+          else \
+	    echo "Cannot install library $(JpsdarkUetainstallname), no installation directory specified"; \
+	  fi; \
+	fi
+
+JpsdarkUetaclean :: JpsdarkUetauninstall
+
+uninstall :: JpsdarkUetauninstall
+
+JpsdarkUetauninstall ::
+	@if test ! "${installarea}" = ""; then \
+	  cd $(bin); \
+	  if test ! "$(install_dir)" = ""; then \
+	    if test -d "$(install_dir)"; then \
+	      echo "Removing installed library $(JpsdarkUetainstallname) from $(install_dir)"; \
+	      $(cmt_uninstall_area_command) $(install_dir)/$(JpsdarkUetainstallname); \
+	      $(cmt_uninstall_area_command) $(install_dir)/$(JpsdarkUetainstallname).cmtref; \
+	    fi \
+          else \
+	    echo "Cannot uninstall library $(JpsdarkUetainstallname), no installation directory specified"; \
+	  fi; \
+	fi
+
+
+
+
+#-- start of dependency ------------------
+ifneq ($(MAKECMDGOALS),JpsdarkUetaclean)
+
+#$(bin)JpsdarkUeta_dependencies.make :: dirs
+
+ifndef QUICK
+$(bin)JpsdarkUeta_dependencies.make : ../src/JpsdarkUeta.cxx ../src/components/JpsdarkUeta_load.cxx ../src/components/JpsdarkUeta_entries.cxx $(use_requirements) $(cmt_final_setup_JpsdarkUeta)
+	$(echo) "(JpsdarkUeta.make) Rebuilding $@"; \
+	  $(build_dependencies) JpsdarkUeta -all_sources -out=$@ ../src/JpsdarkUeta.cxx ../src/components/JpsdarkUeta_load.cxx ../src/components/JpsdarkUeta_entries.cxx
+endif
+
+#$(JpsdarkUeta_dependencies)
+
+-include $(bin)JpsdarkUeta_dependencies.make
+
+endif
+#-- end of dependency -------------------
+#-- start of cpp_library -----------------
+
+$(bin)JpsdarkUeta_dependencies.make : $(JpsdarkUeta_cxx_dependencies)
+
+$(bin)$(binobj)JpsdarkUeta.o : $(JpsdarkUeta_cxx_dependencies)
+	$(cpp_echo) $(src)JpsdarkUeta.cxx
+	$(cpp_silent) $(cppcomp) -o $(@) $(use_pp_cppflags) $(JpsdarkUeta_pp_cppflags) $(lib_JpsdarkUeta_pp_cppflags) $(JpsdarkUeta_pp_cppflags) $(use_cppflags) $(JpsdarkUeta_cppflags) $(lib_JpsdarkUeta_cppflags) $(JpsdarkUeta_cppflags) $(JpsdarkUeta_cxx_cppflags)  $(src)JpsdarkUeta.cxx
+
+#-- end of cpp_library ------------------
+#-- start of cpp_library -----------------
+
+$(bin)JpsdarkUeta_dependencies.make : $(JpsdarkUeta_load_cxx_dependencies)
+
+$(bin)$(binobj)JpsdarkUeta_load.o : $(JpsdarkUeta_load_cxx_dependencies)
+	$(cpp_echo) $(src)components/JpsdarkUeta_load.cxx
+	$(cpp_silent) $(cppcomp) -o $(@) $(use_pp_cppflags) $(JpsdarkUeta_pp_cppflags) $(lib_JpsdarkUeta_pp_cppflags) $(JpsdarkUeta_load_pp_cppflags) $(use_cppflags) $(JpsdarkUeta_cppflags) $(lib_JpsdarkUeta_cppflags) $(JpsdarkUeta_load_cppflags) $(JpsdarkUeta_load_cxx_cppflags) -I../src/components $(src)components/JpsdarkUeta_load.cxx
+
+#-- end of cpp_library ------------------
+#-- start of cpp_library -----------------
+
+$(bin)JpsdarkUeta_dependencies.make : $(JpsdarkUeta_entries_cxx_dependencies)
+
+$(bin)$(binobj)JpsdarkUeta_entries.o : $(JpsdarkUeta_entries_cxx_dependencies)
+	$(cpp_echo) $(src)components/JpsdarkUeta_entries.cxx
+	$(cpp_silent) $(cppcomp) -o $(@) $(use_pp_cppflags) $(JpsdarkUeta_pp_cppflags) $(lib_JpsdarkUeta_pp_cppflags) $(JpsdarkUeta_entries_pp_cppflags) $(use_cppflags) $(JpsdarkUeta_cppflags) $(lib_JpsdarkUeta_cppflags) $(JpsdarkUeta_entries_cppflags) $(JpsdarkUeta_entries_cxx_cppflags) -I../src/components $(src)components/JpsdarkUeta_entries.cxx
+
+#-- end of cpp_library ------------------
+#-- start of cleanup_header --------------
+
+clean :: JpsdarkUetaclean
+	@cd .
+
+ifndef PEDANTIC
+.DEFAULT::
+	$(echo) "(JpsdarkUeta.make) $@: No rule for such target" >&2
+#	@echo "#CMT> Warning: $@: No rule for such target" >&2; exit
+else
+.DEFAULT::
+	$(echo) "(JpsdarkUeta.make) PEDANTIC: $@: No rule for such target" >&2
+	if test $@ = "$(cmt_final_setup)" -o\
+	 $@ = "$(cmt_final_setup_JpsdarkUeta)" ; then\
+	 found=n; for s in 1 2 3 4 5; do\
+	 sleep $$s; test ! -f $@ || { found=y; break; }\
+	 done; if test $$found = n; then\
+	 test -z "$(cmtmsg)" ||\
+	 echo "$(CMTMSGPREFIX)" "(JpsdarkUeta.make) PEDANTIC: $@: Seems to be missing. Ignore it for now" >&2; exit 0 ; fi;\
+	 elif test `expr index $@ '/'` -ne 0 ; then\
+	 test -z "$(cmtmsg)" ||\
+	 echo "$(CMTMSGPREFIX)" "(JpsdarkUeta.make) PEDANTIC: $@: Seems to be a missing file. Please check" >&2; exit 2 ; \
+	 else\
+	 test -z "$(cmtmsg)" ||\
+	 echo "$(CMTMSGPREFIX)" "(JpsdarkUeta.make) PEDANTIC: $@: Seems to be a fake target due to some pattern. Just ignore it" >&2 ; exit 0; fi
+endif
+
+JpsdarkUetaclean ::
+#-- end of cleanup_header ---------------
+#-- start of cleanup_library -------------
+	$(cleanup_echo) library
+	-$(cleanup_silent) cd $(bin); /bin/rm -f $(binobj)$(library_prefix)JpsdarkUeta$(library_suffix).a $(binobj)$(library_prefix)JpsdarkUeta$(library_suffix).s? $(binobj)JpsdarkUeta.stamp $(binobj)JpsdarkUeta.shstamp
+#-- end of cleanup_library ---------------
+

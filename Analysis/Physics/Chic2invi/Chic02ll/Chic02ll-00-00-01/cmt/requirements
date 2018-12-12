@@ -1,0 +1,25 @@
+package Chic02ll
+
+
+author He Kanglin <hekl@ihep.ac.cn>
+
+use BesPolicy BesPolicy-*
+use GaudiInterface GaudiInterface-* External
+
+use DstEvent DstEvent-* Event
+use EventModel   EventModel-*  Event
+use EvtRecEvent EvtRecEvent-* Event
+use McTruth McTruth-*  Event
+
+
+use VertexFit    VertexFit-*   Analysis 
+use ParticleID   ParticleID-*  Analysis
+use GammaConv    GammaConv-*   Reconstruction
+
+
+use BesROOT      BesROOT-00-*     External
+
+apply_pattern component_library 
+library Chic02ll   *.cxx  components/*.cxx
+
+apply_pattern declare_runtime files=*.txt
