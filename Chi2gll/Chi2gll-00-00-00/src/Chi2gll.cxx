@@ -45,10 +45,12 @@ StatusCode Chi2gll::initialize(){
 			status = m_tuple1->addItem("indexmc",          m_idxmc, 0, 100);
 			status = m_tuple1->addIndexedItem("p4truth", m_idxmc, 6, m_p4truth);//0-3 : p4; 4: pdgid; 5: mcidx
 
-			status = m_tuple1->addItem ("ncharged",  m_ntrk, 0, 15);//good charged track
-			status = m_tuple1->addItem ("nneutral",  m_nshw, 0, 5);//good neutrual track
-			status = m_tuple1->addItem ("ngoodcharged", m_ncharged, 0, 15);
-			status = m_tuple1->addItem ("ngoodneutral", m_nneutral, 0, 5);
+			 status = m_tuple1->addItem ("ngoodcharged",  m_ntrk, 0, 15);//good charged track
+           		 status = m_tuple1->addItem ("ngoodneutral",  m_nshw, 0, 5);//good neutrual track
+           		 status = m_tuple1->addItem ("ncharged", m_ncharged, 0, 15);
+           		 status = m_tuple1->addItem ("nneutral", m_nneutral, 0, 5);// neutral
+
+			
 			status = m_tuple1->addItem ("nlepton", m_nlepton, 0,5);
 			//0-3:p4;  4: charge; 5: particle type;  6-9 p4 shower of this lepton;;
 			status = m_tuple1->addIndexedItem("p4trk",     m_nlepton,10, m_p4trk);
@@ -134,7 +136,8 @@ StatusCode Chi2gll::execute(){
 
 
 	m_nlepton = VEpId.size() + VEmId.size() + VMupId.size() + VMumId.size();
-
+       
+       if (m_nlepton > 4) return StatusCode::SUCCESS;
 
 	for(int i =0; i<m_nlepton ; i++){
 		int leptonId = -1;

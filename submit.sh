@@ -67,7 +67,10 @@ usage() {
     printf "\n\t%-9s  %-40s"  "2.0.1"    "Generate -- 6000 chic02ee MC signal..."
     printf "\n\t%-9s  %-40s"  "2.0.2"    "Reconstruction -- 6000 chic02ee MC signal..."
     printf "\n\t%-9s  %-40s"  "2.0.3"    "Preselection of the events and generate root file"
-    
+    printf "\n\t%-9s  %-40s"  "2.0.4"    "Preselection of the events and generate root file with Kai's code.."
+    printf "\n\t%-9s  %-40s"  "2.0.5"    "Select events on signal MC sample..."
+
+
     printf "\n\t%-9s  %-40s"  "3.0"      "[run on chicj2gamgam for peaking background]"
     printf "\n\t%-9s  %-40s"  "3.0.1"    "Generate -- 6000 chicj2gamgam MC signal for peaking background..."
     printf "\n\t%-9s  %-40s"  "3.0.2"    "Reconstruction -- 6000 chicj2gamgam MC signal..."
@@ -1067,6 +1070,18 @@ case $option in
 	cd scripts/chic02ee/jobs_chic0
 	    boss.condor -g physics jobOptions_chic02ee_gen_mc.txt
         ;;
+
+    2.0.4) echo "Preselection of the events and generate root file with Kai's code with 10 events..."
+        
+	cd scripts/chic02ee/jobs_chic0 
+	boss.exe  jobOptions_chi2gll_gen_mc.txt
+         ;;
+    
+    2.0.5) echo "Select events on signal MC sample..."
+
+        ./python/sel_events.py scripts/chic02ee/rootfile_chic02ee/chi2gll_gen_mc.root scripts/chic02ee/rootfile_chic02ee/chi2gll_gen_mc_event.root
+	 ;;
+ 
 
 3.0) echo "[run on signal MC--chicj2gamgam for the study of peaking background]"
 	 ;;

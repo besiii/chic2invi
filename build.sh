@@ -14,7 +14,9 @@ usage() {
     printf "\n\t%-5s  %-40s\n"  "2"  "build ChicNoTDC analyzer"
 #    printf "\n\t%-5s  %-40s\n"  "3"  "build Jpsi2pnpi analyzer"
 #    printf "\n\t%-5s  %-40s\n"  "4"  "build Jpsi2lplm analyzer"
-    printf "\n\t%-5s  %-40s\n"  "5"  "build Chic02ee analyzer"    
+    printf "\n\t%-5s  %-40s\n"  "5"  "build Chic02ee analyzer"
+    printf "\n\t%-5s  %-40s\n"  "6"  "building Chi2gll module.."
+    printf "\n\t%-5s  %5-40s\n" "7"  "building Chic02ll module.."
 printf "\n\n" 
 }
 
@@ -48,6 +50,14 @@ case $option in
        cd Analysis/Physics/Chic2invi/Chic02ee/Chic02ee-00-00-01/cmt
        gmake
        ;;
+     6) echo "Building Chi2gll module ..."
+	   cd Chi2gll/Chi2gll-00-00-00/cmt
+	   gmake
+	   ;;
+     7) echo "Building Chic02ll module ..."
+       cd Analysis/Physics/Chic2invi/Chic02ll/Chic02ll-00-00-01/cmt
+       gmake
+       ;; 
 
 esac
 
