@@ -16,6 +16,13 @@ from tools import duration
 #global histogram
 h_run = ROOT.TH1D('h_run','run',100, -27120, -25330)
 h_event = ROOT.TH1D('h_event', 'event', 100, 0, 20 )
+h_indexmc = ROOT.TH1D('h_indexmc', 'indexmc',100, 5, 15 )
+h_ncharged = ROOT.TH1D('h_ncharged', 'ncharged', 100, 1, 5)
+h_ngoodcharged = ROOT.TH1D('h_ngoodcharged', 'ngoodcharged',100, 1, 4)
+h_ngoodneutral = ROOT.TH1D('h_ngoodneutral', 'ngoodneutral',100, 1, 5)
+h_nlepton = ROOT.TH1D('h_nlepton', 'nlepton',100, 1, 5)
+h_nneutral = ROOT.TH1D('h_nneutral', 'nneutral',100, 1.5, 10)
+
 
 def main ():
 
@@ -31,11 +38,25 @@ def main ():
     for k in range(entries):
         pbar.update(k+1)
         t.GetEntry(k)
-        h_event.Fill(t.event)
         h_run.Fill(t.run)
-    
+        h_event.Fill(t.event)
+        h_ncharged.Fill(t.ncharged)
+        h_ngoodcharged.Fill(t.ngoodcharged)
+        h_ngoodneutral.Fill(t.ngoodneutral)
+        h_nlepton.Fill(t.nlepton)
+        h_nneutral.Fill(t.nneutral)
+        
+
+
     h_run.Write()
     h_event.Write()
+    h_indexmc.Write()
+    h_ncharged.Write()
+    h_ngoodcharged.Write()
+    h_ngoodneutral.Write()
+    h_nlepton.Write()
+    h_nneutral.Write()
+    
     fout.Close()
     pbar.finish()
     dur = duration(time()-time_start)
