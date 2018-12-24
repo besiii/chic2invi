@@ -15,6 +15,7 @@ from tools import duration
 
 #global histogram
 h_run = ROOT.TH1D('h_run','run',100, -27120, -25330)
+h_event = ROOT.TH1D('h_event', 'event', 100, 0, 20 )
 
 def main ():
 
@@ -30,9 +31,11 @@ def main ():
     for k in range(entries):
         pbar.update(k+1)
         t.GetEntry(k)
+        h_event.Fill(t.event)
         h_run.Fill(t.run)
     
     h_run.Write()
+    h_event.Write()
     fout.Close()
     pbar.finish()
     dur = duration(time()-time_start)
