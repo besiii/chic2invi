@@ -69,6 +69,7 @@ usage() {
     printf "\n\t%-9s  %-40s"  "2.0.3"    "Preselection of the events and generate root file"
     printf "\n\t%-9s  %-40s"  "2.0.4"    "Preselection of the events and generate root file with Kai's code.."
     printf "\n\t%-9s  %-40s"  "2.0.5"    "Select events on signal MC sample..."
+    printf "\n\t%-9s  %-40s"  "2.0.6"    "Drawing on canvas for run number"
 
 
     printf "\n\t%-9s  %-40s"  "3.0"      "[run on chicj2gamgam for peaking background]"
@@ -1079,9 +1080,12 @@ case $option in
     
     2.0.5) echo "Select events on signal MC sample..."
 
-        ./python/sel_events.py scripts/chic02ee/rootfile_chic02ee/chi2gll_gen_mc.root scripts/chic02ee/rootfile_chic02ee/chi2gll_gen_mc_event.root
-	 ;;
- 
+        ./python/sel_events_chi2gll.py
+	    ;;
+
+    2.0.6) echo "Drawing on canvas for run number"
+        ./python/plt_summary_chi2gll.py chi2gll 
+        ;;
 
 3.0) echo "[run on signal MC--chicj2gamgam for the study of peaking background]"
 	 ;;
