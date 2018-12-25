@@ -21,6 +21,7 @@ def main():
 	c = ROOT.TCanvas('c', 'c', 800, 800)
 	
 	draw_run(sample, c, fs)
+	draw_mass_electron(sample, c, fs)
 
 def get_files_from_sample(sample):
 	fs = []
@@ -50,6 +51,24 @@ def draw_run(sample, c, fs):
 	for h in hs:
 		if hs.index(h) == 0:
 			h.SetXTitle('run')
+			h.SetYTitle('Events')
+			h.SetMarkerStyle(ROOT.kFullDotLarge)
+			h.Draw()
+		else:
+			h.Draw('same')
+	leg.Draw()
+	c.SaveAs(figfile)
+
+def draw_mass_electron(sample, c, fs):
+	hname = 'h_inv_mass_electron'
+	figfile = 'doc/fig/chi2gll_mass_electron_%s.pdf' %"_".join(sample)
+	check_outfile_path(figfile)
+	leg = ROOT.TLegend(0.2, 0.71, 0.32, 0.91)
+	hs, leg = get_common_objects_to_draw(fs, hname, leg)
+
+	for h in hs:
+		if hs.index(h) == 0:
+			h.SetXTitle('mass_electron(GeV)')
 			h.SetYTitle('Events')
 			h.SetMarkerStyle(ROOT.kFullDotLarge)
 			h.Draw()

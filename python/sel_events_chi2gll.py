@@ -22,6 +22,8 @@ h_ngoodcharged = ROOT.TH1D('h_ngoodcharged', 'ngoodcharged',100, 1, 4)
 h_ngoodneutral = ROOT.TH1D('h_ngoodneutral', 'ngoodneutral',100, 1, 5)
 h_nlepton = ROOT.TH1D('h_nlepton', 'nlepton',100, 1, 5)
 h_nneutral = ROOT.TH1D('h_nneutral', 'nneutral',100, 1.5, 10)
+h_inv_mass_electron = ROOT.TH1D('h_inv_mass_electron','mass_electron(GeV)',100,0,0.001)
+#h_transverse_momentum = ROOT.TH1D('h_transverse_momentum', 'transverse_momentum',100, 0, 5)
 
 
 def main ():
@@ -36,6 +38,7 @@ def main ():
     time_start = time()
 
     for k in range(entries):
+    
         pbar.update(k+1)
         t.GetEntry(k)
         h_run.Fill(t.run)
@@ -45,9 +48,19 @@ def main ():
         h_ngoodneutral.Fill(t.ngoodneutral)
         h_nlepton.Fill(t.nlepton)
         h_nneutral.Fill(t.nneutral)
+        #h_inv_mass_electron.Fill(t.inv_mass_electron)
+        #h_transverse_momentum.Fill(t.transverse_momentum)
+
+        p4trk_lep1 = ROOT.TLorentzVector(t.p4trk[0],t.p4trk[1],t.p4trk[2],t.p4trk[3])
+        inv_mass_electron = p4trk_lep1.M()
+        h_inv_mass_electron.Fill(inv_mass_electron)
+        #transverse_momentum = p4trk_lep1.Perp()
         
-
-
+        #print(inv_mass_electron)
+        #print(transverse_momentum)
+        #print(p4trk_lep1, p4trk_lep1[0])
+        
+        
     h_run.Write()
     h_event.Write()
     h_indexmc.Write()
@@ -56,7 +69,11 @@ def main ():
     h_ngoodneutral.Write()
     h_nlepton.Write()
     h_nneutral.Write()
-    
+    h_inv_mass_electron.Write()
+    #h_transverse_momentum.Write()
+
+
+
     fout.Close()
     pbar.finish()
     dur = duration(time()-time_start)
