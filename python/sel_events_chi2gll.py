@@ -64,7 +64,6 @@ def main ():
         for elements in t.p4trk:
             print('>>>>>', t.p4trk[5])
             print('0:electron, 1:muon, 2:pion, 3:kaon, 4:proton')
-            exit()
 
         p4trk_lep1 = ROOT.TLorentzVector(t.p4trk[0],t.p4trk[1],t.p4trk[2],t.p4trk[3])
         p4trk_lep2 = ROOT.TLorentzVector(t.p4trk[10],t.p4trk[11],t.p4trk[12],t.p4trk[13])
