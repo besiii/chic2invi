@@ -1,6 +1,6 @@
 #!/bin/bash
 
-JobText_SaveDir=../../run/chic2incl/job_text/inclusiveMC
+JobText_SaveDir=../../dat/run/chic2incl/job_text/inclusiveMC
 
 for num in {1..394}
 do
@@ -11,11 +11,11 @@ do
     echo   "#include \"\$VERTEXFITROOT/share/jobOptions_VertexDbSvc.txt\" " >> ${JobText_SaveDir}/${jobOptions}
     echo   "#include \"\$MAGNETICFIELDROOT/share/MagneticField.txt\"      " >> ${JobText_SaveDir}/${jobOptions}
     echo   "#include \"\$ABSCORROOT/share/jobOptions_AbsCor.txt\"         " >> ${JobText_SaveDir}/${jobOptions}
-    echo   "#include \"\$HOME/bes/chic2invi/v0.1/run/samples/inclusiveMC/$file_list\" " >> ${JobText_SaveDir}/${jobOptions}
+    echo   "#include \"\$HOME/bes/chic2invi/v0.1/dat/run/samples/inclusiveMC/$file_list\" " >> ${JobText_SaveDir}/${jobOptions}
     echo   "                                                              " >> ${JobText_SaveDir}/${jobOptions}
     echo   "                                                              " >> ${JobText_SaveDir}/${jobOptions}
-    echo   "ApplicationMgr.DLLs += {\"Chic2invi\"};                       " >> ${JobText_SaveDir}/${jobOptions}
-    echo   "ApplicationMgr.TopAlg += { \"Chic2invi\" };                   " >> ${JobText_SaveDir}/${jobOptions}
+    echo   "ApplicationMgr.DLLs += {\"Chi2gll\"};                       " >> ${JobText_SaveDir}/${jobOptions}
+    echo   "ApplicationMgr.TopAlg += { \"Chi2gll\" };                   " >> ${JobText_SaveDir}/${jobOptions}
     echo   "                                                              " >> ${JobText_SaveDir}/${jobOptions}
     echo   "// Set output level threshold (2=DEBUG, 3=INFO, 4=WARNING, 5=ERROR, 6=FATAL ) " >> ${JobText_SaveDir}/${jobOptions}
     echo   "MessageSvc.OutputLevel = 5;                                   " >> ${JobText_SaveDir}/${jobOptions}
@@ -25,7 +25,7 @@ do
     echo   "ApplicationMgr.EvtMax = -1;                                   " >> ${JobText_SaveDir}/${jobOptions}
     echo   "                                                              " >> ${JobText_SaveDir}/${jobOptions}
     echo   "Chic2invi.IsMonteCarlo=\"true\";                             " >> ${JobText_SaveDir}/${jobOptions}
-    echo   "Chic2invi.OutputFileName=\"\$HOME/bes/chic2invi/v0.1/run/chic2incl/rootfile_inclusiveMC/$rootfile\"; " >> ${JobText_SaveDir}/${jobOptions}
+    echo   "Chic2invi.OutputFileName=\"\$HOME/bes/chic2invi/v0.1/dat/run/chic2incl/rootfile_inclusiveMC/$rootfile\"; " >> ${JobText_SaveDir}/${jobOptions}
     echo   "                                                              " >> ${JobText_SaveDir}/${jobOptions}
     echo   "                                                              " >> ${JobText_SaveDir}/${jobOptions}
 done
