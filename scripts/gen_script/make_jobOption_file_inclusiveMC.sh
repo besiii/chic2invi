@@ -24,8 +24,9 @@ do
     echo   "//ApplicationMgr.EvtMax = 5000;                               " >> ${JobText_SaveDir}/${jobOptions}
     echo   "ApplicationMgr.EvtMax = -1;                                   " >> ${JobText_SaveDir}/${jobOptions}
     echo   "                                                              " >> ${JobText_SaveDir}/${jobOptions}
-    echo   "Chic2invi.IsMonteCarlo=\"true\";                             " >> ${JobText_SaveDir}/${jobOptions}
-    echo   "Chic2invi.OutputFileName=\"\$HOME/bes/chic2invi/v0.1/dat/run/chic2incl/rootfile_inclusiveMC/$rootfile\"; " >> ${JobText_SaveDir}/${jobOptions}
+    echo   "ApplicationMgr.HistogramPersistency = \"ROOT\";               " >> ${JobText_SaveDir}/${jobOptions}
+    echo   "NTupleSvc.Output = {\"FILE1 DATAFILE='$HOME/bes/chic2invi/v0.1/dat/run/chic2incl/rootfile_inclusiveMC/$rootfile' OPT='NEW' TYP='ROOT'\"};" >> ${JobText_SaveDir}/${jobOptions}
+
     echo   "                                                              " >> ${JobText_SaveDir}/${jobOptions}
     echo   "                                                              " >> ${JobText_SaveDir}/${jobOptions}
 done

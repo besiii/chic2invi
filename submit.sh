@@ -1170,7 +1170,7 @@ case $option in
         ./dat/run/chic2incl/job_text/inclusiveMC/jobOptions_inclusive_psip_mc-0.txt"
         read opt
         if [ $opt == "yes" ]
-            then
+            then 
             echo "now in yes"  
             cd dat/run/chic2incl/job_text/inclusiveMC
             boss.exe jobOptions_inclusive_psip_mc-0.txt
@@ -1181,10 +1181,8 @@ case $option in
         ;;
 
     5.0.4) echo "Submit Condor jobs on incl MC ---- 2..."
-        cd run/chic2incl/job_text/inclusiveMC
-        find . -name "*.txt.*" | xargs rm
-        rm ../../rootfile_inclusiveMC/chic2incl_psip_mc-*
-		boss.condor -g physics -n 394 jobOptions_inclusive_psip_mc-%{ProcId}.txt
+        cd dat/run/chic2incl/job_text/inclusiveMC
+        boss.condor -g physics -n 2 jobOptions_inclusive_psip_mc-%{ProcId}.txt
         cd $HOME/bes/chic2invi/v0.1	    
         ;;
 
