@@ -91,7 +91,7 @@ usage() {
     printf "\n\t%-9s  %-40s"  "5.0.6"    "Test 1 job on incl MC event..."
     printf "\n\t%-9s  %-40s"  "5.0.7"    "Generate Condor jobs on MC event..." 
     printf "\n\t%-9s  %-40s"  "5.0.8"    "Submit Condor jobs on MC event..."
-   
+    printf "\n\t%-9s  %-40s"  "5.0.9"    "Check Condor jobs on MC event..."
     printf "\n\n" 
 
 
@@ -1090,7 +1090,7 @@ case $option in
     
     2.0.5) echo "Select events on signal MC sample..."
 
-        ./python/sel_events_chi2gll.py
+        ./python/sel_events_chi2gll.py dat.bak/chi2gll_gen_mc.root dat.bak/chi2gll_selection_001.root
 	    ;;
 
     2.0.6) echo "Drawing the Histogram on canvas for run number"
@@ -1204,24 +1204,24 @@ case $option in
         cd ../../dat/run/chic2incl/job_text/inclusiveMC_event
         chmod 755 jobOptions_chic2incl_inclusive_mc_event-*
         mv jobOptions_chic2incl_inclusive_mc_event-394.sh jobOptions_chic2incl_inclusive_mc_event-0.sh
-        cd $HOME/bes/chic2invi/v0.1	    
+        cd $HOME/bes/chic2invi/v0.1
 	   ;;
 
     5.0.8) echo "Submit Condor jobs on MC event..."
         cd dat/run/chic2incl/job_text/inclusiveMC_event
- #       hep_sub -g physics -n 394 jobOptions_chic2incl_inclusive_mc_event-%{ProcId}.sh
+        hep_sub -g physics -n 394 jobOptions_chic2incl_inclusive_mc_event-%{ProcId}.sh
 
-        hep_sub -g physics  jobOptions_chic2incl_inclusive_mc_event-1.sh
+        #hep_sub -g physics  jobOptions_chic2incl_inclusive_mc_event-1.sh
         cd $HOME/bes/chic2invi/v0.1
         ;;
+
 
     5.0.9) echo "Check Condor jobs on MC event..."
 	   ./python/chk_condorjobs.py dat/run/chic2incl/event_inclusiveMC  394
 	   ;;
 
 	5.0.10) echo  "Merge rootfile on MC event..."
-       rm dat/run/chic2incl/hist_inclusiveMC/chic2incl_psip_mc_event_merged_1.root
-	   ./python/mrg_rootfiles.py run/chic2incl/event_inclusiveMC run/chic2incl/hist_inclusiveMC
+       ./python/mrg_rootfiles.py run/chic2incl/event_inclusiveMC run/chic2incl/hist_inclusiveMC
 	   ;;
 
 

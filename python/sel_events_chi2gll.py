@@ -13,7 +13,7 @@ import sys
 import ROOT
 from progressbar import Bar, Percentage, ProgressBar
 from time import time
-from tools import duration
+from tools import duration, check_outfile_path
 
 #global histogram
 h_run = ROOT.TH1D('h_run','run',100, -27120, -25330)
@@ -39,10 +39,21 @@ h_energy_gamma2 = ROOT.TH1D('h_energy_gamma2', 'energy_gamma2', 100, 0, 1)
 
 def main ():
 
-    infile = 'dat/run/chic2incl/rootfile_inclusiveMC/chic2incl_psip_mc-1.root'
+    args = sys.argv[1:]
+
+    if (len(args) < 2):
+        print 'input error'
+
+
+
+    infile = args[0]
+    outfile = args[1]
+    check_outfile_path(outfile)
+
+    #infile = 'dat.bak/chi2gll_gen_mc.root'
     fin = ROOT.TFile(infile)
     t = fin.Get('ana')
-    outfile = 'dat/run/chic2incl/event_inclusiveMC/chic2incl_psip_mc_event-1.root'
+    #outfile = 'dat.bak/chi2gll_selection_001.root'
     fout = ROOT.TFile(outfile,"RECREATE")
     entries = t.GetEntriesFast()
     pbar = ProgressBar(widgets=[Percentage(), Bar()], maxval=entries).start()
