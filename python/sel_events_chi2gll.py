@@ -33,13 +33,16 @@ h_transverse_momentum12 = ROOT.TH1D('h_transverse_momentum12', 'transverse_momen
 h_inv_mass_gam1 = ROOT.TH1D ('h_inv_mass_gam1','inv_mass_gam1',100, -0.1, 0.1)
 h_inv_mass_gam2 = ROOT.TH1D ('h_inv_mass_gam2','inv_mass_gam2',100, -0.1, 0.1)
 h_inv_mass_chicj = ROOT.TH1D ('h_inv_mass_chicj','inv_mass_chicj',100, 0,5)
+h_rec_mass_gam12 = ROOT.TH1D('h_rec_mass_gam12', 'rec_mass_gam12',100, -0.5, 3)
+h_energy_gamma1 = ROOT.TH1D('h_energy_gamma1', 'energy_gamma1', 100, 0, 2)
+h_energy_gamma2 = ROOT.TH1D('h_energy_gamma2', 'energy_gamma2', 100, 0, 1)
 
 def main ():
 
-    infile = 'dat/chi2gll_gen_mc.root'
+    infile = 'dat/run/chic2incl/rootfile_inclusiveMC/chic2incl_psip_mc-1.root'
     fin = ROOT.TFile(infile)
     t = fin.Get('ana')
-    outfile = 'dat/chi2gll_selection_001.root'
+    outfile = 'dat/run/chic2incl/event_inclusiveMC/chic2incl_psip_mc_event-1.root'
     fout = ROOT.TFile(outfile,"RECREATE")
     entries = t.GetEntriesFast()
     pbar = ProgressBar(widgets=[Percentage(), Bar()], maxval=entries).start()
@@ -88,16 +91,26 @@ def main ():
 
         p4shw_gam1 = ROOT.TLorentzVector(t.p4shw[0],t.p4shw[1],t.p4shw[2],t.p4shw[3])
         p4shw_gam2 = ROOT.TLorentzVector(t.p4shw[4],t.p4shw[5],t.p4shw[6],t.p4shw[7])
+
+        energy_gamma1 = p4shw_gam1.E()
+        energy_gamma2 = p4shw_gam2.E()
         
+        h_energy_gamma1.Fill(energy_gamma1)
+        h_energy_gamma2.Fill(energy_gamma2)
+                
+        #mass of chicj reconstruction by adding e+ , e- and gamma from the final state
         p4_chicj = p4trk_lep12 + p4shw_gam1
         inv_mass_chicj = p4_chicj.M()
         h_inv_mass_chicj.Fill(inv_mass_chicj)
 
         inv_mass_gam1 = p4shw_gam1.M()
         inv_mass_gam2 = p4shw_gam2.M()
-
+        p4shw_gam12 = p4shw_gam1 + p4shw_gam2
+        rec_mass_gam12 = p4shw_gam12.M()
+        
         h_inv_mass_gam1.Fill(inv_mass_gam1)
         h_inv_mass_gam2.Fill(inv_mass_gam2)
+        h_rec_mass_gam12.Fill(rec_mass_gam12)
 
         #print(p4shw_gam1, p4shw_gam1[3])
         #exit()
@@ -122,7 +135,9 @@ def main ():
     h_inv_mass_gam1.Write()
     h_inv_mass_gam2.Write()
     h_inv_mass_chicj.Write()
-
+    h_rec_mass_gam12.Write()
+    h_energy_gamma1.Write()
+    h_energy_gamma2.Write()
 
     fout.Close()
     pbar.finish()

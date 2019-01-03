@@ -84,11 +84,14 @@ usage() {
 
     printf "\n\t%-9s  %-40s"  "5.0"      "[run on Inclusive MC sample]" 
     printf "\n\t%-9s  %-40s"  "5.0.1"    "Split MC sample with each group 20G"
-    printf "\n\t%-9s  %-40s"  "5.0.2"    "Submit Condor jobs on MC"
-    printf "\n\t%-9s  %-40s"  "5.0.3"    "Check Condor jobs on MC."
-    printf "\n\t%-9s  %-40s"  "5.0.4"    "Merge root file on MC."
-    printf "\n\t%-9s  %-40s"  "5.0.5"   "Select events on MC."
-
+    printf "\n\t%-9s  %-40s"  "5.0.2"    "Generate Condor jobs on inclusive MC ----1"
+    printf "\n\t%-9s  %-40s"  "5.0.3"    "Test on inclusive MC..."
+    printf "\n\t%-9s  %-40s"  "5.0.4"    "Submit Condor jobs on inclusive MC ----2"
+    printf "\n\t%-9s  %-40s"  "5.0.5"    "Check condor jobs on inclusive MC"
+    printf "\n\t%-9s  %-40s"  "5.0.6"    "Test 1 job on incl MC event..."
+    printf "\n\t%-9s  %-40s"  "5.0.7"    "Generate Condor jobs on MC event..." 
+    printf "\n\t%-9s  %-40s"  "5.0.8"    "Submit Condor jobs on MC event..."
+   
     printf "\n\n" 
 
 
@@ -1182,11 +1185,45 @@ case $option in
 
     5.0.4) echo "Submit Condor jobs on incl MC ---- 2..."
         cd dat/run/chic2incl/job_text/inclusiveMC
-        boss.condor -g physics -n 2 jobOptions_inclusive_psip_mc-%{ProcId}.txt
+        boss.condor -g physics -n 394 jobOptions_inclusive_psip_mc-%{ProcId}.txt
         cd $HOME/bes/chic2invi/v0.1	    
         ;;
 
-    
+    5.0.5) echo "Check condor jobs on inclusive MC..."
+        ./python/chk_condorjobs.py dat/run/chic2incl/rootfile_inclusiveMC 394
+        ;;
+
+    5.0.6) echo "Test 1 job on incl MC event..."
+        ./python/sel_events_chi2gll.py dat/run/chic2incl/rootfile_inclusiveMC/chic2incl_psip_mc-1.root dat/run/chic2incl/event_inclusiveMC/chic2incl_psip_mc_event-1.root  
+        ;;
+
+    5.0.7) echo "Generate Condor jobs on MC event..."
+        mkdir -p dat/run/chic2incl/job_text/inclusiveMC_event
+        cd scripts/gen_script
+        ./make_jobOption_file_inclusiveMC_event.sh
+        cd ../../dat/run/chic2incl/job_text/inclusiveMC_event
+        chmod 755 jobOptions_chic2incl_inclusive_mc_event-*
+        mv jobOptions_chic2incl_inclusive_mc_event-394.sh jobOptions_chic2incl_inclusive_mc_event-0.sh
+        cd $HOME/bes/chic2invi/v0.1	    
+	   ;;
+
+    5.0.8) echo "Submit Condor jobs on MC event..."
+        cd dat/run/chic2incl/job_text/inclusiveMC_event
+ #       hep_sub -g physics -n 394 jobOptions_chic2incl_inclusive_mc_event-%{ProcId}.sh
+
+        hep_sub -g physics  jobOptions_chic2incl_inclusive_mc_event-1.sh
+        cd $HOME/bes/chic2invi/v0.1
+        ;;
+
+    5.0.9) echo "Check Condor jobs on MC event..."
+	   ./python/chk_condorjobs.py dat/run/chic2incl/event_inclusiveMC  394
+	   ;;
+
+	5.0.10) echo  "Merge rootfile on MC event..."
+       rm dat/run/chic2incl/hist_inclusiveMC/chic2incl_psip_mc_event_merged_1.root
+	   ./python/mrg_rootfiles.py run/chic2incl/event_inclusiveMC run/chic2incl/hist_inclusiveMC
+	   ;;
+
 
 
 esac
