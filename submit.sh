@@ -1221,7 +1221,8 @@ case $option in
 	   ;;
 
 	5.0.10) echo  "Merge rootfile on MC event..."
-       ./python/mrg_rootfiles.py run/chic2incl/event_inclusiveMC run/chic2incl/hist_inclusiveMC
+        rm dat/run/chic2incl/hist_inclusiveMC/chic2incl_psip_mc_event_merged_1.root
+       ./python/mrg_rootfiles.py dat/run/chic2incl/event_inclusiveMC dat/run/chic2incl/hist_inclusiveMC
 	   ;;
 
 
