@@ -3,9 +3,9 @@
 Generate plots
 """
 
-__author__ = "XIAO Suyu <xiaosuyu@ihep.ac.cn>"
-__copyright__ = "Copyright (c) XIAO Suyu"
-__created__ = "[2018-02-27 Tue 15:49]"
+__author__ = "AMIT PATHAK <amit@ihep.ac.cn>"
+__copyright__ = "Copyright (c) AMIT PATHAK"
+__created__ = "[2019-01-08 Tue 15:00]"
 
 import ROOT
 from ROOT import gStyle, TCanvas, TString, TChain, TStyle
@@ -23,44 +23,43 @@ mbc.SetTopMargin(0.1)
 mbc.SetBottomMargin(0.15)
 
 xmin = 0.0
-xmax = 0.4
-xbins = 100.0
+xmax = 5.0
+xbins = 500.0
 ytitle = "Events/%dMeV" %((xmax - xmin) / xbins * 1000.0)
 
-f0 = TFile("scripts/chic0_invi/event_chic0/chic0_gam2invi_gen_mc_event_nveto.root")
-f1 = TFile("scripts/chic1_invi/event_chic1/chic1_gam2invi_gen_mc_event_nveto.root")
-f2 = TFile("scripts/chic2_invi/event_chic2/chic2_gam2invi_gen_mc_event_nveto.root")
-#h0_E = f0.Get('h_gam1_E')
-#h1_E = f1.Get('h_gam1_E')
-#h2_E = f2.Get('h_gam1_E')
-h0_E = f0.Get('h_mrec_gam1')
-h1_E = f1.Get('h_mrec_gam1')
-h2_E = f2.Get('h_mrec_gam1')
+f0 = TFile("doc/fig/chi2gll_selection_001.root")
+f1 = TFile("doc/fig/chic2incl_psip_mc_event_merged_1.root")
+
+
+h0_E = f0.Get('h_inv_mass_chicj')
+h1_E = f1.Get('h_inv_mass_chicj')
+
+h0_E.Scale(1.0/h0_E.Integral())
+h1_E.Scale(1.0/h1_E.Integral())
 
 h0_E.SetLineColor(ROOT.kRed)
 h1_E.SetLineColor(ROOT.kBlue)
-h2_E.SetLineColor(ROOT.kMagenta)
+
 h0_E.SetLineWidth(2)
 h1_E.SetLineWidth(2)
-h2_E.SetLineWidth(2)
-h2_E.Draw()
+h1_E.Draw()
+h0_E.Draw()
 h1_E.Draw("same")
 h0_E.Draw("same")
-#h2_E.GetXaxis().SetTitle("E_{#gamma1} (GeV)")
-h2_E.GetXaxis().SetTitle("mrec_{#gamma1} (GeV/c^{2})")
-h2_E.GetYaxis().SetTitle(ytitle)
-h2_E.GetYaxis().SetTitleOffset(1.5)
-h2_E.SetMaximum(1200)
+h1_E.GetXaxis().SetTitle("inv_mass_{#chi_{cJ}} (GeV/c^{2})")
+h1_E.GetYaxis().SetTitle(ytitle)
+h1_E.GetYaxis().SetTitleOffset(1.5)
+h1_E.SetMaximum(2400)
 
 legend = TLegend(0.65, 0.6, 0.82, 0.8)
-legend.AddEntry(h0_E,'#gamma_{1} with #chi_{c0}')
-legend.AddEntry(h1_E,'#gamma_{1} with #chi_{c1}')
-legend.AddEntry(h2_E,'#gamma_{1} with #chi_{c2}')
+legend.AddEntry(h0_E,'inv_mass of #chi_{cJ}')
+legend.AddEntry(h1_E,'inv_mass of #chi_{cJ}')
 
-#legend.SetNColums(1)
+
+
+
 legend.SetBorderSize(0)
 legend.SetFillColor(0)
 legend.Draw()
-#mbc.SaveAs("python/plots/egam1_signal.pdf")
-mbc.SaveAs("python/plots/mrecgam1_signal.pdf")
+mbc.SaveAs("dat/run/plots/mass_chicj_signal.pdf")
 

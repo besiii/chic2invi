@@ -92,6 +92,9 @@ usage() {
     printf "\n\t%-9s  %-40s"  "5.0.7"    "Generate Condor jobs on MC event..." 
     printf "\n\t%-9s  %-40s"  "5.0.8"    "Submit Condor jobs on MC event..."
     printf "\n\t%-9s  %-40s"  "5.0.9"    "Check Condor jobs on MC event..."
+    printf "\n\t%-9s  %-40s"  "5.0.10"    "Merge rootfile on MC event..."
+    printf "\n\t%-9s  %-40s"  "5.0.11"    "Generate plots of signal and inclusive MC samples"
+
     printf "\n\n" 
 
 
@@ -1116,6 +1119,7 @@ case $option in
         boss.condor -g physics jobOptions_chicj2gamgam_gen_mc.txt
         ;;
     
+    
 4.0) echo "[run on data for psi(2S)-- 2012]"
 	 ;;
 
@@ -1225,6 +1229,9 @@ case $option in
        ./python/mrg_rootfiles.py dat/run/chic2incl/event_inclusiveMC dat/run/chic2incl/hist_inclusiveMC
 	   ;;
 
+    5.0.11) echo "Generate plots of signal and inclusive MC samples"
+        ./python/plot_signal.py 
+        ;;
 
 
 esac
