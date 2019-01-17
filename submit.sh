@@ -67,7 +67,11 @@ usage() {
     printf "\n\t%-9s  %-40s"  "2.0.1"    "Generate -- 6000 chic02ee MC signal..."
     printf "\n\t%-9s  %-40s"  "2.0.2"    "Reconstruction -- 6000 chic02ee MC signal..."
     printf "\n\t%-9s  %-40s"  "2.0.3"    "Preselection of the events and generate root file"
-    
+    printf "\n\t%-9s  %-40s"  "2.0.4"    "Preselection of the events and generate root file with Kai's code.."
+    printf "\n\t%-9s  %-40s"  "2.0.5"    "Select events on signal MC sample..."
+    printf "\n\t%-9s  %-40s"  "2.0.6"    "Drawing on canvas for run number"
+
+
     printf "\n\t%-9s  %-40s"  "3.0"      "[run on chicj2gamgam for peaking background]"
     printf "\n\t%-9s  %-40s"  "3.0.1"    "Generate -- 6000 chicj2gamgam MC signal for peaking background..."
     printf "\n\t%-9s  %-40s"  "3.0.2"    "Reconstruction -- 6000 chicj2gamgam MC signal..."
@@ -77,6 +81,19 @@ usage() {
     printf "\n\t%-9s  %-40s"  "4.0.1"    "Generate Condor jobs on data 2012 ---- 1..."  
     printf "\n\t%-9s  %-40s"  "4.0.2"    "Test on Data 2012..."
     printf "\n\t%-9s  %-40s"  "4.0.3"    "Submit Condor jobs on data 2012 ---- 2..."
+
+    printf "\n\t%-9s  %-40s"  "5.0"      "[run on Inclusive MC sample]" 
+    printf "\n\t%-9s  %-40s"  "5.0.1"    "Split MC sample with each group 20G"
+    printf "\n\t%-9s  %-40s"  "5.0.2"    "Generate Condor jobs on inclusive MC ----1"
+    printf "\n\t%-9s  %-40s"  "5.0.3"    "Test on inclusive MC..."
+    printf "\n\t%-9s  %-40s"  "5.0.4"    "Submit Condor jobs on inclusive MC ----2"
+    printf "\n\t%-9s  %-40s"  "5.0.5"    "Check condor jobs on inclusive MC"
+    printf "\n\t%-9s  %-40s"  "5.0.6"    "Test 1 job on incl MC event..."
+    printf "\n\t%-9s  %-40s"  "5.0.7"    "Generate Condor jobs on MC event..." 
+    printf "\n\t%-9s  %-40s"  "5.0.8"    "Submit Condor jobs on MC event..."
+    printf "\n\t%-9s  %-40s"  "5.0.9"    "Check Condor jobs on MC event..."
+    printf "\n\t%-9s  %-40s"  "5.0.10"    "Merge rootfile on MC event..."
+    printf "\n\t%-9s  %-40s"  "5.0.11"    "Generate plots of signal and inclusive MC samples"
 
     printf "\n\n" 
 
@@ -1068,6 +1085,22 @@ case $option in
 	    boss.condor -g physics jobOptions_chic02ee_gen_mc.txt
         ;;
 
+    2.0.4) echo "Preselection of the events and generate root file with Kai's code with 10 events..."
+        
+	cd scripts/chic02ee/jobs_chic0 
+	boss.exe  jobOptions_chi2gll_gen_mc.txt
+         ;;
+    
+    2.0.5) echo "Select events on signal MC sample..."
+
+        ./python/sel_events_chi2gll.py dat.bak/chi2gll_gen_mc.root dat.bak/chi2gll_selection_001.root
+	    ;;
+
+    2.0.6) echo "Drawing the Histogram on canvas for run number"
+        ./python/plt_summary_chi2gll.py chi2gll 
+        ;;
+
+
 3.0) echo "[run on signal MC--chicj2gamgam for the study of peaking background]"
 	 ;;
 
@@ -1085,6 +1118,7 @@ case $option in
         cd scripts/chicj2gamgam/jobs_chicj2gamgam
         boss.condor -g physics jobOptions_chicj2gamgam_gen_mc.txt
         ;;
+    
     
 4.0) echo "[run on data for psi(2S)-- 2012]"
 	 ;;
@@ -1122,7 +1156,82 @@ case $option in
         cd $HOME/bes/chic2invi/v0.1
         ;;
 
+5.0) echo "Running on Inclusive MC sample..."
+	 ;;
 
+    5.0.1) echo "Split MC sample with each group 20G ..."
+	   ./python/get_samples.py  /bes3fs/offline/data/664p03/psip/12mc/dst dat/run/samples/inclusiveMC/mc_664p03_psip_12mc.txt 20G
+	   # made 394 groups 
+	   ;;
+
+    5.0.2) echo "Generate Condor jobs on incl MC ---- 1..."
+	    cd scripts/gen_script
+		./make_jobOption_file_inclusiveMC.sh
+		cd ../../dat/run/chic2incl/job_text/inclusiveMC
+        mv jobOptions_inclusive_psip_mc-394.txt jobOptions_inclusive_psip_mc-0.txt       
+        cd $HOME/bes/chic2invi/v0.1	 
+        ;;   
+
+    5.0.3) echo "Test on incl MC..."
+        echo "have you changed test number?(yes / NO)
+        ./dat/run/chic2incl/job_text/inclusiveMC/jobOptions_inclusive_psip_mc-0.txt"
+        read opt
+        if [ $opt == "yes" ]
+            then 
+            echo "now in yes"  
+            cd dat/run/chic2incl/job_text/inclusiveMC
+            boss.exe jobOptions_inclusive_psip_mc-0.txt
+            cd $HOME/bes/chic2invi/v0.1
+        else
+            echo "Default value is 'NO', please change test number."
+        fi
+        ;;
+
+    5.0.4) echo "Submit Condor jobs on incl MC ---- 2..."
+        cd dat/run/chic2incl/job_text/inclusiveMC
+        boss.condor -g physics -n 394 jobOptions_inclusive_psip_mc-%{ProcId}.txt
+        cd $HOME/bes/chic2invi/v0.1	    
+        ;;
+
+    5.0.5) echo "Check condor jobs on inclusive MC..."
+        ./python/chk_condorjobs.py dat/run/chic2incl/rootfile_inclusiveMC 394
+        ;;
+
+    5.0.6) echo "Test 1 job on incl MC event..."
+        ./python/sel_events_chi2gll.py dat/run/chic2incl/rootfile_inclusiveMC/chic2incl_psip_mc-1.root dat/run/chic2incl/event_inclusiveMC/chic2incl_psip_mc_event-1.root  
+        ;;
+
+    5.0.7) echo "Generate Condor jobs on MC event..."
+        mkdir -p dat/run/chic2incl/job_text/inclusiveMC_event
+        cd scripts/gen_script
+        ./make_jobOption_file_inclusiveMC_event.sh
+        cd ../../dat/run/chic2incl/job_text/inclusiveMC_event
+        chmod 755 jobOptions_chic2incl_inclusive_mc_event-*
+        mv jobOptions_chic2incl_inclusive_mc_event-394.sh jobOptions_chic2incl_inclusive_mc_event-0.sh
+        cd $HOME/bes/chic2invi/v0.1
+	   ;;
+
+    5.0.8) echo "Submit Condor jobs on MC event..."
+        cd dat/run/chic2incl/job_text/inclusiveMC_event
+        hep_sub -g physics -n 394 jobOptions_chic2incl_inclusive_mc_event-%{ProcId}.sh
+
+        #hep_sub -g physics  jobOptions_chic2incl_inclusive_mc_event-1.sh
+        cd $HOME/bes/chic2invi/v0.1
+        ;;
+
+
+    5.0.9) echo "Check Condor jobs on MC event..."
+	   ./python/chk_condorjobs.py dat/run/chic2incl/event_inclusiveMC  394
+	   ;;
+
+	5.0.10) echo  "Merge rootfile on MC event..."
+        rm dat/run/chic2incl/hist_inclusiveMC/chic2incl_psip_mc_event_merged_1.root
+       ./python/mrg_rootfiles.py dat/run/chic2incl/event_inclusiveMC dat/run/chic2incl/hist_inclusiveMC
+	   ;;
+
+    5.0.11) echo "Generate plots of signal and inclusive MC samples"
+        ./python/plot_signal.py 
+        ;;
 
 
 esac
