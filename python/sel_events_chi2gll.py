@@ -32,7 +32,7 @@ h_transverse_momentum2 = ROOT.TH1D('h_transverse_momentum2', 'transverse_momentu
 h_transverse_momentum12 = ROOT.TH1D('h_transverse_momentum12', 'transverse_momentum12',100, -1, 2)
 h_inv_mass_gam1 = ROOT.TH1D ('h_inv_mass_gam1','inv_mass_gam1',100, -0.1, 0.1)
 h_inv_mass_gam2 = ROOT.TH1D ('h_inv_mass_gam2','inv_mass_gam2',100, -0.1, 0.1)
-h_inv_mass_chicj = ROOT.TH1D ('h_inv_mass_chicj','inv_mass_chicj',100, 0,5)
+h_inv_mass_chicj = ROOT.TH1D ('h_inv_mass_chicj','inv_mass_chicj',50, 3.0,3.6)
 h_rec_mass_gam12 = ROOT.TH1D('h_rec_mass_gam12', 'rec_mass_gam12',100, -0.5, 3)
 h_energy_gamma1 = ROOT.TH1D('h_energy_gamma1', 'energy_gamma1', 100, 0, 2)
 h_energy_gamma2 = ROOT.TH1D('h_energy_gamma2', 'energy_gamma2', 100, 0, 1)
@@ -63,8 +63,8 @@ def main ():
     
         pbar.update(k+1)
         t.GetEntry(k)
-        #if not (t.ncharged == 2 and t.ngoodcharged == 2 and t.nlepton == 2):
-            #continue
+        if not (t.ncharged == 2 and t.ngoodcharged == 2 and t.nlepton == 2 and t.nneutral == 2 and t.ngoodneutral == 2):
+            continue
         h_run.Fill(t.run)
         h_event.Fill(t.event)
         h_ncharged.Fill(t.ncharged)
@@ -82,6 +82,8 @@ def main ():
         p4trk_lep1 = ROOT.TLorentzVector(t.p4trk[0],t.p4trk[1],t.p4trk[2],t.p4trk[3])
         p4trk_lep2 = ROOT.TLorentzVector(t.p4trk[10],t.p4trk[11],t.p4trk[12],t.p4trk[13])
         p4trk_lep12 = p4trk_lep1 + p4trk_lep2
+
+        cut_jpsi = (p4trk_lep12.M()<3.0 or p4trk_lep12.M()>3.2)
 
         inv_mass_electron1 = p4trk_lep1.M()
         inv_mass_electron2 = p4trk_lep2.M()
@@ -126,8 +128,7 @@ def main ():
         #print(p4shw_gam1, p4shw_gam1[3])
         #exit()
 
-        #print(p4trk_lep1, p4trk_lep1[0])
-        
+         
         
     h_run.Write()
     h_event.Write()

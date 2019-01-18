@@ -1069,34 +1069,36 @@ case $option in
 	 ;;
 
     2.0.1) echo "simulation --6000 signal MC sample chic02ee events..."
+        
         cd scripts/chic02ee/jobs_chic0
         boss.condor -g physics jobOptions_sim_chic02ee.txt
         ;;
     
     2.0.2) echo "reconstruction -- generate 6000 signal MC sample..."
             
-	cd scripts/chic02ee/jobs_chic0
+	    cd scripts/chic02ee/jobs_chic0
         boss.condor -g physics jobOptions_rec_chic02ee.txt
         ;;
 
     2.0.3) echo "Preselection for 6000 events -- generate root file..."
 	
-	cd scripts/chic02ee/jobs_chic0
+	    cd scripts/chic02ee/jobs_chic0
 	    boss.condor -g physics jobOptions_chic02ee_gen_mc.txt
         ;;
 
     2.0.4) echo "Preselection of the events and generate root file with Kai's code with 10 events..."
         
-	cd scripts/chic02ee/jobs_chic0 
-	boss.exe  jobOptions_chi2gll_gen_mc.txt
-         ;;
+	    cd scripts/chic02ee/jobs_chic0 
+	    boss.condor  jobOptions_chi2gll_gen_mc.txt
+        ;;
     
     2.0.5) echo "Select events on signal MC sample..."
 
-        ./python/sel_events_chi2gll.py dat.bak/chi2gll_gen_mc.root dat.bak/chi2gll_selection_001.root
+        ./python/sel_events_chi2gll.py scripts/chic02ee/rootfile_chic02ee/chi2gll_gen_mc.root scripts/chic02ee/rootfile_chic02ee/chi2gll_selection_001.root
 	    ;;
 
     2.0.6) echo "Drawing the Histogram on canvas for run number"
+        
         ./python/plt_summary_chi2gll.py chi2gll 
         ;;
 
@@ -1131,7 +1133,7 @@ case $option in
         ;;
 
    
-     4.0.2) echo "Test on data 2012..."
+    4.0.2) echo "Test on data 2012..."
         echo "have you changed test number?(yes / NO)
         ./Analysis/Physics/Chic2invi/JpsdarkUeta/JpsdarkUeta-00-00-02/run/data/jobOptions_inclusive_psip_data-0.txt"
         read opt
@@ -1215,7 +1217,6 @@ case $option in
         cd dat/run/chic2incl/job_text/inclusiveMC_event
         hep_sub -g physics -n 394 jobOptions_chic2incl_inclusive_mc_event-%{ProcId}.sh
 
-        #hep_sub -g physics  jobOptions_chic2incl_inclusive_mc_event-1.sh
         cd $HOME/bes/chic2invi/v0.1
         ;;
 
