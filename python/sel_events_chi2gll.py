@@ -15,6 +15,8 @@ from progressbar import Bar, Percentage, ProgressBar
 from time import time
 from tools import duration, check_outfile_path
 
+MCHICJ = 3.414 #GeV
+
 #global histogram
 h_run = ROOT.TH1D('h_run','run',100, -27120, -25330)
 h_event = ROOT.TH1D('h_event', 'event', 100, 0, 20 )
@@ -117,9 +119,14 @@ def main ():
         inv_mass_chicj1 = p4_chicj1.M()
         inv_mass_chicj2 = p4_chicj2.M()
 
-        h_inv_mass_chicj1.Fill(inv_mass_chicj1)
-        h_inv_mass_chicj2.Fill(inv_mass_chicj2)
-
+        if ((inv_mass_chicj2 - MCHICJ) < (inv_mass_chicj1 - MCHICJ)):
+            #print(inv_mass_chicj1, "gamma1 is more energetic")
+            h_inv_mass_chicj1.Fill(inv_mass_chicj1)
+        else:
+            #print(inv_mass_chicj2, "gamma2 is more energetic")
+        #exit()
+            h_inv_mass_chicj2.Fill(inv_mass_chicj2)
+        
         inv_mass_gam1 = p4shw_gam1.M()
         inv_mass_gam2 = p4shw_gam2.M()
         p4shw_gam12 = p4shw_gam1 + p4shw_gam2
