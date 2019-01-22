@@ -57,8 +57,6 @@ legend.AddEntry(h0_E,'inv_mass of #chi_{cJ}')
 legend.AddEntry(h1_E,'inv_mass of #chi_{cJ}')
 
 
-
-
 legend.SetBorderSize(0)
 legend.SetFillColor(0)
 legend.Draw()

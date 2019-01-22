@@ -32,7 +32,8 @@ h_transverse_momentum2 = ROOT.TH1D('h_transverse_momentum2', 'transverse_momentu
 h_transverse_momentum12 = ROOT.TH1D('h_transverse_momentum12', 'transverse_momentum12',100, -1, 2)
 h_inv_mass_gam1 = ROOT.TH1D ('h_inv_mass_gam1','inv_mass_gam1',100, -0.1, 0.1)
 h_inv_mass_gam2 = ROOT.TH1D ('h_inv_mass_gam2','inv_mass_gam2',100, -0.1, 0.1)
-h_inv_mass_chicj = ROOT.TH1D ('h_inv_mass_chicj','inv_mass_chicj',50, 3.0,3.6)
+h_inv_mass_chicj1 = ROOT.TH1D ('h_inv_mass_chicj1','inv_mass_chicj1',30, 0.0,4.0)
+h_inv_mass_chicj2 = ROOT.TH1D ('h_inv_mass_chicj2','inv_mass_chicj2',30, 0.0,4.0)
 h_rec_mass_gam12 = ROOT.TH1D('h_rec_mass_gam12', 'rec_mass_gam12',100, -0.5, 3)
 h_energy_gamma1 = ROOT.TH1D('h_energy_gamma1', 'energy_gamma1', 100, 0, 2)
 h_energy_gamma2 = ROOT.TH1D('h_energy_gamma2', 'energy_gamma2', 100, 0, 1)
@@ -43,7 +44,6 @@ def main ():
 
     if (len(args) < 2):
         print 'input error'
-
 
 
     infile = args[0]
@@ -111,10 +111,14 @@ def main ():
         h_energy_gamma1.Fill(energy_gamma1)
         h_energy_gamma2.Fill(energy_gamma2)
                 
-        #mass of chicj reconstruction by adding e+ , e- and gamma from the final state
-        p4_chicj = p4trk_lep12 + p4shw_gam1
-        inv_mass_chicj = p4_chicj.M()
-        h_inv_mass_chicj.Fill(inv_mass_chicj)
+        #mass of chicj reconstructed by adding e+ , e- and gamma from the final state
+        p4_chicj1 = p4trk_lep12 + p4shw_gam1
+        p4_chicj2 = p4trk_lep12 + p4shw_gam2
+        inv_mass_chicj1 = p4_chicj1.M()
+        inv_mass_chicj2 = p4_chicj2.M()
+
+        h_inv_mass_chicj1.Fill(inv_mass_chicj1)
+        h_inv_mass_chicj2.Fill(inv_mass_chicj2)
 
         inv_mass_gam1 = p4shw_gam1.M()
         inv_mass_gam2 = p4shw_gam2.M()
@@ -146,7 +150,8 @@ def main ():
     h_transverse_momentum12.Write()
     h_inv_mass_gam1.Write()
     h_inv_mass_gam2.Write()
-    h_inv_mass_chicj.Write()
+    h_inv_mass_chicj1.Write()
+    h_inv_mass_chicj2.Write()
     h_rec_mass_gam12.Write()
     h_energy_gamma1.Write()
     h_energy_gamma2.Write()
