@@ -16,6 +16,7 @@ from time import time
 from tools import duration, check_outfile_path
 
 MCHICJ = 3.414 #GeV
+ECMS = 3.686
 
 #global histogram
 h_run = ROOT.TH1D('h_run','run',100, -27120, -25330)
@@ -34,9 +35,9 @@ h_transverse_momentum2 = ROOT.TH1D('h_transverse_momentum2', 'transverse_momentu
 h_transverse_momentum12 = ROOT.TH1D('h_transverse_momentum12', 'transverse_momentum12',100, -1, 2)
 h_inv_mass_gam1 = ROOT.TH1D ('h_inv_mass_gam1','inv_mass_gam1',100, -0.1, 0.1)
 h_inv_mass_gam2 = ROOT.TH1D ('h_inv_mass_gam2','inv_mass_gam2',100, -0.1, 0.1)
-h_inv_mass_chicj1 = ROOT.TH1D ('h_inv_mass_chicj1','inv_mass_chicj1',30, 0.0,4.0)
-h_inv_mass_chicj2 = ROOT.TH1D ('h_inv_mass_chicj2','inv_mass_chicj2',30, 0.0,4.0)
-h_rec_mass_gam12 = ROOT.TH1D('h_rec_mass_gam12', 'rec_mass_gam12',100, -0.5, 3)
+h_inv_mass_chicj1 = ROOT.TH1D ('h_inv_mass_chicj1','inv_mass_chicj1',70, 3.0,3.7)
+h_inv_mass_chicj2 = ROOT.TH1D ('h_inv_mass_chicj2','inv_mass_chicj2',70, 3.0,3.7)
+h_rec_mass_gam12 = ROOT.TH1D('h_rec_mass_gam12', 'rec_mass_gam12',50, -1.0, 4)
 h_energy_gamma1 = ROOT.TH1D('h_energy_gamma1', 'energy_gamma1', 100, 0, 2)
 h_energy_gamma2 = ROOT.TH1D('h_energy_gamma2', 'energy_gamma2', 100, 0, 1)
 
@@ -61,6 +62,7 @@ def main ():
     pbar = ProgressBar(widgets=[Percentage(), Bar()], maxval=entries).start()
     time_start = time()
 
+    cms_p4 = ROOT.TLorentzVector(0.011*ECMS, 0, 0, ECMS)
     for k in range(entries):
     
         pbar.update(k+1)
@@ -130,7 +132,10 @@ def main ():
         inv_mass_gam1 = p4shw_gam1.M()
         inv_mass_gam2 = p4shw_gam2.M()
         p4shw_gam12 = p4shw_gam1 + p4shw_gam2
-        rec_mass_gam12 = p4shw_gam12.M()
+
+        rec_gams_p4_raw = cms_p4 - p4shw_gam12
+
+        rec_mass_gam12 = rec_gams_p4_raw.M()
         
         h_inv_mass_gam1.Fill(inv_mass_gam1)
         h_inv_mass_gam2.Fill(inv_mass_gam2)
