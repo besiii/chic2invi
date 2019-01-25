@@ -33,10 +33,10 @@ h_inv_mass_electron12 = ROOT.TH1D('h_inv_mass_electron12', 'mass_electron12(GeV)
 h_transverse_momentum1 = ROOT.TH1D('h_transverse_momentum1', 'transverse_momentum1',100, -1, 2)
 h_transverse_momentum2 = ROOT.TH1D('h_transverse_momentum2', 'transverse_momentum2',100, -1, 2)
 h_transverse_momentum12 = ROOT.TH1D('h_transverse_momentum12', 'transverse_momentum12',100, -1, 2)
-h_inv_mass_gam1 = ROOT.TH1D ('h_inv_mass_gam1','inv_mass_gam1',100, -0.1, 0.1)
-h_inv_mass_gam2 = ROOT.TH1D ('h_inv_mass_gam2','inv_mass_gam2',100, -0.1, 0.1)
-h_inv_mass_chicj1 = ROOT.TH1D ('h_inv_mass_chicj1','inv_mass_chicj1',70, 3.0,3.7)
-h_inv_mass_chicj2 = ROOT.TH1D ('h_inv_mass_chicj2','inv_mass_chicj2',70, 3.0,3.7)
+h_inv_mass_gam1 = ROOT.TH1D ('h_rec_mass_gam1','rec_mass_gam1',100, 0, 3.7)
+h_inv_mass_gam2 = ROOT.TH1D ('h_rec_mass_gam2','rec_mass_gam2',80, 3.3, 3.7)
+h_inv_mass_chicj1 = ROOT.TH1D ('h_inv_mass_chicj1','inv_mass_chicj1',70, 3, 3.7)
+h_inv_mass_chicj2 = ROOT.TH1D ('h_inv_mass_chicj2','inv_mass_chicj2',100, 0,3.7)
 h_rec_mass_gam12 = ROOT.TH1D('h_rec_mass_gam12', 'rec_mass_gam12',50, -1.0, 4)
 h_energy_gamma1 = ROOT.TH1D('h_energy_gamma1', 'energy_gamma1', 100, 0, 2)
 h_energy_gamma2 = ROOT.TH1D('h_energy_gamma2', 'energy_gamma2', 100, 0, 1)
@@ -118,19 +118,27 @@ def main ():
         #mass of chicj reconstructed by adding e+ , e- and gamma from the final state
         p4_chicj1 = p4trk_lep12 + p4shw_gam1
         p4_chicj2 = p4trk_lep12 + p4shw_gam2
+
         inv_mass_chicj1 = p4_chicj1.M()
         inv_mass_chicj2 = p4_chicj2.M()
 
-        if ((inv_mass_chicj2 - MCHICJ) < (inv_mass_chicj1 - MCHICJ)):
+        #if ((inv_mass_chicj2 - MCHICJ) < (inv_mass_chicj1 - MCHICJ)):
             #print(inv_mass_chicj1, "gamma1 is more energetic")
-            h_inv_mass_chicj1.Fill(inv_mass_chicj1)
-        else:
+        h_inv_mass_chicj1.Fill(inv_mass_chicj1)
+        #else:
             #print(inv_mass_chicj2, "gamma2 is more energetic")
         #exit()
-            h_inv_mass_chicj2.Fill(inv_mass_chicj2)
-        
-        inv_mass_gam1 = p4shw_gam1.M()
-        inv_mass_gam2 = p4shw_gam2.M()
+        h_inv_mass_chicj2.Fill(inv_mass_chicj2)
+            
+        p4_shw_gam1 = cms_p4 - p4shw_gam1
+        p4_shw_gam2 = cms_p4 - p4shw_gam2
+
+        inv_mass_gam1 = p4_shw_gam1.M()
+        inv_mass_gam2 = p4_shw_gam2.M()
+        #print(inv_mass_gam1)
+        #print(inv_mass_gam2)
+        #exit()
+
         p4shw_gam12 = p4shw_gam1 + p4shw_gam2
 
         rec_gams_p4_raw = cms_p4 - p4shw_gam12
