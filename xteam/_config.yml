@@ -1,0 +1,54 @@
+name: "X-Team"
+title: "X-Team"
+description: "X-Team Home Page"
+
+encoding: utf-8
+timezone: Asia/Shanghai
+
+collections:
+  research:
+    permalink: /research/:path/
+    output: true
+
+  members:
+    permalink: /members/:path/
+    output: true
+ 
+  docs:
+    permalink: /docs/:path/
+    output: true
+
+  posts:
+    permalink: "/news/:year/:month/:day/:title/"
+    output: true
+
+defaults:
+  - scope:
+      path: _research
+      type: research
+    values:
+      layout: research 
+  - scope:
+      path: _members
+      type: members
+    values:
+      layout: members 
+  - scope:
+      path: _docs
+      type: docs
+    values:
+      layout: docs 
+  - scope:
+      path: _posts
+      type: posts
+    values:
+      layout: news_item
+plugins:
+  - jekyll-avatar
+sass:
+  style: compressed
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md

@@ -1,0 +1,15 @@
+- title: Getting Started
+  pages: 
+  - quickstart 
+  - rule
+  
+- title: Computing
+  pages:
+    - git
+    - mac
+    - vsc
+
+- title: Activities
+  pages: 
+    - journalclub
+    - puertorico
